@@ -118,7 +118,8 @@ class MandamientoController extends Controller
      */
     public function create()
     {
-        //
+        $mandamientos = new Mandamiento();
+        return view('mandamientos.formulario', compact('mandamientos'));
     }
 
     /**

@@ -11,9 +11,9 @@
                         <i class="ri-file-list-line align-middle me-1"></i> Listado de Mandamientos
                     </h5>
                     <div class="flex-shrink-0">
-                        <a href="{{ route('mandamientos.create') }}" class="btn btn-primary">
+                        <button value="{{ route('mandamientos.create') }}" class="btn btn-primary openModal" >
                             <i class="ri-add-line align-middle me-1"></i> Nuevo Mandamiento
-                        </a>
+                        </button>
                     </div>
                 </div>
                 <div class="card-body">
@@ -44,36 +44,30 @@
         </div>
     </div>
 
+
+
     <!-- Modal de confirmación de eliminación -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+    <div class="modal fade" id="miModal" tabindex="-1" aria-labelledby="miModal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Confirmar Eliminación</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ¿Está seguro que desea eliminar este mandamiento? Esta acción no se puede deshacer.
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="button" class="btn btn-danger" id="confirmDelete">Eliminar</button>
-                </div>
+
             </div>
         </div>
     </div>
+
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#miModal" id="openDeleteModal"
+       >
+        Abrir Modal
+    </button>
 @endsection
 
 @section('title', 'Listado de Mandamientos')
 
 @section('css')
     <!-- DataTables CSS -->
-    <link href="{{ url('/assets/libs/datatables/dataTables.bootstrap5.css') }}" rel="stylesheet"
-        type="text/css" />
-    <link href="{{ url('/assets/libs/datatables/responsive.bootstrap5.css') }}" rel="stylesheet"
-        type="text/css" />
-    <link href="{{ url('/assets/libs/datatables/buttons.bootstrap5.css') }}" rel="stylesheet"
-        type="text/css" />
+    <link href="{{ url('/assets/libs/datatables/dataTables.bootstrap5.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ url('/assets/libs/datatables/responsive.bootstrap5.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ url('/assets/libs/datatables/buttons.bootstrap5.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 
 @section('page-title', 'Mandamientos de Aprehensión')

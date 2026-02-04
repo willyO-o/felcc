@@ -3,7 +3,7 @@
  * Sistema de Gestión de Mandamientos de Aprehensión - FELCC
  */
 
-(function() {
+(function () {
     'use strict';
 
     console.log('Inicializando DataTable de Mandamientos');
@@ -14,7 +14,7 @@
     /**
      * Inicializar cuando el DOM esté listo
      */
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         initDataTable();
         initDeleteModal();
     });
@@ -30,7 +30,7 @@
             ajax: {
                 url: window.location.href,
                 type: 'GET',
-                error: function(xhr, error, code) {
+                error: function (xhr, error, code) {
                     console.error('Error en DataTables:', error);
                     showAlert('Error al cargar los datos', 'error');
                 }
@@ -118,7 +118,7 @@
             dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>rt<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
             responsive: true,
             autoWidth: false,
-            drawCallback: function() {
+            drawCallback: function () {
                 // Re-inicializar eventos de eliminación después de cada redibujado
                 initDeleteButtons();
             }
@@ -129,7 +129,7 @@
      * Inicializar botones de eliminación
      */
     function initDeleteButtons() {
-        $('.btn-delete').off('click').on('click', function() {
+        $('.btn-delete').off('click').on('click', function () {
             deleteId = $(this).data('id');
             const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
             deleteModal.show();
@@ -140,7 +140,7 @@
      * Inicializar modal de eliminación
      */
     function initDeleteModal() {
-        $('#confirmDelete').on('click', function() {
+        $('#confirmDelete').on('click', function () {
             if (deleteId) {
                 deleteMandamiento(deleteId);
             }
@@ -162,34 +162,34 @@
                 'Accept': 'application/json'
             }
         })
-        .then(response => response.json())
-        .then(data => {
-            // Cerrar modal
-            const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
-            deleteModal.hide();
-
-            if (data.success) {
-                showAlert(data.message || 'Mandamiento eliminado correctamente', 'success');
-                // Recargar la tabla
-                mandamientosTable.ajax.reload(null, false);
-            } else {
-                showAlert(data.message || 'Error al eliminar el mandamiento', 'error');
-            }
-
-            deleteId = null;
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            showAlert('Error al eliminar el mandamiento', 'error');
-
-            // Cerrar modal
-            const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
-            if (deleteModal) {
+            .then(response => response.json())
+            .then(data => {
+                // Cerrar modal
+                const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
                 deleteModal.hide();
-            }
 
-            deleteId = null;
-        });
+                if (data.success) {
+                    showAlert(data.message || 'Mandamiento eliminado correctamente', 'success');
+                    // Recargar la tabla
+                    mandamientosTable.ajax.reload(null, false);
+                } else {
+                    showAlert(data.message || 'Error al eliminar el mandamiento', 'error');
+                }
+
+                deleteId = null;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showAlert('Error al eliminar el mandamiento', 'error');
+
+                // Cerrar modal
+                const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteModal'));
+                if (deleteModal) {
+                    deleteModal.hide();
+                }
+
+                deleteId = null;
+            });
     }
 
     /**
@@ -212,10 +212,31 @@
     /**
      * Función para recargar la tabla (puede ser llamada desde fuera)
      */
-    window.reloadMandamientosTable = function() {
+    window.reloadMandamientosTable = function () {
         if (mandamientosTable) {
             mandamientosTable.ajax.reload(null, false);
         }
     };
+
+
+
+    $(document).on('click', '.openModal', function (e) {
+        e.preventDefault();
+
+        const url = $(this).val();
+        console.log('Cargando formulario desde URL:', url);
+        const miModal = new bootstrap.Modal(document.getElementById('miModal'));
+        miModal.show();
+        $.get(url)
+            .done(function (data) {
+                $('#miModal .modal-content').html(data);
+
+            })
+            .fail(function () {
+                showAlert('Error al cargar el formulario', 'error');
+            });
+
+    })
+
 
 })();
