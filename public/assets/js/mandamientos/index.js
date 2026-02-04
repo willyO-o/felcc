@@ -6,6 +6,7 @@
 (function() {
     'use strict';
 
+    console.log('Inicializando DataTable de Mandamientos');
     // Variable global para la tabla
     let mandamientosTable;
     let deleteId = null;
@@ -25,6 +26,7 @@
         mandamientosTable = $('#mandamientos-table').DataTable({
             processing: true,
             serverSide: true,
+            responsive: true,
             ajax: {
                 url: window.location.href,
                 type: 'GET',
