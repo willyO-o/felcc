@@ -16,8 +16,8 @@ return new class extends Migration
             $table->string('tipo', 50);
             $table->string('ruta', 255);
             $table->string('nombre_archivo', 255);
-
             $table->foreignId('id_mandamiento')->constrained('mandamiento')->onDelete('cascade');
+            $table->foreignId('id_persona')->constrained('persona')->onDelete('cascade');
             $table->timestamps();
         });
     }

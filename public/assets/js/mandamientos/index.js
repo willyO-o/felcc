@@ -603,6 +603,10 @@
                 <input type="text" id="swal-paterno" class="form-control form-control-sm mb-2" placeholder="Apellido Paterno" required>
                 <input type="text" id="swal-materno" class="form-control form-control-sm mb-2" placeholder="Apellido Materno">
                 <input type="text" id="swal-ci" class="form-control form-control-sm mb-2" placeholder="Cédula de Identidad" required>
+                <input type="number" id="swal-celular" class="form-control form-control-sm mb-2" placeholder="Número de Celular">
+                <input type="date" id="swal-fecha_nacimiento" class="form-control form-control-sm mb-2" placeholder="Fecha de Nacimiento">
+                <textarea id="swal-direccion" class="form-control form-control-sm mb-2" rows="3" placeholder="Dirección"></textarea>
+                <in
             `,
             focusConfirm: false,
             showCancelButton: true,

@@ -47,8 +47,9 @@
 
 
     <!-- Modal de confirmación de eliminación -->
-    <div class="modal fade" id="miModal" tabindex="-1" aria-labelledby="miModal"  data-bs-focus="false" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg" >
+    <div class="modal fade" id="miModal" tabindex="-1" aria-labelledby="miModal" data-bs-focus="false" aria-hidden="true"
+        data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="miModalLabel">Registrar Mandamiento</h5>
@@ -74,7 +75,8 @@
                             </div><!--end col-->
                             <div class="col-xxl-6">
                                 <div>
-                                    <label for="id_persona" class="form-label">Persona <span id="btnPersona" class="btn btn-sm btn-primary">+ Añadir</span></label>
+                                    <label for="id_persona" class="form-label">Persona <span id="btnPersona"
+                                            class="btn btn-sm btn-primary">+ Añadir</span></label>
 
                                     <select name="id_persona" id="id_persona" class="form-select"></select>
 
@@ -133,6 +135,15 @@
                                         placeholder="Ingrese asignado" name="asignado" value="">
                                 </div>
                             </div><!--end col-->
+
+                            <div class="col-12">
+                                <label for="imagen_mandamiento" class="form-label">Adjuntar Foto del Mandamiento</label>
+                                <div class="input-group">
+                                    <input type="file" class="form-control" id="inputGroupFile02"
+                                        accept=".jpg,.png,.pdf,.jpeg,.webp" name="imagen_mandamiento">
+                                    <label class="input-group-text" for="inputGroupFile02">Seleccionar</label>
+                                </div>
+                            </div>
 
 
                         </div><!--end row-->
