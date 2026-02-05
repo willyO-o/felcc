@@ -32,8 +32,9 @@
              <div class="col-xxl-6">
                  <div>
                      <label for="id_persona" class="form-label">Nombre</label>
-                     <input type="text" class="form-control" id="id_persona" placeholder="Ingrese nombre"
-                         name="id_persona" value="{{ old('id_persona', $mandamientos->id_persona ?? '') }}">
+
+                     <select name="id_persona" id="id_persona" class="form-select"></select>
+
                  </div>
              </div><!--end col-->
 
@@ -41,24 +42,30 @@
              <div class="col-xxl-6">
                  <div>
                      <label for="id_juzgado" class="form-label">Juzgado</label>
-                     <input type="text" class="form-control" id="id_juzgado" placeholder="Ingrese nombre"
-                         name="id_juzgado" value="{{ old('id_juzgado', $mandamientos->id_juzgado ?? '') }}">
+                     <select name="id_juzgado" id="id_juzgado" class="form-select"></select>
                  </div>
              </div><!--end col-->
 
              <div class="col-xxl-6">
                  <div>
                      <label for="id_delito" class="form-label">Delito</label>
-                     <input type="text" class="form-control" id="id_delito" placeholder="Ingrese nombre"
-                         name="id_delito" value="{{ old('id_delito', $mandamientos->id_delito ?? '') }}">
+                     <select name="id_delito" id="id_delito" class="form-select"></select>
                  </div>
              </div><!--end col-->
              <div class="col-xxl-6">
-                 <div>
-                     <label for="id_tipo_mandamiento" class="form-label">Tipo Mandamiento</label>
-                     <input type="text" class="form-control" id="id_tipo_mandamiento" placeholder="Ingrese nombre"
-                         name="id_tipo_mandamiento"
-                         value="{{ old('id_tipo_mandamiento', $mandamientos->id_tipo_mandamiento ?? '') }}">
+                 <label for="id_tipo_mandamiento" class="form-label">Tipo Mandamiento</label>
+
+                 <div class="input-group">
+
+                     <select name="id_tipo_mandamiento" id="id_tipo_mandamiento" class="form-select">
+                         @foreach ($tipoMandamientos as $tipo)
+                             <option value="{{ $tipo->id }}"
+                                 {{ old('id_tipo_mandamiento', $mandamientos->id_tipo_mandamiento ?? '') == $tipo->id ? 'selected' : '' }}>
+                                 {{ $tipo->tipo_mandamiento }}
+                             </option>
+                         @endforeach
+                     </select>
+                     <span class="input-group-text btn btn-info"><i class="ri-add-line"></i> </span>
                  </div>
              </div><!--end col-->
 
@@ -67,40 +74,34 @@
                  <div>
                      <div class="form-check form-check-inline">
                          <input class="form-check-input" type="radio" name="estado" id="inlineRadio2"
-                             value="PENDIENTE" {{ old('estado', $mandamientos->estado ?? 'PENDIENTE') == 'PENDIENTE' ? 'checked' : '' }}>
-                         <label class="form-check-label" for="inlineRadio2" >PENDIENTE</label>
+                             value="PENDIENTE"
+                             {{ old('estado', $mandamientos->estado ?? 'PENDIENTE') == 'PENDIENTE' ? 'checked' : '' }}>
+                         <label class="form-check-label" for="inlineRadio2">PENDIENTE</label>
                      </div>
                      <div class="form-check form-check-inline">
                          <input class="form-check-input" type="radio" name="estado" id="inlineRadio1"
-                             value="EJECUTADO" {{ old('estado', $mandamientos->estado ?? '') == 'EJECUTADO' ? 'checked' : '' }}>
+                             value="EJECUTADO"
+                             {{ old('estado', $mandamientos->estado ?? '') == 'EJECUTADO' ? 'checked' : '' }}>
                          <label class="form-check-label" for="inlineRadio1">EJECUTADO</label>
                      </div>
 
                      <div class="form-check form-check-inline">
                          <input class="form-check-input" type="radio" name="estado" id="inlineRadio3"
-                             value="CANCELADO" {{ old('estado', $mandamientos->estado ?? '') == 'CANCELADO' ? 'checked' : '' }}>
+                             value="CANCELADO"
+                             {{ old('estado', $mandamientos->estado ?? '') == 'CANCELADO' ? 'checked' : '' }}>
                          <label class="form-check-label" for="inlineRadio3">CANCELADO</label>
                      </div>
                  </div>
              </div><!--end col-->
-             <div class="col-xxl-6">
+             <div class="col-md-12">
                  <div>
                      <label for="asignado" class="form-label">Asignado</label>
                      <input type="text" class="form-control" id="asignado" placeholder="Ingrese asignado"
                          name="asignado" value="{{ old('asignado', $mandamientos->asignado ?? '') }}">
                  </div>
              </div><!--end col-->
-             <div class="col-xxl-6">
-                 <div>
-                     <label for="passwordInput" class="form-label">Password</label>
-                     <input type="password" class="form-control" id="passwordInput" value="451326546">
-                 </div>
-             </div><!--end col-->
 
 
-             'fecha_ejecucion',
-             'detalle_ejecucion',
-             'actividades_realizadas',
          </div><!--end row-->
      </div>
      <div class="modal-footer">

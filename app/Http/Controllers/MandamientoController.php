@@ -119,7 +119,8 @@ class MandamientoController extends Controller
     public function create()
     {
         $mandamientos = new Mandamiento();
-        return view('mandamientos.formulario', compact('mandamientos'));
+        $tipoMandamientos = TipoMandamiento::all();
+        return view('mandamientos.formulario', compact('mandamientos', 'tipoMandamientos'));
     }
 
     /**
@@ -143,7 +144,9 @@ class MandamientoController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $mandamientos = Mandamiento::findOrFail($id);
+        $tipoMandamientos = TipoMandamiento::all();
+        return view('mandamientos.formulario', compact('mandamientos', 'tipoMandamientos'));
     }
 
     /**

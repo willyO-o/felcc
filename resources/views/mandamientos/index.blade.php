@@ -68,6 +68,7 @@
     <link href="{{ url('/assets/libs/datatables/dataTables.bootstrap5.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ url('/assets/libs/datatables/responsive.bootstrap5.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ url('/assets/libs/datatables/buttons.bootstrap5.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ url('/assets/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
 @endsection
 
 @section('page-title', 'Mandamientos de Aprehensión')
@@ -91,6 +92,7 @@
     <script src="{{ url('/assets/libs/datatables/buttons.bootstrap5.js') }}"></script>
     <script src="{{ url('/assets/libs/datatables/buttons.html5.js') }}"></script>
     <script src="{{ url('/assets/libs/datatables/buttons.print.js') }}"></script>
+    <script src="{{ url('/assets/js/select2.min.js') }}"></script>
 
     <!-- Custom DataTable Script -->
     <script src="{{ url('/assets/js/mandamientos/index.js') }}"></script>
