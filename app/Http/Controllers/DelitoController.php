@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Models\Delito;
 class DelitoController extends Controller
 {
     /**
@@ -11,7 +11,8 @@ class DelitoController extends Controller
      */
     public function index()
     {
-        //
+        $delitos = Delito::all();
+        return response()->json($delitos);
     }
 
     /**
@@ -19,7 +20,7 @@ class DelitoController extends Controller
      */
     public function create()
     {
-        //
+
     }
 
     /**
@@ -27,7 +28,11 @@ class DelitoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nombre_delito' => 'required|string|max:255',
+        ]);
+        $delito = Delito::create($request->all());
+        return response()->json(['success' => true, 'message' => 'Delito creado correctamente', 'data' => $delito]);
     }
 
     /**

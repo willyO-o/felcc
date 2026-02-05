@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use App\Models\Juzgado;
 class JuzgadoController extends Controller
 {
     /**
@@ -11,7 +11,9 @@ class JuzgadoController extends Controller
      */
     public function index()
     {
-        //
+        $juzgados = Juzgado::all();
+        return response()->json($juzgados);
+
     }
 
     /**
@@ -27,7 +29,11 @@ class JuzgadoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'nombre_juzgado' => 'required|string|max:255',
+        ]);
+        $juzgado = Juzgado::create($request->all());
+        return response()->json(['success' => true, 'message' => 'Juzgado creado correctamente', 'data' => $juzgado]);
     }
 
     /**

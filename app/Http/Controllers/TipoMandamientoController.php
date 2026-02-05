@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\TipoMandamiento;
 
 class TipoMandamientoController extends Controller
 {
@@ -11,7 +12,8 @@ class TipoMandamientoController extends Controller
      */
     public function index()
     {
-        //
+        $tiposMandamientos = TipoMandamiento::all();
+        return response()->json($tiposMandamientos);
     }
 
     /**
@@ -27,7 +29,11 @@ class TipoMandamientoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'tipo_mandamiento' => 'required|string|max:255',
+        ]);
+        $tipoMandamiento = TipoMandamiento::create($request->all());
+        return response()->json(['success' => true, 'message' => 'Tipo de mandamiento creado correctamente', 'data' => $tipoMandamiento]);
     }
 
     /**
