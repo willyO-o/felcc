@@ -498,5 +498,31 @@ $(function () {
 
 
 
+    window.imagenesArray = function (texto) {
+        if (texto == null || texto == undefined || texto == '') {
+            return [];
+        }
+
+        try {
+            let array = JSON.parse(texto);
+            if (Array.isArray(array)) {
+                return array;
+            } else {
+                return [];
+            }
+        } catch (error) {
+            console.error("Error al parsear el texto a un array:", error);
+            return [];
+        }
+    }
+
+    window.primeraImagen = function (texto) {
+        let imagenes = imagenesArray(texto);
+        if (imagenes.length > 0) {
+            return imagenes[0];
+        } else {
+            return '';
+        }
+    }
 
 });

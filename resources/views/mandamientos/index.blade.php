@@ -17,94 +17,94 @@
                         </button>
                     </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body" id="containerListaMandamientos" style="height: 70vh;">
 
-                    <div class="row job-list-row" id="candidate-list">
+                    <!-- Botones para cambiar de vista -->
+                    <div class="d-flex justify-content-end mb-3">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary active" id="btn-grid-view">
+                                <i class="ri-grid-fill"></i> Grid
+                            </button>
+                            <button type="button" class="btn btn-outline-primary" id="btn-list-view">
+                                <i class="ri-list-check"></i> Lista
+                            </button>
+                        </div>
+                    </div>
 
-                        <div class="col-xxl-3 col-md-6">
+                    {{-- <div class="row job-list-row grid-view-mode" id="candidate-list"> --}}
+                    <div class="row job-list-row grid-view-mode" id="listadoMandamientos">
+
+
+                        {{-- <div class="candidate-item col-xxl-3 col-md-6">
                             <div class="card">
                                 <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <div class="avatar-lg rounded"><img src="/assets/images/users/avatar-10.jpg"
-                                                    alt="" class="member-img img-fluid d-block rounded"></div>
+                                    <!-- Vista GRID -->
+                                    <div class="grid-view-content">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-shrink-0">
+                                                <div class="avatar-lg rounded"><img src="/assets/images/users/avatar-10.jpg"
+                                                        alt="" class="member-img img-fluid d-block rounded"></div>
+                                            </div>
+                                            <div class="flex-grow-1 ms-3">
+                                                <a href="pages-profile">
+                                                    <h5 class="fs-16 mb-1">Tonya Noble</h5>
+                                                </a>
+                                                <p class="text-muted mb-2">Web Designer</p>
+                                                <div class="d-flex flex-wrap gap-2 align-items-center">
+                                                    <div class="badge text-bg-success"><i class="mdi mdi-star me-1"></i>4.2
+                                                    </div>
+                                                    <div class="text-muted">2.2k Ratings</div>
+                                                </div>
+                                                <div class="d-flex gap-4 mt-2 text-muted">
+                                                    <div><i class="ri-map-pin-2-line text-primary me-1 align-bottom"></i>
+                                                        Cullera, Spain</div>
+                                                    <div><i class="ri-time-line text-primary me-1 align-bottom"></i><span
+                                                            class="badge badge-soft-danger">Part Time</span></div>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="flex-grow-1 ms-3"> <a href="pages-profile">
-                                                <h5 class="fs-16 mb-1">Tonya Noble</h5>
-                                            </a>
-                                            <p class="text-muted mb-2">Web Designer</p>
-                                            <div class="d-flex flex-wrap gap-2 align-items-center">
+                                    </div>
+                                    <!-- Vista LISTA -->
+                                    <div class="list-view-content" style="display: none;">
+                                        <div class="d-lg-flex align-items-center">
+                                            <div class="flex-shrink-0">
+                                                <div class="avatar-sm rounded"><img src="/assets/images/users/avatar-10.jpg"
+                                                        alt="" class="member-img img-fluid d-block rounded"></div>
+                                            </div>
+                                            <div class="ms-lg-3 my-3 my-lg-0">
+                                                <a href="pages-profile">
+                                                    <h5 class="fs-16 mb-2">Tonya Noble</h5>
+                                                </a>
+                                                <p class="text-muted mb-0">Web Designer</p>
+                                            </div>
+                                            <div class="d-flex gap-4 mt-0 text-muted mx-auto">
+                                                <div><i class="ri-map-pin-2-line text-primary me-1 align-bottom"></i>
+                                                    Cullera, Spain</div>
+                                                <div><i class="ri-time-line text-primary me-1 align-bottom"></i> <span
+                                                        class="badge badge-soft-danger">Part Time</span></div>
+                                            </div>
+                                            <div class="d-flex flex-wrap gap-2 align-items-center mx-auto my-3 my-lg-0">
                                                 <div class="badge text-bg-success"><i class="mdi mdi-star me-1"></i>4.2
                                                 </div>
                                                 <div class="text-muted">2.2k Ratings</div>
                                             </div>
-                                            <div class="d-flex gap-4 mt-2 text-muted">
-                                                <div> <i class="ri-map-pin-2-line text-primary me-1 align-bottom"></i>
-                                                    Cullera, Spain</div>
-                                                <div> <i class="ri-time-line text-primary me-1 align-bottom"></i><span
-                                                        class="badge badge-soft-danger">Part Time</span> </div>
+                                            <div>
+                                                <a href="#!" class="btn btn-soft-success">View Details</a>
+                                                <a href="#!" class="btn btn-ghost-danger btn-icon custom-toggle active"
+                                                    data-bs-toggle="button">
+                                                    <span class="icon-on"><i
+                                                            class="ri-bookmark-line align-bottom"></i></span>
+                                                    <span class="icon-off"><i
+                                                            class="ri-bookmark-3-fill align-bottom"></i></span>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="col-xxl-3 col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <div class="avatar-lg rounded"><img src="/assets/images/users/avatar-10.jpg"
-                                                    alt="" class="member-img img-fluid d-block rounded"></div>
-                                        </div>
-                                        <div class="flex-grow-1 ms-3"> <a href="pages-profile">
-                                                <h5 class="fs-16 mb-1">Tonya Noble</h5>
-                                            </a>
-                                            <p class="text-muted mb-2">Web Designer</p>
-                                            <div class="d-flex flex-wrap gap-2 align-items-center">
-                                                <div class="badge text-bg-success"><i class="mdi mdi-star me-1"></i>4.2
-                                                </div>
-                                                <div class="text-muted">2.2k Ratings</div>
-                                            </div>
-                                            <div class="d-flex gap-4 mt-2 text-muted">
-                                                <div> <i class="ri-map-pin-2-line text-primary me-1 align-bottom"></i>
-                                                    Cullera, Spain</div>
-                                                <div> <i class="ri-time-line text-primary me-1 align-bottom"></i><span
-                                                        class="badge badge-soft-danger">Part Time</span> </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xxl-3 col-md-6">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div class="d-flex align-items-center">
-                                        <div class="flex-shrink-0">
-                                            <div class="avatar-lg rounded"><img src="/assets/images/users/avatar-10.jpg"
-                                                    alt="" class="member-img img-fluid d-block rounded"></div>
-                                        </div>
-                                        <div class="flex-grow-1 ms-3"> <a href="pages-profile">
-                                                <h5 class="fs-16 mb-1">Tonya Noble</h5>
-                                            </a>
-                                            <p class="text-muted mb-2">Web Designer</p>
-                                            <div class="d-flex flex-wrap gap-2 align-items-center">
-                                                <div class="badge text-bg-success"><i class="mdi mdi-star me-1"></i>4.2
-                                                </div>
-                                                <div class="text-muted">2.2k Ratings</div>
-                                            </div>
-                                            <div class="d-flex gap-4 mt-2 text-muted">
-                                                <div> <i class="ri-map-pin-2-line text-primary me-1 align-bottom"></i>
-                                                    Cullera, Spain</div>
-                                                <div> <i class="ri-time-line text-primary me-1 align-bottom"></i><span
-                                                        class="badge badge-soft-danger">Part Time</span> </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        </div> --}}
+
+
 
                     </div>
 
@@ -112,6 +112,7 @@
             </div>
         </div>
     </div>
+
 
 
 
@@ -242,6 +243,8 @@
 
     <!-- Select2 CSS -->
     <link href="{{ url('/assets/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="/assets/libs/filepond/filepond.min.css" type="text/css" />
+    <link rel="stylesheet" href="/assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.css">
     {{-- <link href="{{ url('/assets/css/select2-bootstrap.css') }}" rel="stylesheet" type="text/css" /> --}}
 @endsection
 
@@ -270,4 +273,73 @@
 
     <!-- Custom DataTable Script -->
     {{-- <script src="{{ url('/assets/js/mandamientos/index.js') }}"></script> --}}
+
+    <script>
+        // Toggle entre vista Grid y Lista
+        document.addEventListener('DOMContentLoaded', function() {
+            const btnGridView = document.getElementById('btn-grid-view');
+            const btnListView = document.getElementById('btn-list-view');
+            const candidateList = document.getElementById('listadoMandamientos');
+
+            if (btnGridView && btnListView) {
+                btnGridView.addEventListener('click', function() {
+                    // Cambiar a vista Grid
+                    candidateList.classList.remove('list-view-mode');
+                    candidateList.classList.add('grid-view-mode');
+
+                    // Cambiar clases de columnas
+                    document.querySelectorAll('.candidate-item').forEach(item => {
+                        item.className = 'candidate-item col-xxl-3 col-md-6';
+                    });
+
+                    // Mostrar/ocultar contenido
+                    document.querySelectorAll('.grid-view-content').forEach(el => el.style.display =
+                        'block');
+                    document.querySelectorAll('.list-view-content').forEach(el => el.style.display =
+                        'none');
+
+                    // Cambiar botones activos
+                    btnGridView.classList.add('active');
+                    btnListView.classList.remove('active');
+                });
+
+                btnListView.addEventListener('click', function() {
+                    // Cambiar a vista Lista
+                    candidateList.classList.remove('grid-view-mode');
+                    candidateList.classList.add('list-view-mode');
+
+                    // Cambiar clases de columnas
+                    document.querySelectorAll('.candidate-item').forEach(item => {
+                        item.className = 'candidate-item  col-lg-12';
+                    });
+
+                    // Mostrar/ocultar contenido
+                    document.querySelectorAll('.grid-view-content').forEach(el => el.style.display =
+                        'none');
+                    document.querySelectorAll('.list-view-content').forEach(el => el.style.display =
+                        'block');
+
+                    // Cambiar los cards a mb-0
+                    document.querySelectorAll('.candidate-item .card').forEach(card => {
+                        card.classList.add('mb-0');
+                    });
+
+                    // Cambiar botones activos
+                    btnListView.classList.add('active');
+                    btnGridView.classList.remove('active');
+                });
+            }
+        });
+    </script>
+    <script src="/assets/libs/filepond/filepond.min.js"></script>
+    <script src="/assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js"></script>
+    <script src="/assets/libs/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js"></script>
+    <script src="/assets/libs/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js">
+    </script>
+    <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
+
+    <script src="/assets/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fslightbox/3.4.0-2/index.js"
+        integrity="sha512-Vdge+4gAuFr0U/JCfFdR24aOl9R0c/3pCYgi5bt/nU+Hl6REetTWmOr6FYjOW/7JdyQt27U8x7XJcE+IS8vKMA=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 @endsection

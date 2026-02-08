@@ -34,65 +34,33 @@ class MandamientoController extends Controller
      */
     private function getDataForDataTable(Request $request)
     {
-        $mandamientos = Mandamiento::select(
-            'mandamiento.id',
-            'mandamiento.hoja_ruta',
-            'mandamiento.estado',
-            'mandamiento.tipo_documento',
-            'mandamiento.created_at',
-            DB::raw("CONCAT(persona.nombre, ' ', COALESCE(persona.paterno, ''), ' ', COALESCE(persona.materno, '')) as nombre_completo"),
-            'persona.ci',
-            'tipo_mandamiento.tipo_mandamiento',
-            'delito.nombre_delito',
-            'juzgado.nombre_juzgado'
-        )
+        // $mandamientos = Mandamiento::with(['usuario', 'juzgado', 'delito', 'tipoMandamiento'])
+        $mandamientos = Mandamiento::select('mandamiento.*')
             ->leftJoin('persona', 'mandamiento.id_persona', '=', 'persona.id')
             ->leftJoin('delito', 'mandamiento.id_delito', '=', 'delito.id')
             ->leftJoin('juzgado', 'mandamiento.id_juzgado', '=', 'juzgado.id')
-            ->leftJoin('tipo_mandamiento', 'mandamiento.id_tipo_mandamiento', '=', 'tipo_mandamiento.id');
+            ->leftJoin('tipo_mandamiento', 'mandamiento.id_tipo_mandamiento', '=', 'tipo_mandamiento.id')
+            ->leftJoin('multimedia', 'mandamiento.id', '=', 'multimedia.id_mandamiento')
+            ->addSelect([
+                'nombre_completo' => DB::raw("CONCAT(COALESCE(persona.nombre, ''), ' ', COALESCE(persona.paterno, ''), ' ', COALESCE(persona.materno, '')) as nombre_completo"),
+                'ci' => 'persona.ci',
+                'nombre_delito' => 'delito.nombre_delito',
+                'nombre_juzgado' => 'juzgado.nombre_juzgado',
+                'tipo_mandamiento' => 'tipo_mandamiento.tipo_mandamiento',
+                'ruta_multimedia' => 'multimedia.ruta',
+                'imagenes' => DB::raw("(SELECT JSON_ARRAYAGG(m.ruta)
+                                            FROM multimedia m
+                                            WHERE m.id_persona = persona.id) as imagenes_persona" )
+            ]);
 
-        return DataTables::of($mandamientos)
-            ->addIndexColumn()
-            ->addColumn('hoja_ruta', function ($row) {
-                return $row->hoja_ruta ?? 'N/A';
-            })
-            ->addColumn('nombre_completo', function ($row) {
-                return $row->nombre_completo ?? 'N/A';
-            })
-            ->addColumn('ci', function ($row) {
-                return $row->ci ?? 'N/A';
-            })
-            ->addColumn('tipo_mandamiento', function ($row) {
-                return $row->tipo_mandamiento ?? 'N/A';
-            })
-            ->addColumn('tipo_documento', function ($row) {
-                if (!$row->tipo_documento || $row->tipo_documento === 'N/A') {
-                    return '<span class="badge bg-secondary">N/A</span>';
-                }
-                return '<span class="badge bg-info">' . $row->tipo_documento . '</span>';
-            })
-            ->addColumn('delito', function ($row) {
-                return $row->nombre_delito ?? 'N/A';
-            })
-            ->addColumn('juzgado', function ($row) {
-                return $row->nombre_juzgado ?? 'N/A';
-            })
-            ->addColumn('estado', function ($row) {
-                $badges = [
-                    'PENDIENTE' => 'bg-warning',
-                    'EJECUTADO' => 'bg-success',
-                    'ANULADO' => 'bg-danger',
-                    'EN PROCESO' => 'bg-info'
-                ];
-                $estado = $row->estado ?? 'N/A';
-                $badgeClass = $badges[$estado] ?? 'bg-secondary';
-                return '<span class="badge ' . $badgeClass . '">' . $estado . '</span>';
-            })
-            ->addColumn('acciones', function ($row) {
-                return $this->getActionButtons($row->id);
-            })
-            ->rawColumns(['tipo_documento', 'estado', 'acciones'])
-            ->make(true);
+
+        $mandamientos = $mandamientos->paginate(10);
+
+        return [
+            'datos' => $mandamientos->items(),
+            'total' => $mandamientos->total(),
+            'page' => $mandamientos->currentPage(),
+        ];
     }
 
     /**

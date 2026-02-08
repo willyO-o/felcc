@@ -9,7 +9,6 @@ import 'bootstrap';
 import axios from 'axios';
 window.axios = axios;
 
-window.baseUrl = window.location.origin;
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 

@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Persona;
+use Illuminate\Support\Facades\DB;
+use App\Models\Multimedia;
+use Illuminate\Support\Facades\Storage;
 
 class PersonaController extends Controller
 {
@@ -18,24 +21,52 @@ class PersonaController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
+        // return response()->json(['success' => true, 'message' => 'Persona creada correctamente', 'data' => $request->all()],400);
+
         $request->validate([
             'nombre' => 'required|string|max:255',
             'paterno' => 'required|string|max:255',
             'materno' => 'nullable|string|max:255',
-            'ci' => 'required|string|max:20|unique:persona,ci',
+            'ci' => 'nullable|string|max:20|unique:persona,ci',
+            'fecha_nacimiento' => 'nullable|date|before:today',
+            'fotos' => 'nullable|array',
+            'fotos.*' => 'file|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
-        $persona = Persona::create($request->all());
-        return response()->json(['success' => true, 'message' => 'Persona creada correctamente', 'data' => $persona]);
+
+        try {
+            DB::beginTransaction();
+            $persona = Persona::create($request->all());
+
+            $fotos = $request->file('fotos');
+            if ($fotos) {
+                foreach ($fotos as $foto) {
+                    $nombreArchivo = $foto->hashName();
+                    $ruta = $foto->storeAs('personas', $nombreArchivo, 'public');
+                    if (Storage::disk('public')->exists('personas/' . $nombreArchivo)) {
+                        Multimedia::create([
+                            'tipo' => 'persona',
+                            'ruta' => $ruta,
+                            'nombre_archivo' => $nombreArchivo,
+                            'id_persona' => $persona->id,
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit();
+
+            return response()->json(['success' => true, 'message' => 'Persona creada correctamente', 'data' => $persona], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => 'Error al crear la persona: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
