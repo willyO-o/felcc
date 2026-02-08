@@ -13,4 +13,5 @@
 <link href="/assets/libs/swiper/swiper-bundle.min.css" rel="stylesheet" type="text/css" />
 
 <script src="{{url('/assets/js/jquery-4.0.0.min.js')}}"></script>
+<script src="{{url('/assets/js/scrollpagination-container.js')}}"></script>
 

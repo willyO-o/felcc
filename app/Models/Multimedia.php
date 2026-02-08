@@ -12,7 +12,8 @@ class Multimedia extends Model
         'tipo',
         'ruta',
         'nombre_archivo',
-        'id_mandamiento'
+        'id_mandamiento',
+        'id_persona'
     ];
 
     /**
@@ -21,5 +22,13 @@ class Multimedia extends Model
     public function mandamiento()
     {
         return $this->belongsTo(Mandamiento::class, 'id_mandamiento');
+    }
+
+    /**
+     * Relación con persona
+     */
+    public function persona()
+    {
+        return $this->belongsTo(Persona::class, 'id_persona');
     }
 }

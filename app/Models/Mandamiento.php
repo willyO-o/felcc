@@ -74,4 +74,14 @@ class Mandamiento extends Model
     {
         return $this->hasMany(Multimedia::class, 'id_mandamiento');
     }
+
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($mandamiento) {
+            $mandamiento->id_usuario = auth()->id() ?? null; // Asignar el ID del usuario autenticado o null si no hay ninguno
+        });
+    }
 }

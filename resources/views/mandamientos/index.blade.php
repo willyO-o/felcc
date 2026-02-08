@@ -11,34 +11,103 @@
                         <i class="ri-file-list-line align-middle me-1"></i> Listado de Mandamientos
                     </h5>
                     <div class="flex-shrink-0">
-                        <button value="{{ route('mandamientos.create') }}" class="btn btn-primary openModal">
+                        <button value="{{ route('mandamientos.store') }}" class="btn btn-primary openModal"
+                            id="mandamientosBtn">
                             <i class="ri-add-line align-middle me-1"></i> Nuevo Mandamiento
                         </button>
                     </div>
                 </div>
                 <div class="card-body">
-                    <div class="table-responsive">
-                        <table id="mandamientos-table"
-                            class="table table-bordered dt-responsive nowrap table-striped align-middle" style="width:100%">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>Hoja de Ruta</th>
-                                    <th>Nombre Completo</th>
-                                    <th>CI</th>
-                                    <th>Tipo Mandamiento</th>
-                                    <th>Copia</th>
-                                    <th>Delito</th>
-                                    <th>Juzgado</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- DataTables will populate this -->
-                            </tbody>
-                        </table>
+
+                    <div class="row job-list-row" id="candidate-list">
+
+                        <div class="col-xxl-3 col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <div class="avatar-lg rounded"><img src="/assets/images/users/avatar-10.jpg"
+                                                    alt="" class="member-img img-fluid d-block rounded"></div>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3"> <a href="pages-profile">
+                                                <h5 class="fs-16 mb-1">Tonya Noble</h5>
+                                            </a>
+                                            <p class="text-muted mb-2">Web Designer</p>
+                                            <div class="d-flex flex-wrap gap-2 align-items-center">
+                                                <div class="badge text-bg-success"><i class="mdi mdi-star me-1"></i>4.2
+                                                </div>
+                                                <div class="text-muted">2.2k Ratings</div>
+                                            </div>
+                                            <div class="d-flex gap-4 mt-2 text-muted">
+                                                <div> <i class="ri-map-pin-2-line text-primary me-1 align-bottom"></i>
+                                                    Cullera, Spain</div>
+                                                <div> <i class="ri-time-line text-primary me-1 align-bottom"></i><span
+                                                        class="badge badge-soft-danger">Part Time</span> </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xxl-3 col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <div class="avatar-lg rounded"><img src="/assets/images/users/avatar-10.jpg"
+                                                    alt="" class="member-img img-fluid d-block rounded"></div>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3"> <a href="pages-profile">
+                                                <h5 class="fs-16 mb-1">Tonya Noble</h5>
+                                            </a>
+                                            <p class="text-muted mb-2">Web Designer</p>
+                                            <div class="d-flex flex-wrap gap-2 align-items-center">
+                                                <div class="badge text-bg-success"><i class="mdi mdi-star me-1"></i>4.2
+                                                </div>
+                                                <div class="text-muted">2.2k Ratings</div>
+                                            </div>
+                                            <div class="d-flex gap-4 mt-2 text-muted">
+                                                <div> <i class="ri-map-pin-2-line text-primary me-1 align-bottom"></i>
+                                                    Cullera, Spain</div>
+                                                <div> <i class="ri-time-line text-primary me-1 align-bottom"></i><span
+                                                        class="badge badge-soft-danger">Part Time</span> </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-xxl-3 col-md-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="flex-shrink-0">
+                                            <div class="avatar-lg rounded"><img src="/assets/images/users/avatar-10.jpg"
+                                                    alt="" class="member-img img-fluid d-block rounded"></div>
+                                        </div>
+                                        <div class="flex-grow-1 ms-3"> <a href="pages-profile">
+                                                <h5 class="fs-16 mb-1">Tonya Noble</h5>
+                                            </a>
+                                            <p class="text-muted mb-2">Web Designer</p>
+                                            <div class="d-flex flex-wrap gap-2 align-items-center">
+                                                <div class="badge text-bg-success"><i class="mdi mdi-star me-1"></i>4.2
+                                                </div>
+                                                <div class="text-muted">2.2k Ratings</div>
+                                            </div>
+                                            <div class="d-flex gap-4 mt-2 text-muted">
+                                                <div> <i class="ri-map-pin-2-line text-primary me-1 align-bottom"></i>
+                                                    Cullera, Spain</div>
+                                                <div> <i class="ri-time-line text-primary me-1 align-bottom"></i><span
+                                                        class="badge badge-soft-danger">Part Time</span> </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
+
                 </div>
             </div>
         </div>
@@ -55,7 +124,7 @@
                     <h5 class="modal-title" id="miModalLabel">Registrar Mandamiento</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form method="POST" id="mandamientoForm">
+                <form method="POST" id="mandamientoForm" action="/mandamientos">
 
                     <div class="modal-body">
                         <div class="row g-3">
@@ -150,7 +219,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-primary" id="confirmSave">
+                        <button type="submit" class="btn btn-primary" id="confirmSave">
                             <i class="ri-save-3-line align-middle me-1"></i>
                             Guardar
                         </button>

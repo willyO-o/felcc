@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Mandamiento;
+use App\Models\Multimedia;
 use App\Models\Persona;
 use App\Models\Delito;
 use App\Models\Juzgado;
 use App\Models\TipoMandamiento;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\Storage;
 
 class MandamientoController extends Controller
 {
@@ -33,17 +35,17 @@ class MandamientoController extends Controller
     private function getDataForDataTable(Request $request)
     {
         $mandamientos = Mandamiento::select(
-                'mandamiento.id',
-                'mandamiento.hoja_ruta',
-                'mandamiento.estado',
-                'mandamiento.tipo_documento',
-                'mandamiento.created_at',
-                DB::raw("CONCAT(persona.nombre, ' ', COALESCE(persona.paterno, ''), ' ', COALESCE(persona.materno, '')) as nombre_completo"),
-                'persona.ci',
-                'tipo_mandamiento.tipo_mandamiento',
-                'delito.nombre_delito',
-                'juzgado.nombre_juzgado'
-            )
+            'mandamiento.id',
+            'mandamiento.hoja_ruta',
+            'mandamiento.estado',
+            'mandamiento.tipo_documento',
+            'mandamiento.created_at',
+            DB::raw("CONCAT(persona.nombre, ' ', COALESCE(persona.paterno, ''), ' ', COALESCE(persona.materno, '')) as nombre_completo"),
+            'persona.ci',
+            'tipo_mandamiento.tipo_mandamiento',
+            'delito.nombre_delito',
+            'juzgado.nombre_juzgado'
+        )
             ->leftJoin('persona', 'mandamiento.id_persona', '=', 'persona.id')
             ->leftJoin('delito', 'mandamiento.id_delito', '=', 'delito.id')
             ->leftJoin('juzgado', 'mandamiento.id_juzgado', '=', 'juzgado.id')
@@ -100,13 +102,13 @@ class MandamientoController extends Controller
     {
         return '
             <div class="d-flex gap-2">
-                <a href="'.route('mandamientos.show', $id).'" class="btn btn-sm btn-info" title="Ver">
+                <a href="' . route('mandamientos.show', $id) . '" class="btn btn-sm btn-info" title="Ver">
                     <i class="ri-eye-line"></i>
                 </a>
-                <a href="'.route('mandamientos.edit', $id).'" class="btn btn-sm btn-warning" title="Editar">
+                <a href="' . route('mandamientos.edit', $id) . '" class="btn btn-sm btn-warning" title="Editar">
                     <i class="ri-edit-line"></i>
                 </a>
-                <button type="button" class="btn btn-sm btn-danger btn-delete" data-id="'.$id.'" title="Eliminar">
+                <button type="button" class="btn btn-sm btn-danger btn-delete" data-id="' . $id . '" title="Eliminar">
                     <i class="ri-delete-bin-line"></i>
                 </button>
             </div>
@@ -128,7 +130,38 @@ class MandamientoController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+
+        try {
+
+            DB::beginTransaction();
+
+            $mandamiento = Mandamiento::create($request->all());
+            $imagenMandamiento = $request->file('imagen_mandamiento');
+
+            if ($imagenMandamiento) {
+                $nombreArchivo = $imagenMandamiento->hashName();
+                $ruta =  $imagenMandamiento->storeAs('mandamientos', $nombreArchivo, 'public');
+                if (Storage::disk('public')->exists('mandamientos/' . $nombreArchivo)) {
+                    $multimedia = Multimedia::create([
+                        'tipo' => 'mandamiento',
+                        'ruta' => $ruta,
+                        'nombre_archivo' => $nombreArchivo,
+                        'id_mandamiento' => $mandamiento->id, // Se asignará después de crear el mandamiento
+                    ]);
+                }
+            }
+
+
+            DB::commit();
+            return response()->json([
+                'success' => 'Mandamiento guardado correctamente.',
+                'data' => $mandamiento
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Error al guardar el mandamiento: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -165,4 +198,3 @@ class MandamientoController extends Controller
         //
     }
 }
-
