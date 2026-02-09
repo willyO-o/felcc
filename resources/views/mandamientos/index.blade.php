@@ -11,16 +11,15 @@
                         <i class="ri-file-list-line align-middle me-1"></i> Listado de Mandamientos
                     </h5>
                     <div class="flex-shrink-0">
-                        <button value="{{ route('mandamientos.store') }}" class="btn btn-primary openModal"
+                        <button value="" class="btn btn-primary openModal"
                             id="mandamientosBtn">
                             <i class="ri-add-line align-middle me-1"></i> Nuevo Mandamiento
                         </button>
                     </div>
-                </div>
-                <div class="card-body" id="containerListaMandamientos" style="height: 70vh;">
 
-                    <!-- Botones para cambiar de vista -->
-                    <div class="d-flex justify-content-end mb-3">
+                </div>
+                <div class="card-header">
+                    <div class="d-flex justify-content-end ">
                         <div class="btn-group" role="group">
                             <button type="button" class="btn btn-outline-primary active" id="btn-grid-view">
                                 <i class="ri-grid-fill"></i> Grid
@@ -30,6 +29,12 @@
                             </button>
                         </div>
                     </div>
+                </div>
+                <!-- Botones para cambiar de vista -->
+
+                <div class="card-body overflow-auto" id="containerListaMandamientos" style="height: 60vh;">
+
+
 
                     {{-- <div class="row job-list-row grid-view-mode" id="candidate-list"> --}}
                     <div class="row job-list-row grid-view-mode" id="listadoMandamientos">
@@ -138,9 +143,19 @@
                             </div><!--end col-->
                             <div class="col-md-6">
                                 <div>
-                                    <label for="tipo_documento" class="form-label">Tipo Documento</label>
-                                    <input type="text" class="form-control" id="tipo_documento"
-                                        placeholder="Ingrese Tipo Documento" name="tipo_documento" value="">
+                                    <label for="tipo_documento" class="form-label">Tipo </label>
+                                    <div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="tipo_documento" id="rado-origina"
+                                                value="ORIGINAL" >
+                                            <label class="form-check-label" for="rado-origina">ORIGINAL</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="tipo_documento" id="radio-fotocopia"
+                                                value="FOTOCOPIA" checked>
+                                            <label class="form-check-label" for="radio-fotocopia">FOTOCOPIA</label>
+                                        </div>
+                                    </div>
                                 </div>
                             </div><!--end col-->
                             <div class="col-xxl-6">
@@ -148,7 +163,7 @@
                                     <label for="id_persona" class="form-label">Persona <span id="btnPersona"
                                             class="btn btn-sm btn-primary">+ Añadir</span></label>
 
-                                    <select name="id_persona" id="id_persona" class="form-select"></select>
+                                    <select name="id_persona" id="id_persona" class="form-select" required></select>
 
                                 </div>
                             </div><!--end col-->
@@ -182,7 +197,7 @@
                                 <div>
                                     <div class="form-check form-check-inline">
                                         <input class="form-check-input" type="radio" name="estado" id="inlineRadio2"
-                                            value="PENDIENTE">
+                                            value="PENDIENTE" checked>
                                         <label class="form-check-label" for="inlineRadio2">PENDIENTE</label>
                                     </div>
                                     <div class="form-check form-check-inline">
@@ -200,7 +215,7 @@
                             </div><!--end col-->
                             <div class="col-md-12">
                                 <div>
-                                    <label for="asignado" class="form-label">Asignado</label>
+                                    <label for="asignado" class="form-label">Asignado A</label>
                                     <input type="text" class="form-control" id="asignado"
                                         placeholder="Ingrese asignado" name="asignado" value="">
                                 </div>
@@ -210,7 +225,7 @@
                                 <label for="imagen_mandamiento" class="form-label">Adjuntar Foto del Mandamiento</label>
                                 <div class="input-group">
                                     <input type="file" class="form-control" id="inputGroupFile02"
-                                        accept=".jpg,.png,.pdf,.jpeg,.webp" name="imagen_mandamiento">
+                                        accept=".jpg,.png,.jpeg,.webp" name="imagen_mandamiento">
                                     <label class="input-group-text" for="inputGroupFile02">Seleccionar</label>
                                 </div>
                             </div>

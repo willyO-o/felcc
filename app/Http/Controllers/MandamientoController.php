@@ -22,6 +22,15 @@ class MandamientoController extends Controller
     {
         // Si es una petición AJAX, devolver los datos para DataTables
         if ($request->ajax()) {
+            $mandamientos=Mandamiento::getMandamientos($request->all())
+            ->paginate($request->get('size', 10), ['*'], 'page', $request->get('page', 1));
+
+            return response()->json([
+                'datos' => $mandamientos->items(),
+                'total' => $mandamientos->total(),
+                'page' => $mandamientos->currentPage(),
+            ]);
+
             return $this->getDataForDataTable($request);
         }
 
@@ -121,10 +130,12 @@ class MandamientoController extends Controller
             }
 
 
+
             DB::commit();
+            $datos = Mandamiento::getMandamientos([], $mandamiento->id)->first();
             return response()->json([
                 'success' => 'Mandamiento guardado correctamente.',
-                'data' => $mandamiento
+                'datos' => $datos
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -137,7 +148,13 @@ class MandamientoController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $mandamiento = Mandamiento::getMandamientos([], $id)->first();
+
+        if (!$mandamiento) {
+            return response()->json(['error' => 'Mandamiento no encontrado'], 404);
+        }
+
+        return response()->json(['datos' => $mandamiento], 200);
     }
 
     /**
