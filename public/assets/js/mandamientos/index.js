@@ -19,6 +19,18 @@
             lightbox.props.sources = imagenes.map(img => '/storage/' + img);
             lightbox.open();
         }
+
+        $(this).removeData('img'); // Evitar que se vuelva a abrir el lightbox con la misma imagen
+    });
+    $(document).on('click', '.btn-ver-img', function (e) {
+        e.preventDefault();
+        const imagen = $(this).data('img');
+
+        const lightbox = new FsLightbox();
+        lightbox.props.sources = ['/storage/' + imagen];
+        lightbox.open();
+
+        $(this).removeData('img'); // Evitar que se vuelva a abrir el lightbox con la misma imagen
     });
 
     let dataScroll = {
@@ -59,6 +71,24 @@
         let html =/*html*/ `
                 <div class="candidate-item mb-3 col-xxl-4 col-md-6" style='opacity:${opacity};-moz-opacity: ${opacity};filter: alpha(opacity=${opacity});'>
                     <div class="card h-100">
+                        <div class="card-header border-0 pb-0 pt-3 align-items-center d-sm-flex">
+                            <h4 class="card-title mb-0 flex-grow-1">HR: ${item.hoja_ruta || "-"} </h4>
+                            <div class="mt-2 mt-sm-0">
+                                <button type="button" class="btn btn-soft-secondary btn-sm shadow-none" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Detalles">
+                                    <i class="ri-eye-line"></i>
+                                </button>
+                                <button type="button" class="btn btn-soft-secondary btn-sm shadow-none" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Mandamiento">
+                                    <i class="ri-pencil-line"></i>
+                                </button>
+                                <button type="button" class="btn btn-soft-secondary btn-sm shadow-none" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Mandamiento">
+                                    <i class="ri-delete-bin-2-line"></i>
+                                </button>
+                                ${item.ruta ? `
+                                    <button type="button" class="btn btn-soft-secondary btn-sm shadow-none btn-ver-img" data-img='${item.ruta}' data-bs-toggle="tooltip" data-bs-placement="top" title="Ver imagen mandamiento">
+                                        <i class="ri-image-line"></i>
+                                    </button>` : ''}
+                            </div>
+                        </div>
                         <div class="card-body">
                             <!-- Vista GRID -->
                             <div class="grid-view-content">
@@ -66,21 +96,23 @@
                                     <div class="flex-shrink-0">
                                         <div class="avatar-xxl rounded">
 
-                                            <img src="${item.imagenes_persona ? ('/storage/'+primeraImagen(item.imagenes_persona)) : '/assets/img/user-dummy-img.jpg'}" alt="imagen de la persona"
+                                            <img src="${item.imagenes_persona ? ('/storage/' + primeraImagen(item.imagenes_persona)) : '/assets/img/user-dummy-img.jpg'}" alt="imagen de la persona"
                                                 class="member-img img-fluid d-block rounded ${item.imagenes_persona ? 'cursor-pointer image-popup-zoom' : ''} " data-img='${item.imagenes_persona}'>
                                         </div>
                                     </div>
                                     <div class="flex-grow-1 ms-3">
                                         <a href="pages-profile">
                                             <h5 class="fs-16 mb-1">${item.nombre_completo}</h5>
+                                            <h6 class="text-muted mb-2">C.I.: <strong>${item.ci || "-"}</strong></h6>
                                         </a>
-                                        <p class="text-muted mb-2">Web Designer</p>
-                                        <div class="d-flex flex-wrap gap-2 align-items-center">
-                                            <div class="badge text-bg-success"><i class="mdi mdi-star me-1"></i>4.2</div>
-                                            <div class="text-muted">2.2k Ratings</div>
+                                        <p class="text-muted mb-2"> Delito: <strong>${item.nombre_delito || "-"}</strong></p>
+                                        <p class="text-muted mb-2"> <strong>${item.tipo_mandamiento || "-"}</strong></p>
+                                        <div class="d-flex flex-wrap gap-2 align-items-center">Estado:
+                                            <div class="badge text-bg-info">${item.estado}</div>
+                                            <!-- <div class="text-muted">2.2k Ratings</div> -->
                                         </div>
-                                        <div class="d-flex gap-4 mt-2 text-muted">
-                                            <div><i class="ri-map-pin-2-line text-primary me-1 align-bottom"></i> Cullera, Spain</div>
+                                        <div class=" gap-4 mt-2 text-muted">
+                                            <div><i class="ri-scales-line text-primary me-1 align-bottom"></i> ${item.nombre_juzgado || ""}</div>
                                             <div><i class="ri-time-line text-primary me-1 align-bottom"></i><span
                                                     class="badge badge-soft-danger">Part Time</span></div>
                                         </div>
@@ -91,33 +123,41 @@
                             <div class="list-view-content" style="display: none;">
                                 <div class="d-sm-flex align-items-center">
                                     <div class="flex-shrink-0">
-                                        <div class="avatar-lg rounded"><img src="${item.imagenes_persona ? ('/storage/'+primeraImagen(item.imagenes_persona)) : '/assets/img/user-dummy-img.jpg'}" alt=""
+                                        <div class="avatar-lg height-auto rounded"><img src="${item.imagenes_persona ? ('/storage/' + primeraImagen(item.imagenes_persona)) : '/assets/img/user-dummy-img.jpg'}" alt=""
                                                 class="member-img img-fluid d-block rounded ${item.imagenes_persona ? 'cursor-pointer image-popup-zoom' : ''} " data-img='${item.imagenes_persona}'>
                                             </div>
                                     </div>
                                     <div class="flex-grow-1 ms-md-3 mt-3 mt-md-0 d-md-flex align-items-center">
                                         <div class="ms-lg-3 my-3 my-lg-0">
                                             <a href="pages-profile">
-                                                <h5 class="fs-16 mb-2">Tonya Noble</h5>
+                                                <h5 class="fs-16 mb-2">${item.nombre_completo}</h5>
+                                                <h6 class="text-muted mb-2">C.I.: <strong>${item.ci || "-"}</strong></h6>
+
                                             </a>
-                                            <p class="text-muted mb-0">Web Designer</p>
+                                            <p class="text-muted mb-2"> Delito: <strong>${item.nombre_delito || "-"}</strong></p>
+                                            <!-- <p class="text-muted mb-0">${item.tipo_mandamiento || "-"}</p> -->
                                         </div>
                                         <div class="d-flex gap-4 mt-0 text-muted mx-auto">
-                                            <div><i class="ri-map-pin-2-line text-primary me-1 align-bottom"></i> Cullera, Spain</div>
+                                            <div><i class="ri-auction-line text-primary me-1 align-bottom"></i> ${item.tipo_mandamiento || "-"}</div>
+                                            <!-- <div><i class="ri-map-pin-2-line text-primary me-1 align-bottom"></i> Cullera, Spain</div>
                                             <div><i class="ri-time-line text-primary me-1 align-bottom"></i> <span
-                                                    class="badge badge-soft-danger">Part Time</span></div>
+                                                    class="badge badge-soft-danger">Part Time</span></div> -->
                                         </div>
                                         <div class="d-flex flex-wrap gap-2 align-items-center mx-auto my-3 my-lg-0">
-                                            <div class="badge text-bg-success"><i class="mdi mdi-star me-1"></i>4.2</div>
-                                            <div class="text-muted">2.2k Ratings</div>
+                                            <!-- <div class="badge text-bg-success"><i class="mdi mdi-star me-1"></i>4.2</div>
+                                            <div class="text-muted">2.2k Ratings</div> -->
+                                            <div><i class="ri-scales-line text-primary me-1 align-bottom"></i> ${item.nombre_juzgado || ""}</div>
                                         </div>
                                         <div>
-                                            <a href="#!" class="btn btn-soft-success">View Details</a>
+                                            Estado:
+                                            <div class="badge text-bg-success"> ${item.estado}</div>
+                                            <!-- <div class="text-muted">${item.estado}</div> -->
+                                            <!-- <a href="#!" class="btn btn-soft-success">View Details</a>
                                             <a href="#!" class="btn btn-ghost-danger btn-icon custom-toggle active"
                                                 data-bs-toggle="button">
                                                 <span class="icon-on"><i class="ri-bookmark-line align-bottom"></i></span>
                                                 <span class="icon-off"><i class="ri-bookmark-3-fill align-bottom"></i></span>
-                                            </a>
+                                            </a> -->
                                         </div>
                                     </div>
 
@@ -197,6 +237,60 @@
 
         return html;
 
+    }
+
+
+    const btnGridView = document.getElementById('btn-grid-view');
+    const btnListView = document.getElementById('btn-list-view');
+    const candidateList = document.getElementById('listadoMandamientos');
+
+    if (btnGridView && btnListView) {
+        btnGridView.addEventListener('click', function () {
+            // Cambiar a vista Grid
+            candidateList.classList.remove('list-view-mode');
+            candidateList.classList.add('grid-view-mode');
+
+            // Cambiar clases de columnas
+            document.querySelectorAll('.candidate-item').forEach(item => {
+                item.className = 'candidate-item col-xxl-4 col-md-6';
+            });
+
+            // Mostrar/ocultar contenido
+            document.querySelectorAll('.grid-view-content').forEach(el => el.style.display =
+                'block');
+            document.querySelectorAll('.list-view-content').forEach(el => el.style.display =
+                'none');
+
+            // Cambiar botones activos
+            btnGridView.classList.add('active');
+            btnListView.classList.remove('active');
+        });
+
+        btnListView.addEventListener('click', function () {
+            // Cambiar a vista Lista
+            candidateList.classList.remove('grid-view-mode');
+            candidateList.classList.add('list-view-mode');
+
+            // Cambiar clases de columnas
+            document.querySelectorAll('.candidate-item').forEach(item => {
+                item.className = 'candidate-item  col-lg-12';
+            });
+
+            // Mostrar/ocultar contenido
+            document.querySelectorAll('.grid-view-content').forEach(el => el.style.display =
+                'none');
+            document.querySelectorAll('.list-view-content').forEach(el => el.style.display =
+                'block');
+
+            // Cambiar los cards a mb-0
+            document.querySelectorAll('.candidate-item .card').forEach(card => {
+                card.classList.add('mb-0');
+            });
+
+            // Cambiar botones activos
+            btnListView.classList.add('active');
+            btnGridView.classList.remove('active');
+        });
     }
 
 

@@ -274,63 +274,6 @@
     <!-- Custom DataTable Script -->
     {{-- <script src="{{ url('/assets/js/mandamientos/index.js') }}"></script> --}}
 
-    <script>
-        // Toggle entre vista Grid y Lista
-        document.addEventListener('DOMContentLoaded', function() {
-            const btnGridView = document.getElementById('btn-grid-view');
-            const btnListView = document.getElementById('btn-list-view');
-            const candidateList = document.getElementById('listadoMandamientos');
-
-            if (btnGridView && btnListView) {
-                btnGridView.addEventListener('click', function() {
-                    // Cambiar a vista Grid
-                    candidateList.classList.remove('list-view-mode');
-                    candidateList.classList.add('grid-view-mode');
-
-                    // Cambiar clases de columnas
-                    document.querySelectorAll('.candidate-item').forEach(item => {
-                        item.className = 'candidate-item col-xxl-3 col-md-6';
-                    });
-
-                    // Mostrar/ocultar contenido
-                    document.querySelectorAll('.grid-view-content').forEach(el => el.style.display =
-                        'block');
-                    document.querySelectorAll('.list-view-content').forEach(el => el.style.display =
-                        'none');
-
-                    // Cambiar botones activos
-                    btnGridView.classList.add('active');
-                    btnListView.classList.remove('active');
-                });
-
-                btnListView.addEventListener('click', function() {
-                    // Cambiar a vista Lista
-                    candidateList.classList.remove('grid-view-mode');
-                    candidateList.classList.add('list-view-mode');
-
-                    // Cambiar clases de columnas
-                    document.querySelectorAll('.candidate-item').forEach(item => {
-                        item.className = 'candidate-item  col-lg-12';
-                    });
-
-                    // Mostrar/ocultar contenido
-                    document.querySelectorAll('.grid-view-content').forEach(el => el.style.display =
-                        'none');
-                    document.querySelectorAll('.list-view-content').forEach(el => el.style.display =
-                        'block');
-
-                    // Cambiar los cards a mb-0
-                    document.querySelectorAll('.candidate-item .card').forEach(card => {
-                        card.classList.add('mb-0');
-                    });
-
-                    // Cambiar botones activos
-                    btnListView.classList.add('active');
-                    btnGridView.classList.remove('active');
-                });
-            }
-        });
-    </script>
     <script src="/assets/libs/filepond/filepond.min.js"></script>
     <script src="/assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js"></script>
     <script src="/assets/libs/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js"></script>
