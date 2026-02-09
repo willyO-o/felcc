@@ -132,6 +132,7 @@
                 </div>
                 <form method="POST" id="mandamientoForm" action="/mandamientos">
 
+                    <input type="hidden" name="_method" id="formMethod" value="POST">
                     <div class="modal-body">
                         <div class="row g-3">
                             <div class="col-md-6">
@@ -172,22 +173,22 @@
                             <div class="col-xxl-6">
                                 <div>
                                     <label for="id_juzgado" class="form-label">Juzgado</label>
-                                    <select name="id_juzgado" id="id_juzgado" class="form-select"></select>
+                                    <select name="id_juzgado" id="id_juzgado" class="form-select" required></select>
                                 </div>
                             </div><!--end col-->
 
                             <div class="col-xxl-6">
                                 <div>
                                     <label for="id_delito" class="form-label">Delito</label>
-                                    <select name="id_delito" id="id_delito" class="form-select"></select>
+                                    <select name="id_delito" id="id_delito" class="form-select" required></select>
                                 </div>
                             </div><!--end col-->
                             <div class="col-xxl-6">
 
                                 <div>
-                                    <label for="id_tipo_mandamiento" class="form-label">Tipo Mandamiento</label>
+                                    <label for="id_tipo_mandamiento" class="form-label" >Tipo Mandamiento</label>
 
-                                    <select name="id_tipo_mandamiento" id="id_tipo_mandamiento" class="form-select">
+                                    <select name="id_tipo_mandamiento" id="id_tipo_mandamiento" class="form-select" required>
                                     </select>
                                 </div>
                             </div><!--end col-->

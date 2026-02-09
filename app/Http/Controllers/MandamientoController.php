@@ -22,8 +22,8 @@ class MandamientoController extends Controller
     {
         // Si es una petición AJAX, devolver los datos para DataTables
         if ($request->ajax()) {
-            $mandamientos=Mandamiento::getMandamientos($request->all())
-            ->paginate($request->get('size', 10), ['*'], 'page', $request->get('page', 1));
+            $mandamientos = Mandamiento::getMandamientos($request->all())
+                ->paginate($request->get('size', 10), ['*'], 'page', $request->get('page', 1));
 
             return response()->json([
                 'datos' => $mandamientos->items(),
@@ -59,7 +59,7 @@ class MandamientoController extends Controller
                 'ruta_multimedia' => 'multimedia.ruta',
                 'imagenes' => DB::raw("(SELECT JSON_ARRAYAGG(m.ruta)
                                             FROM multimedia m
-                                            WHERE m.id_persona = persona.id) as imagenes_persona" )
+                                            WHERE m.id_persona = persona.id) as imagenes_persona")
             ]);
 
 
@@ -119,14 +119,15 @@ class MandamientoController extends Controller
             if ($imagenMandamiento) {
                 $nombreArchivo = $imagenMandamiento->hashName();
                 $ruta =  $imagenMandamiento->storeAs('mandamientos', $nombreArchivo, 'public');
-                if (Storage::disk('public')->exists('mandamientos/' . $nombreArchivo)) {
-                    $multimedia = Multimedia::create([
-                        'tipo' => 'mandamiento',
-                        'ruta' => $ruta,
-                        'nombre_archivo' => $nombreArchivo,
-                        'id_mandamiento' => $mandamiento->id, // Se asignará después de crear el mandamiento
-                    ]);
+                if (!Storage::disk('public')->exists('mandamientos/' . $nombreArchivo)) {
+                    throw new \Exception('Error al guardar la imagen del mandamiento.');
                 }
+                $multimedia = Multimedia::create([
+                    'tipo' => 'mandamiento',
+                    'ruta' => $ruta,
+                    'nombre_archivo' => $nombreArchivo,
+                    'id_mandamiento' => $mandamiento->id, // Se asignará después de crear el mandamiento
+                ]);
             }
 
 
@@ -172,7 +173,51 @@ class MandamientoController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            DB::beginTransaction();
+            $mandamiento = Mandamiento::findOrFail($id);
+            $imagenMandamiento = $request->file('imagen_mandamiento');
+
+            if ($imagenMandamiento) {
+
+                $imagenExistente = Multimedia::where('id_mandamiento', $mandamiento->id)->first();
+
+                $nombreArchivo = $imagenMandamiento->hashName();
+                $ruta =  $imagenMandamiento->storeAs('mandamientos', $nombreArchivo, 'public');
+                if (!Storage::disk('public')->exists('mandamientos/' . $nombreArchivo)) {
+                    throw new \Exception('Error al guardar la imagen del mandamiento.');
+                }
+                $multimedia = Multimedia::create([
+                    'tipo' => 'mandamiento',
+                    'ruta' => $ruta,
+                    'nombre_archivo' => $nombreArchivo,
+                    'id_mandamiento' => $mandamiento->id, // Se asignará después de crear el mandamiento
+                ]);
+
+                if ($imagenExistente) {
+                    // Eliminar la imagen anterior del almacenamiento
+                    if (Storage::disk('public')->exists($imagenExistente->ruta)) {
+                        Storage::disk('public')->delete($imagenExistente->ruta);
+                    }
+                    // Eliminar el registro de la imagen anterior en la base de datos
+                    $imagenExistente->delete();
+                }
+            }
+
+            $mandamiento->update($request->all());
+
+            DB::commit();
+
+            $datos = Mandamiento::getMandamientos([], $id)->first();
+
+            return response()->json([
+                'success' => 'Mandamiento actualizado correctamente.',
+                'datos' => $datos
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Error al actualizar el mandamiento: ' . $e->getMessage()], 500);
+        }
     }
 
     /**

@@ -7,6 +7,13 @@
 (function () {
     'use strict';
 
+    const coloresEstados = {
+        "PENDIENTE": "info",
+        "EJECUTADO": "success",
+        "CANCELADO": "danger",
+
+    }
+
     // Variable global para la tabla
     let mandamientosTable;
 
@@ -78,7 +85,7 @@
         const cardClasses = isGridMode ? 'card h-100' : 'card h-100 mb-0';
 
         let html =/*html*/ `
-                <div class="${itemClasses}" style='opacity:${opacity};-moz-opacity: ${opacity};filter: alpha(opacity=${opacity});'>
+                <div data-id="${item.id}" class="${itemClasses}" style='opacity:${opacity};-moz-opacity: ${opacity};filter: alpha(opacity=${opacity});'>
                     <div class="${cardClasses}">
                         <div class="card-header border-0 pb-0 pt-3 align-items-center d-sm-flex">
                             <h4 class="card-title mb-0 flex-grow-1">HR: ${item.hoja_ruta || "-"} </h4>
@@ -117,7 +124,7 @@
                                         <p class="text-muted mb-2"> Delito: <strong>${item.nombre_delito || "-"}</strong></p>
                                         <p class="text-muted mb-2"> <strong>${item.tipo_mandamiento || "-"}</strong></p>
                                         <div class="d-flex flex-wrap gap-2 align-items-center">Estado:
-                                            <div class="badge text-bg-info">${item.estado}</div>
+                                            <div class="badge text-bg-${coloresEstados[item.estado] || 'secondary'}">${item.estado}</div>
                                             <!-- <div class="text-muted">2.2k Ratings</div> -->
                                         </div>
                                         <div class=" gap-4 mt-2 text-muted">
@@ -159,7 +166,7 @@
                                         </div>
                                         <div>
                                             Estado:
-                                            <div class="badge text-bg-success"> ${item.estado}</div>
+                                            <div class="badge text-bg-${coloresEstados[item.estado] || 'secondary'}"> ${item.estado}</div>
                                             <!-- <div class="text-muted">${item.estado}</div> -->
                                             <!-- <a href="#!" class="btn btn-soft-success">View Details</a>
                                             <a href="#!" class="btn btn-ghost-danger btn-icon custom-toggle active"
@@ -327,12 +334,17 @@
             processData: false,
             contentType: false
         }).done(function (response) {
-            console.log(response);
 
             notification(response.success, "Mandamiento Registrado")
 
-            const rowHtmlContent = rowHtml(response.datos,1);
-            $('#listadoMandamientos').prepend(rowHtmlContent);
+            const rowHtmlContent = rowHtml(response.datos, 1);
+
+            if ($("#formMethod").val() === 'PUT') {
+                $("#listadoMandamientos").find(`[data-id="${response.datos.id}"]`).replaceWith(rowHtmlContent);
+            } else {
+                $('#listadoMandamientos').prepend(rowHtmlContent);
+
+            }
             $('#miModal').modal('hide');
 
 
@@ -357,6 +369,10 @@
         $('#id_juzgado').val(null).trigger('change');
         $('#id_persona').val(null).trigger('change');
 
+        $("#mandamientoForm").attr('action', id ? `/mandamientos/${id}` : '/mandamientos');
+        $("#formMethod").val('POST');
+
+
 
         const miModal = new bootstrap.Modal(document.getElementById('miModal'));
         miModal.show();
@@ -368,22 +384,25 @@
                 .done(function (response) {
                     const datos = response.datos;
 
+                    console.log(datos);
+
+
                     // iterar el objeto de datos y asignar los valores a los campos correspondientes
 
                     Object.entries(datos).forEach(function ([key, value]) {
                         $(`#${key}`).val(value).trigger('change');
                         // para loc checkboxes o radio buttons
-                        if($(`input[name="${key}"]`).attr('type')=='radio'){
+                        if ($(`input[name="${key}"]`).attr('type') == 'radio') {
                             $(`input[name="${key}"][value="${value}"]`).prop('checked', true);
                         }
 
-                        if(key === 'id_persona' ){
-                            $(`#${key}`).append(new Option(datos.nombre_completo + "- Ci:" + (datos.ci||'') , value, true, true)).trigger('change');
+                        if (key === 'id_persona') {
+                            $(`#${key}`).append(new Option(datos.nombre_completo + "- Ci:" + (datos.ci || ''), value, true, true)).trigger('change');
                         }
 
-                        console.log($(`#${key}`));
-
                     });
+
+                    $("#formMethod").val('PUT');
                 })
                 .fail(function (error) {
                     console.error('Error al cargar los datos del mandamiento:', error);
