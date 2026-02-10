@@ -37,4 +37,9 @@ class Persona extends Model
     {
         return $this->hasMany(Mandamiento::class, 'id_persona');
     }
+
+    public function multimedia()
+    {
+        return $this->hasMany(Multimedia::class, 'id_persona');
+    }
 }

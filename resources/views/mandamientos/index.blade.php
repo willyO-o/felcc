@@ -11,8 +11,7 @@
                         <i class="ri-file-list-line align-middle me-1"></i> Listado de Mandamientos
                     </h5>
                     <div class="flex-shrink-0">
-                        <button value="" class="btn btn-primary openModal"
-                            id="mandamientosBtn">
+                        <button value="" class="btn btn-primary openModal" id="mandamientosBtn">
                             <i class="ri-add-line align-middle me-1"></i> Nuevo Mandamiento
                         </button>
                     </div>
@@ -147,13 +146,13 @@
                                     <label for="tipo_documento" class="form-label">Tipo </label>
                                     <div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="tipo_documento" id="rado-origina"
-                                                value="ORIGINAL" >
+                                            <input class="form-check-input" type="radio" name="tipo_documento"
+                                                id="rado-origina" value="ORIGINAL">
                                             <label class="form-check-label" for="rado-origina">ORIGINAL</label>
                                         </div>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" type="radio" name="tipo_documento" id="radio-fotocopia"
-                                                value="FOTOCOPIA" checked>
+                                            <input class="form-check-input" type="radio" name="tipo_documento"
+                                                id="radio-fotocopia" value="FOTOCOPIA" checked>
                                             <label class="form-check-label" for="radio-fotocopia">FOTOCOPIA</label>
                                         </div>
                                     </div>
@@ -186,9 +185,10 @@
                             <div class="col-xxl-6">
 
                                 <div>
-                                    <label for="id_tipo_mandamiento" class="form-label" >Tipo Mandamiento</label>
+                                    <label for="id_tipo_mandamiento" class="form-label">Tipo Mandamiento</label>
 
-                                    <select name="id_tipo_mandamiento" id="id_tipo_mandamiento" class="form-select" required>
+                                    <select name="id_tipo_mandamiento" id="id_tipo_mandamiento" class="form-select"
+                                        required>
                                     </select>
                                 </div>
                             </div><!--end col-->
@@ -246,6 +246,28 @@
             </div>
         </div>
     </div>
+
+
+    <div class="modal fade" id="modalDetalles" tabindex="-1" aria-labelledby="modalDetalles" data-bs-focus="false"
+        aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalDetallesLabel">Detalles del Mandamiento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
 @endsection
 

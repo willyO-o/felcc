@@ -90,7 +90,7 @@
                         <div class="card-header border-0 pb-0 pt-3 align-items-center d-sm-flex">
                             <h4 class="card-title mb-0 flex-grow-1">HR: ${item.hoja_ruta || "-"} </h4>
                             <div class="mt-2 mt-sm-0">
-                                <button type="button" class="btn btn-soft-secondary btn-sm shadow-none" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Detalles">
+                                <button type="button" value="${item.id}" class="btn btn-soft-secondary btn-sm shadow-none verDetalles" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Detalles">
                                     <i class="ri-eye-line"></i>
                                 </button>
                                 <button type="button" value="${item.id}"  class="btn btn-soft-secondary btn-sm shadow-none openModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Mandamiento">
@@ -358,64 +358,81 @@
     });
 
 
-    $(document).on('click', '.openModal', function (e) {
-        e.preventDefault();
+    $(document)
+        .on('click', '.openModal', function (e) {
+            e.preventDefault();
 
-        const id = $(this).val();
-        $("#mandamientoForm")[0].reset();
-        // seleccionar todos los select2 y limpiar su selección
-        $('#id_tipo_mandamiento').val(null).trigger('change');
-        $('#id_delito').val(null).trigger('change');
-        $('#id_juzgado').val(null).trigger('change');
-        $('#id_persona').val(null).trigger('change');
+            const id = $(this).val();
+            $("#mandamientoForm")[0].reset();
+            // seleccionar todos los select2 y limpiar su selección
+            $('#id_tipo_mandamiento').val(null).trigger('change');
+            $('#id_delito').val(null).trigger('change');
+            $('#id_juzgado').val(null).trigger('change');
+            $('#id_persona').val(null).trigger('change');
 
-        $("#mandamientoForm").attr('action', id ? `/mandamientos/${id}` : '/mandamientos');
-        $("#formMethod").val('POST');
-
-
-
-        const miModal = new bootstrap.Modal(document.getElementById('miModal'));
-        miModal.show();
+            $("#mandamientoForm").attr('action', id ? `/mandamientos/${id}` : '/mandamientos');
+            $("#formMethod").val('POST');
 
 
-        if (id) {
+
+            const miModal = new bootstrap.Modal(document.getElementById('miModal'));
+            miModal.show();
+
+
+            if (id) {
+
+                $.get(`/mandamientos/${id}/edit`)
+                    .done(function (response) {
+                        const datos = response.datos;
+
+                        console.log(datos);
+
+
+                        // iterar el objeto de datos y asignar los valores a los campos correspondientes
+
+                        Object.entries(datos).forEach(function ([key, value]) {
+                            $(`#${key}`).val(value).trigger('change');
+                            // para loc checkboxes o radio buttons
+                            if ($(`input[name="${key}"]`).attr('type') == 'radio') {
+                                $(`input[name="${key}"][value="${value}"]`).prop('checked', true);
+                            }
+
+                            if (key === 'id_persona') {
+                                $(`#${key}`).append(new Option(datos.nombre_completo + "- Ci:" + (datos.ci || ''), value, true, true)).trigger('change');
+                            }
+
+                        });
+
+                        $("#formMethod").val('PUT');
+                    })
+                    .fail(function (error) {
+                        console.error('Error al cargar los datos del mandamiento:', error);
+                        showAlert('Error al cargar los datos del mandamiento', 'error');
+                    });
+
+
+            }
+
+
+
+        })
+        .on('click', '.verDetalles', function (e) {
+            e.preventDefault();
+            const id = $(this).val();
+            // Aquí puedes agregar la lógica para mostrar los detalles del mandamiento con el ID proporcionado
+            console.log('Ver detalles del mandamiento con ID:', id);
+            $("#modalDetalles").modal('show');
+            $("#modalDetalles .modal-body").html('<div class="text-center"><span class="loaderHttp"></span><span class="text-muted">Cargando detalles...</span></div>');
 
             $.get(`/mandamientos/${id}`)
                 .done(function (response) {
-                    const datos = response.datos;
-
-                    console.log(datos);
-
-
-                    // iterar el objeto de datos y asignar los valores a los campos correspondientes
-
-                    Object.entries(datos).forEach(function ([key, value]) {
-                        $(`#${key}`).val(value).trigger('change');
-                        // para loc checkboxes o radio buttons
-                        if ($(`input[name="${key}"]`).attr('type') == 'radio') {
-                            $(`input[name="${key}"][value="${value}"]`).prop('checked', true);
-                        }
-
-                        if (key === 'id_persona') {
-                            $(`#${key}`).append(new Option(datos.nombre_completo + "- Ci:" + (datos.ci || ''), value, true, true)).trigger('change');
-                        }
-
-                    });
-
-                    $("#formMethod").val('PUT');
+                    $("#modalDetalles .modal-body").html(response);
                 })
                 .fail(function (error) {
-                    console.error('Error al cargar los datos del mandamiento:', error);
-                    showAlert('Error al cargar los datos del mandamiento', 'error');
+                    console.error('Error al cargar los detalles del mandamiento:', error);
+                    $("#modalDetalles .modal-body").html('<p class="text-danger">Error al cargar los detalles del mandamiento.</p>');
                 });
-
-
-        }
-
-
-
-    })
-
+        });
 
     /* cargar datos parametricos tipo mandamiento */
 

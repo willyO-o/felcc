@@ -155,7 +155,7 @@ class MandamientoController extends Controller
             return response()->json(['error' => 'Mandamiento no encontrado'], 404);
         }
 
-        return response()->json(['datos' => $mandamiento], 200);
+        return view('mandamientos.show', compact('mandamiento'));
     }
 
     /**
@@ -163,9 +163,13 @@ class MandamientoController extends Controller
      */
     public function edit(string $id)
     {
-        $mandamientos = Mandamiento::findOrFail($id);
-        $tipoMandamientos = TipoMandamiento::all();
-        return view('mandamientos.formulario', compact('mandamientos', 'tipoMandamientos'));
+        $mandamiento = Mandamiento::getMandamientos([], $id)->first();
+
+        if (!$mandamiento) {
+            return response()->json(['error' => 'Mandamiento no encontrado'], 404);
+        }
+
+        return response()->json(['datos' => $mandamiento], 200);
     }
 
     /**
