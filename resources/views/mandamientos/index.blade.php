@@ -158,7 +158,7 @@
                                     </div>
                                 </div>
                             </div><!--end col-->
-                            <div class="col-xxl-6">
+                            <div class="col-lg-6">
                                 <div>
                                     <label for="id_persona" class="form-label">Persona <span id="btnPersona"
                                             class="btn btn-sm btn-primary">+ Añadir</span></label>
@@ -169,20 +169,20 @@
                             </div><!--end col-->
 
 
-                            <div class="col-xxl-6">
+                            <div class="col-lg-6">
                                 <div>
                                     <label for="id_juzgado" class="form-label">Juzgado</label>
                                     <select name="id_juzgado" id="id_juzgado" class="form-select" required></select>
                                 </div>
                             </div><!--end col-->
 
-                            <div class="col-xxl-6">
+                            <div class="col-lg-6">
                                 <div>
                                     <label for="id_delito" class="form-label">Delito</label>
                                     <select name="id_delito" id="id_delito" class="form-select" required></select>
                                 </div>
                             </div><!--end col-->
-                            <div class="col-xxl-6">
+                            <div class="col-lg-6">
 
                                 <div>
                                     <label for="id_tipo_mandamiento" class="form-label">Tipo Mandamiento</label>
@@ -214,11 +214,25 @@
                                     </div>
                                 </div>
                             </div><!--end col-->
-                            <div class="col-md-12">
+                            <div class="col-md-4 caja">
+                                <div>
+                                    <label for="fecha_ejecucion" class="form-label">Fecha Ejecución/Cancelación</label>
+                                    <input type="date" class="form-control" id="fecha_ejecucion"
+                                        max="{{ now()->format('Y-m-d') }}" placeholder="Ingrese fecha"
+                                        name="fecha_ejecucion" value="">
+                                </div>
+                            </div><!--end col-->
+                            <div class="col ">
                                 <div>
                                     <label for="asignado" class="form-label">Asignado A</label>
                                     <input type="text" class="form-control" id="asignado"
                                         placeholder="Ingrese asignado" name="asignado" value="">
+                                </div>
+                            </div><!--end col-->
+                            <div class="col-12 ">
+                                <div>
+                                    <label for="actividades_realizadas" class="form-label">Actividades realizadas</label>
+                                    <textarea name="actividades_realizadas" id="actividades_realizadas" class="form-control" rows="3"></textarea>
                                 </div>
                             </div><!--end col-->
 
@@ -323,4 +337,5 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fslightbox/3.4.0-2/index.js"
         integrity="sha512-Vdge+4gAuFr0U/JCfFdR24aOl9R0c/3pCYgi5bt/nU+Hl6REetTWmOr6FYjOW/7JdyQt27U8x7XJcE+IS8vKMA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
 @endsection

@@ -141,7 +141,7 @@ $(function () {
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
             confirmButtonText: txtButon,
-            cancelButtonText: 'No, cancelar'
+            cancelButtonText: 'No, cancelar',
         });
 
         return result.isConfirmed;
@@ -280,6 +280,22 @@ $(function () {
 
         // return fechaFormateada;
 
+    }
+
+    window.fechaInput = function (fecha) {
+
+        if (fecha == null || fecha == undefined || fecha == '' || fecha == '0000-00-00') {
+            return '';
+        }
+        const d = new Date(fecha);
+
+        // Extraemos las partes (getMonth() empieza en 0, por eso sumamos 1)
+        const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+        const dd = String(d.getUTCDate()).padStart(2, '0');
+        const yyyy = d.getUTCFullYear();
+
+        const resultado = `${yyyy}-${mm}-${dd}`;
+        return resultado;
     }
 
     window.calcularEdad = function (fecha) {

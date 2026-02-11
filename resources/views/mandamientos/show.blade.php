@@ -60,10 +60,11 @@
                         <div class="mt-xl-0 mt-5">
                             <div class="d-flex">
                                 <div class="flex-grow-1">
+                                    <h2> Nro HR: {{ $mandamiento->hoja_ruta }}</h2>
                                     <h4>{{ $mandamiento->persona?->nombre_completo }}</h4>
                                     <div class="hstack gap-3 flex-wrap">
                                         <div><a href="#" class="text-primary d-block"><span
-                                                    class="text-muted fw-medium">C.I.:</span>{{ $mandamiento->persona?->ci }}</a>
+                                                    class="text-muted fw-medium">C.I.: </span>{{ $mandamiento->persona?->ci }}</a>
                                         </div>
                                         <div class="vr"></div>
                                         <div class="text-muted">TIPO : <span
@@ -168,7 +169,7 @@
                             <div class="row">
                                 <div class="col-xl-6">
                                     <div class="mt-4">
-                                        <h5 class="fs-14">Tipo Mandamiento  :</h5>
+                                        <h5 class="fs-14">Tipo Mandamiento :</h5>
                                         <div class="d-flex flex-wrap gap-2">
                                             <div class="text-muted"> <span
                                                     class="">{{ $mandamiento->tipo_mandamiento }}</span>
@@ -192,7 +193,7 @@
                             </div>
                             <!-- end row -->
 
-                            <div class="mt-4 text-muted">
+                            <div class="mt-4 text-muted d-none">
                                 <h5 class="fs-14">Description :</h5>
                                 <p>Tommy Hilfiger men striped pink sweatshirt. Crafted with cotton.
                                     Material composition is 100% organic cotton. This is one of the
@@ -202,40 +203,93 @@
                             </div>
 
                             <div class="row">
-                                <div class="col-sm-6">
+                                <div class="col-12">
                                     <div class="mt-3">
-                                        <h5 class="fs-14">Features :</h5>
-                                        <ul class="list-unstyled">
-                                            <li class="py-1"><i
-                                                    class="mdi mdi-circle-medium me-1 text-muted align-middle"></i>
-                                                Full Sleeve</li>
-                                            <li class="py-1"><i
-                                                    class="mdi mdi-circle-medium me-1 text-muted align-middle"></i>
-                                                Cotton</li>
-                                            <li class="py-1"><i
-                                                    class="mdi mdi-circle-medium me-1 text-muted align-middle"></i>
-                                                All Sizes available</li>
-                                            <li class="py-1"><i
-                                                    class="mdi mdi-circle-medium me-1 text-muted align-middle"></i>
-                                                4 Different Color</li>
-                                        </ul>
+                                        <h5 class="fs-14">
+                                            <i class="ri-user-line me-1 align-middle"></i>
+                                            Datos del imputado :</h5>
+                                        <div class="table-responsive">
+                                            <table class="table mb-0">
+                                                <tbody>
+
+                                                    <tr>
+                                                        <th scope="row">Nro C.I.</th>
+                                                        <td>{{ $mandamiento->ci }}</td>
+                                                    </tr>
+                                                    <tr>
+
+                                                        <th scope="row" style="width: 200px;">
+                                                            Nombre</th>
+                                                        <td>{{ $mandamiento->persona->nombre }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row">Apellidos</th>
+                                                        <td>{{ $mandamiento->persona->paterno }}
+                                                            {{ $mandamiento->persona->materno }}
+                                                        </td>
+                                                    </tr>
+
+                                                    <tr>
+                                                        <th scope="row">Nro Celular</th>
+                                                        <td>{{ $mandamiento->persona->telefono }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row">Edad</th>
+                                                        <td>{{ $mandamiento->persona?->fecha_nacimiento?->age }} años
+                                                        </td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row">Domicilio</th>
+                                                        <td>{{ $mandamiento->persona?->domicilio }}</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <th scope="row">Vehiculos</th>
+                                                        <td>{{ $mandamiento->persona?->vehiculos }}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
                                     </div>
                                 </div>
-                                <div class="col-sm-6">
-                                    <div class="mt-3">
-                                        <h5 class="fs-14">Services :</h5>
-                                        <ul class="list-unstyled product-desc-list">
-                                            <li class="py-1">10 Days Replacement</li>
-                                            <li class="py-1">Cash on Delivery available</li>
-                                        </ul>
-                                    </div>
-                                </div>
+
                             </div>
 
 
                             <div class="product-content mt-5">
-                                <h5 class="fs-14 mb-3">Product Description :</h5>
-                                <nav>
+                                <h5 class="fs-14 mb-3">
+                                    <i class="ri-file-list-line me-1 align-middle"></i>
+                                    Detalles :
+                                </h5>
+                                <div class="table-responsive">
+                                    <table class="table mb-0">
+                                        <tbody>
+                                            <tr>
+                                                <th scope="row" style="width: 200px;">
+                                                Nro Hoja de Ruta / Memorandum
+                                                </th>
+                                                <td>{{ $mandamiento->hoja_ruta }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">Estado</th>
+                                                <td>{{ $mandamiento->estado }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">Fecha Ejecución</th>
+                                                <td>{{ $mandamiento->fecha_ejecucion?->format('d/m/Y') }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">Actividades Realizadas</th>
+                                                <td>{{ $mandamiento->actividades_realizadas }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th scope="row">Asignado a</th>
+                                                <td>{{ $mandamiento->asignado }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <nav class="d-none">
                                     <ul class="nav nav-tabs nav-tabs-custom nav-success" id="nav-tab" role="tablist">
                                         <li class="nav-item">
                                             <a class="nav-link active" id="nav-speci-tab" data-bs-toggle="tab"
@@ -249,7 +303,7 @@
                                         </li>
                                     </ul>
                                 </nav>
-                                <div class="tab-content border border-top-0 p-4" id="nav-tabContent">
+                                <div class="tab-content border border-top-0 p-4 d-none" id="nav-tabContent">
                                     <div class="tab-pane fade show active" id="nav-speci" role="tabpanel"
                                         aria-labelledby="nav-speci-tab">
                                         <div class="table-responsive">
@@ -316,7 +370,7 @@
                             </div>
                             <!-- product-content -->
 
-                            <div class="mt-5">
+                            <div class="mt-5 d-none">
                                 <div>
                                     <h5 class="fs-14 mb-3">Ratings & Reviews</h5>
                                 </div>

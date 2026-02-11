@@ -29,6 +29,19 @@ class Mandamiento extends Model
         'fecha_ejecucion' => 'date'
     ];
 
+
+    static $rules = [
+        'estado' => 'required|in:PENDIENTE,EJECUTADO,CANCELADO',
+        'id_juzgado' => 'required|exists:juzgado,id',
+        'id_delito' => 'required|exists:delito,id',
+        'id_tipo_mandamiento' => 'required|exists:tipo_mandamiento,id',
+        'id_persona' => 'required|exists:persona,id',
+        'actividades_realizadas' => 'nullable|string',
+        'fecha_ejecucion' => 'nullable|date|before_or_equal:today',
+        'tipo_documento' => 'nullable|string|max:255',
+        'asignado' => 'nullable|string|max:255',
+    ];
+
     /**
      * Relación con usuario
      */

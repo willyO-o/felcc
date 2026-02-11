@@ -88,7 +88,7 @@
                 <div data-id="${item.id}" class="${itemClasses}" style='opacity:${opacity};-moz-opacity: ${opacity};filter: alpha(opacity=${opacity});'>
                     <div class="${cardClasses}">
                         <div class="card-header border-0 pb-0 pt-3 align-items-center d-sm-flex">
-                            <h4 class="card-title mb-0 flex-grow-1">HR: ${item.hoja_ruta || "-"} </h4>
+                            <h4 class="card-title mb-0 flex-grow-1 hr-label">HR: ${item.hoja_ruta || "-"} </h4>
                             <div class="mt-2 mt-sm-0">
                                 <button type="button" value="${item.id}" class="btn btn-soft-secondary btn-sm shadow-none verDetalles" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Detalles">
                                     <i class="ri-eye-line"></i>
@@ -96,7 +96,7 @@
                                 <button type="button" value="${item.id}"  class="btn btn-soft-secondary btn-sm shadow-none openModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Mandamiento">
                                     <i class="ri-pencil-line"></i>
                                 </button>
-                                <button type="button" class="btn btn-soft-secondary btn-sm shadow-none" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Mandamiento">
+                                <button type="button" class="btn btn-soft-secondary btn-sm shadow-none btnDelete" value="${item.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Mandamiento">
                                     <i class="ri-delete-bin-2-line"></i>
                                 </button>
                                 ${item.ruta ? `
@@ -357,6 +357,10 @@
 
     });
 
+    $(document).on('change', 'input[name="estado"]', function () {
+
+        ($(this).val() === 'EJECUTADO' || $(this).val() === 'CANCELADO') ? $('#fecha_ejecucion').closest('.caja').removeClass('d-none') : $('#fecha_ejecucion').closest('.caja').addClass('d-none');
+    });
 
     $(document)
         .on('click', '.openModal', function (e) {
@@ -385,21 +389,28 @@
                     .done(function (response) {
                         const datos = response.datos;
 
-                        console.log(datos);
 
 
                         // iterar el objeto de datos y asignar los valores a los campos correspondientes
 
                         Object.entries(datos).forEach(function ([key, value]) {
+
+
+
                             $(`#${key}`).val(value).trigger('change');
                             // para loc checkboxes o radio buttons
                             if ($(`input[name="${key}"]`).attr('type') == 'radio') {
-                                $(`input[name="${key}"][value="${value}"]`).prop('checked', true);
+                                $(`input[name="${key}"][value="${value}"]`).prop('checked', true).trigger('change');
                             }
 
                             if (key === 'id_persona') {
                                 $(`#${key}`).append(new Option(datos.nombre_completo + "- Ci:" + (datos.ci || ''), value, true, true)).trigger('change');
                             }
+
+                            if (key === 'fecha_ejecucion' && value) {
+                                $(`#${key}`).val(fechaInput(value));
+                            }
+
 
                         });
 
@@ -432,6 +443,21 @@
                     console.error('Error al cargar los detalles del mandamiento:', error);
                     $("#modalDetalles .modal-body").html('<p class="text-danger">Error al cargar los detalles del mandamiento.</p>');
                 });
+        })
+        .on('click', '.btnDelete', async function (e) {
+            e.preventDefault();
+            const id = $(this).val();
+            const hrLabel = $(this).closest('.card').find('.hr-label').text();
+
+            const confirmacion = await confirmarEnvio( "Si, Eliminar", `¿Estás seguro de eliminar este mandamiento? <br> <strong>${hrLabel}</strong>`, "¡Sí, eliminar!", "Cancelar", "warning");
+
+
+            console.log(confirmacion, hrLabel);
+
+            if(confirmacion){
+
+            }
+
         });
 
     /* cargar datos parametricos tipo mandamiento */
