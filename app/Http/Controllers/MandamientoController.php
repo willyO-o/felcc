@@ -31,66 +31,13 @@ class MandamientoController extends Controller
                 'page' => $mandamientos->currentPage(),
             ]);
 
-            return $this->getDataForDataTable($request);
         }
 
         // Si no es AJAX, mostrar la vista
         return view('mandamientos.index');
     }
 
-    /**
-     * Obtener datos para DataTables usando Yajra (Server-Side)
-     */
-    private function getDataForDataTable(Request $request)
-    {
-        // $mandamientos = Mandamiento::with(['usuario', 'juzgado', 'delito', 'tipoMandamiento'])
-        $mandamientos = Mandamiento::select('mandamiento.*')
-            ->leftJoin('persona', 'mandamiento.id_persona', '=', 'persona.id')
-            ->leftJoin('delito', 'mandamiento.id_delito', '=', 'delito.id')
-            ->leftJoin('juzgado', 'mandamiento.id_juzgado', '=', 'juzgado.id')
-            ->leftJoin('tipo_mandamiento', 'mandamiento.id_tipo_mandamiento', '=', 'tipo_mandamiento.id')
-            ->leftJoin('multimedia', 'mandamiento.id', '=', 'multimedia.id_mandamiento')
-            ->addSelect([
-                'nombre_completo' => DB::raw("CONCAT(COALESCE(persona.nombre, ''), ' ', COALESCE(persona.paterno, ''), ' ', COALESCE(persona.materno, '')) as nombre_completo"),
-                'ci' => 'persona.ci',
-                'nombre_delito' => 'delito.nombre_delito',
-                'nombre_juzgado' => 'juzgado.nombre_juzgado',
-                'tipo_mandamiento' => 'tipo_mandamiento.tipo_mandamiento',
-                'ruta_multimedia' => 'multimedia.ruta',
-                'imagenes' => DB::raw("(SELECT JSON_ARRAYAGG(m.ruta)
-                                            FROM multimedia m
-                                            WHERE m.id_persona = persona.id) as imagenes_persona")
-            ]);
 
-
-        $mandamientos = $mandamientos->paginate(10);
-
-        return [
-            'datos' => $mandamientos->items(),
-            'total' => $mandamientos->total(),
-            'page' => $mandamientos->currentPage(),
-        ];
-    }
-
-    /**
-     * Generar botones de acción
-     */
-    private function getActionButtons($id)
-    {
-        return '
-            <div class="d-flex gap-2">
-                <a href="' . route('mandamientos.show', $id) . '" class="btn btn-sm btn-info" title="Ver">
-                    <i class="ri-eye-line"></i>
-                </a>
-                <a href="' . route('mandamientos.edit', $id) . '" class="btn btn-sm btn-warning" title="Editar">
-                    <i class="ri-edit-line"></i>
-                </a>
-                <button type="button" class="btn btn-sm btn-danger btn-delete" data-id="' . $id . '" title="Eliminar">
-                    <i class="ri-delete-bin-line"></i>
-                </button>
-            </div>
-        ';
-    }
 
     /**
      * Show the form for creating a new resource.
@@ -230,6 +177,9 @@ class MandamientoController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $mandamiento = Mandamiento::findOrFail($id);
+        $mandamiento->delete();
+
+        return response()->json(['success' => 'Mandamiento eliminado correctamente.'], 200);
     }
 }

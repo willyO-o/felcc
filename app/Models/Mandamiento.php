@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+// usar soft deletes
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 class Mandamiento extends Model
 {
+    use SoftDeletes;
     protected $table = 'mandamiento';
 
     protected $fillable = [
@@ -105,6 +108,11 @@ class Mandamiento extends Model
     static function getMandamientos($filtros = [], $idMandamiento = null)
     {
 
+        $search = $filtros['search'] ?? null;
+
+
+
+
         $query = self::select('mandamiento.*')
             ->leftJoin('persona', 'mandamiento.id_persona', '=', 'persona.id')
             ->leftJoin('delito', 'mandamiento.id_delito', '=', 'delito.id')
@@ -123,6 +131,35 @@ class Mandamiento extends Model
                                             WHERE m.id_persona = persona.id) as imagenes_persona")
             ])
             ->orderBy('mandamiento.id', 'desc');
+
+        if ($search) {
+            $search= str_replace(' ', '%', $search); // Reemplazar espacios por comodines para mejorar la búsqueda
+            $query->where(function ($q) use ($search) {
+                $q->where('persona.nombre', 'like', "%$search%")
+                    ->orWhere('persona.paterno', 'like', "%$search%")
+                    ->orWhere('persona.materno', 'like', "%$search%")
+                    ->orWhere('persona.ci', 'like', "%$search%")
+                    ->orWhere('delito.nombre_delito', 'like', "%$search%")
+                    ->orWhere('juzgado.nombre_juzgado', 'like', "%$search%")
+                    ->orWhere('tipo_mandamiento.tipo_mandamiento', 'like', "%$search%")
+                    ->orWhere('mandamiento.hoja_ruta', 'like', "%$search%")
+                    ->orWhereRaw("CONCAT(COALESCE(persona.nombre, ''), ' ', COALESCE(persona.paterno, ''), ' ', COALESCE(persona.materno, '')) like ?", ["%$search%"])
+                    ->orWhereRaw("CONCAT(COALESCE(persona.ci, ''), ' ', COALESCE(persona.nombre, ''), ' ', COALESCE(persona.paterno, ''), ' ', COALESCE(persona.materno, '')) like ?", ["%$search%"])
+                    ->orWhereRaw("CONCAT(COALESCE(persona.nombre, ''), ' ', COALESCE(persona.paterno, ''), ' ', COALESCE(persona.materno, ''), ' ', COALESCE(persona.ci, '')) like ?", ["%$search%"]);
+
+            });
+
+        }
+
+        $idDelito = $filtros['id_delito'] ?? null;
+        if ($idDelito) {
+            $query->where('mandamiento.id_delito', $idDelito);
+        }
+
+        $estado = $filtros['estado'] ?? null;
+        if ($estado) {
+            $query->where('mandamiento.estado', $estado);
+        }
 
 
         if ($idMandamiento) {

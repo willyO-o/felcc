@@ -14,8 +14,6 @@
 
     }
 
-    // Variable global para la tabla
-    let mandamientosTable;
 
     $(document).on('click', '.image-popup-zoom', function (e) {
         e.preventDefault();
@@ -50,25 +48,27 @@
 
     function getDataFilter() {
 
-        dataScroll.tipo_persona = $("#filtroSelectTipoPersona").val();
-        dataScroll.estado_persona = $("#filtroEstadoPersona").val();
+        dataScroll.id_delito = $("#filtroDelito").val();
+        dataScroll.estado = $("#filtroEstado").val();
 
-        dataScroll.search = $("#inputBuscarPersona").val();
+        dataScroll.search = $("#searchMandamientos").val();
 
         return dataScroll;
     }
+
+
 
     let scrollPersonal = $('#listadoMandamientos').scrollPagination({
         'url': '/mandamientos', // the url you are fetching the results
         'method': 'get',
         'data': getDataFilter(),
         'dataTemplateCallback': rowHtml,
-        'elementCountSelector': '#contadorListaMandamientos',
+        'elementCountSelector': '#detalles-pagina',
         'elementCountTemplate': '<span  class=""> Listando <b> {count}  </b>elementos de <b> {total} </b> encontrados </span>',
         'loading': '#loadingMandamientos',
         'scroller': "#containerListaMandamientos",
-        'loadingText': `<div  class=" text-center"><span class="loaderHttp"></span><span class="text-muted">Cargando...</span></div>`,
-        'loadingNomoreText': '<h6 class="text-danger">No se encontraron más Resultados</h6>',
+        'loadingText': `<div  class=" text-center"><i class="mdi mdi-loading mdi-spin fs-20 align-middle me-2"></i><span class="text-muted">Cargando...</span></div>`,
+        'loadingNomoreText': '<h6 class="text-danger text-center">No se encontraron más Resultados</h6>',
 
     });
 
@@ -187,7 +187,23 @@
         return html;
     }
 
+    let timerSearch;
 
+    $("#searchMandamientos").on('input', function (e) {
+        e.preventDefault();
+        clearTimeout(timerSearch);
+        if ($(this).val().trim() != '' && $(this).val().trim().length < 3) return;
+        timerSearch = setTimeout(function () {
+
+            scrollPersonal.resetScrollPagination(getDataFilter());
+        }, 500);
+
+    });
+
+    $("#filtroDelito,#filtroEstado").on('change', function (e) {
+        e.preventDefault();
+        scrollPersonal.resetScrollPagination(getDataFilter());
+    });
     const btnGridView = document.getElementById('btn-grid-view');
     const btnListView = document.getElementById('btn-list-view');
     const candidateList = document.getElementById('listadoMandamientos');
@@ -276,19 +292,6 @@
     }
 
 
-    /**
-     * Inicializar botones de eliminación
-     */
-    function initDeleteButtons() {
-        $('.btn-delete').off('click').on('click', function () {
-            deleteId = $(this).data('id');
-            const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
-            deleteModal.show();
-        });
-    }
-
-
-
 
     /**
      * Mostrar alertas con SweetAlert2
@@ -307,14 +310,7 @@
         Swal.fire(config);
     }
 
-    /**
-     * Función para recargar la tabla (puede ser llamada desde fuera)
-     */
-    window.reloadMandamientosTable = function () {
-        if (mandamientosTable) {
-            mandamientosTable.ajax.reload(null, false);
-        }
-    };
+
 
 
     $(document).on('submit', '#mandamientoForm', function (e) {
@@ -447,14 +443,32 @@
         .on('click', '.btnDelete', async function (e) {
             e.preventDefault();
             const id = $(this).val();
+
+            const btn = $(this);
             const hrLabel = $(this).closest('.card').find('.hr-label').text();
 
-            const confirmacion = await confirmarEnvio( "Si, Eliminar", `¿Estás seguro de eliminar este mandamiento? <br> <strong>${hrLabel}</strong>`, "¡Sí, eliminar!", "Cancelar", "warning");
+            const confirmacion = await confirmarEnvio("Si, Eliminar", `¿Estás seguro de eliminar este mandamiento? <br> <strong>${hrLabel}</strong>`, "¡Sí, eliminar!", "Cancelar", "warning");
 
+            if (confirmacion) {
 
-            console.log(confirmacion, hrLabel);
+                $.ajax({
+                    url: `/mandamientos/${id}`,
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    }
+                }).done(function (response) {
+                    notification(response.success, "Mandamiento Eliminado");
 
-            if(confirmacion){
+                    // Eliminar la tarjeta del DOM
+                    btn.closest('div[data-id="' + id + '"]').fadeOut(500, function () {
+                        $(this).remove();
+                    });
+
+                }).fail(function (xhr) {
+                    processError(xhr);
+
+                })
 
             }
 
@@ -485,6 +499,11 @@
             dropdownParent: $('#miModal'),
             placeholder: 'Seleccione un tipo de mandamiento',
             allowClear: true,
+            language: {
+                noResults: function () {
+                    return "No se encontraron tipos de mandamientos";
+                }
+            },
             width: '100%',
             tags: true,
             data: tiposMandamientos.map(function (tipo) {
@@ -595,6 +614,11 @@
             placeholder: 'Seleccione un delito',
             allowClear: true,
             width: '100%',
+            language: {
+                noResults: function () {
+                    return "No se encontraron delitos";
+                }
+            },
             tags: true,
             data: tiposDelitos.map(function (delito) {
                 return {
@@ -678,6 +702,24 @@
             }
 
         });
+
+        $("#filtroDelito").select2({
+            placeholder: 'Filtrar por delito',
+            theme: 'bootstrap-5',
+            allowClear: true,
+            language: {
+                noResults: function () {
+                    return "No se encontraron delitos";
+                }
+            },
+            width: '100%',
+            data: tiposDelitos.map(function (delito) {
+                return {
+                    id: delito.id,
+                    text: delito.nombre_delito
+                };
+            }),
+        });
     }
 
 
@@ -703,6 +745,11 @@
             placeholder: {
                 id: '',
                 text: 'Seleccione un juzgado'
+            },
+            language: {
+                noResults: function () {
+                    return "No se encontraron juzgados";
+                }
             },
             allowClear: true,
             width: '100%',
@@ -798,6 +845,11 @@
             dropdownParent: $('#miModal'),
             placeholder: 'Seleccione una persona',
             allowClear: true,
+            language: {
+                noResults: function () {
+                    return "No se encontraron personas";
+                }
+            },
             ajax: {
                 url: '/personas-search',
                 dataType: 'json',

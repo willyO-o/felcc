@@ -4,22 +4,43 @@
 
 @section('content')
     <div class="row">
+        <div class="col-12 d-flex justify-content-end mb-2">
+            <div class="flex-shrink-0">
+                <button value="" class="btn btn-primary openModal" id="mandamientosBtn">
+                    <i class="ri-add-line align-middle me-1"></i> Nuevo Mandamiento
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-lg-12">
             <div class="card">
-                <div class="card-header d-flex align-items-center">
-                    <h5 class="card-title mb-0 flex-grow-1">
-                        <i class="ri-file-list-line align-middle me-1"></i> Listado de Mandamientos
-                    </h5>
-                    <div class="flex-shrink-0">
-                        <button value="" class="btn btn-primary openModal" id="mandamientosBtn">
-                            <i class="ri-add-line align-middle me-1"></i> Nuevo Mandamiento
-                        </button>
-                    </div>
 
-                </div>
                 <div class="card-header">
-                    <div class="d-flex justify-content-end ">
-                        <div class="btn-group" role="group">
+                    <div class="d-flex flex-column-reverse flex-md-row justify-content-between align-items-center gap-2">
+                        <div class="col-md-4 mt-2 mt-md-0 ">
+                            <div class="input-group">
+                                <span class="input-group-text btn btn-primary"><i class="ri-search-line"></i></span>
+
+                                <input type="search" id="searchMandamientos" class="form-control "
+                                    placeholder="Buscar mandamiento...">
+                            </div>
+
+                        </div>
+                        <div class="col-md-4">
+                            <select name="filtroDelito" id="filtroDelito" class="">
+                                <option value="">Filtrar por Delito</option>
+                            </select>
+                        </div>
+                        <div class="col">
+                            <select name="filtroEstado" id="filtroEstado" class="form-select">
+                                <option value="">Filtrar por Estado</option>
+                                <option value="PENDIENTE">PENDIENTE</option>
+                                <option value="EJECUTADO">EJECUTADO</option>
+                                <option value="CANCELADO">CANCELADO</option>
+                            </select>
+                        </div>
+                        <div class="btn-group " role="group">
                             <button type="button" class="btn btn-outline-primary active" id="btn-grid-view">
                                 <i class="ri-grid-fill"></i> Grid
                             </button>
@@ -28,6 +49,10 @@
                             </button>
                         </div>
                     </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span id="detalles-pagina"></span>
+                    </div>
+
                 </div>
                 <!-- Botones para cambiar de vista -->
 
@@ -110,8 +135,11 @@
 
 
 
-                    </div>
 
+
+                    </div>
+                    <div id="loadingMandamientos" class="p-5">
+                    </div>
                 </div>
             </div>
         </div>
@@ -285,7 +313,6 @@
 
 @endsection
 
-@section('title', 'Listado de Mandamientos')
 
 @section('css')
     <!-- DataTables CSS -->
@@ -300,7 +327,7 @@
     {{-- <link href="{{ url('/assets/css/select2-bootstrap.css') }}" rel="stylesheet" type="text/css" /> --}}
 @endsection
 
-@section('page-title', 'Mandamientos de Aprehensión')
+@section('page-title', 'Lista de Mandamientos')
 
 @section('breadcrumb')
     <div class="page-title-right">
@@ -337,5 +364,5 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fslightbox/3.4.0-2/index.js"
         integrity="sha512-Vdge+4gAuFr0U/JCfFdR24aOl9R0c/3pCYgi5bt/nU+Hl6REetTWmOr6FYjOW/7JdyQt27U8x7XJcE+IS8vKMA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 @endsection

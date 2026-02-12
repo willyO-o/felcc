@@ -32,19 +32,21 @@
         <div class="main-content">
             <div class="page-content">
                 <div class="container-fluid">
+
                     <!-- start page title -->
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                                <h4 class="mb-sm-0">@yield('page-title', 'Dashboard')</h4>
-                                @yield('breadcrumb')
-                            </div>
-                        </div>
+                    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                        <h4 class="mb-sm-0">@yield('page-title', 'Dashboard')</h4>
+                        @yield('breadcrumb')
                     </div>
+                    {{-- <div class="row">
+                        <div class="col-12">
+
+                        </div>
+                    </div> --}}
                     <!-- end page title -->
 
                     <!-- Alerts/Mensajes -->
-                    @if (session('success'))
+                    {{-- @if (session('success'))
                         <div class="alert alert-success alert-dismissible fade show" role="alert">
                             <strong>¡Éxito!</strong> {{ session('success') }}
                             <button type="button" class="btn-close" data-bs-dismiss="alert"
@@ -71,7 +73,7 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert"
                                 aria-label="Close"></button>
                         </div>
-                    @endif
+                    @endif --}}
 
                     <!-- Content -->
                     @yield('content')
