@@ -29,3 +29,4 @@ Route::resource('delitos', App\Http\Controllers\DelitoController::class);
 Route::get('/personas-search', [PersonaController::class, 'search'])->name('personas.search');
 
 
+Route::resource('registro-criminal', App\Http\Controllers\RegistroCriminalController::class);

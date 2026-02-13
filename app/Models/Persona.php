@@ -42,4 +42,9 @@ class Persona extends Model
     {
         return $this->hasMany(Multimedia::class, 'id_persona');
     }
+
+    public function registroCriminal()
+    {
+        return $this->hasMany(RegistroCriminal::class, 'id_persona');
+    }
 }
