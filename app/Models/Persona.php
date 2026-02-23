@@ -9,9 +9,8 @@ class Persona extends Model
     protected $table = 'persona';
 
     protected $fillable = [
-        'nombre',
-        'paterno',
-        'materno',
+        'nombres',
+        'apellidos',
         'ci',
         'domicilio',
         'telefono',
@@ -27,7 +26,7 @@ class Persona extends Model
      */
     public function getNombreCompletoAttribute()
     {
-        return trim($this->nombre . ' ' . $this->paterno . ' ' . $this->materno);
+        return trim($this->nombres . ' ' . $this->apellidos);
     }
 
     /**
@@ -47,4 +46,15 @@ class Persona extends Model
     {
         return $this->hasMany(RegistroCriminal::class, 'id_persona');
     }
+
+
+
+    static $rules = [
+        'nombres' => 'required|string|max:255',
+        'apellidos' => 'required|string|max:255',
+        'ci' => 'nullable|string|max:20|unique:persona,ci',
+        'fecha_nacimiento' => 'nullable|date|before:today',
+        'fotos' => 'nullable|array',
+        'fotos.*' => 'file|mimes:jpeg,png,jpg,webp|max:2048',
+    ];
 }

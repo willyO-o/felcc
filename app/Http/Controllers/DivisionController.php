@@ -3,16 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\RegistroCriminal;
+use App\Models\Division;
 
-class RegistroCriminalController extends Controller
+class DivisionController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('registro-criminal.index');
+        if (request()->ajax()) {
+            $divisions = Division::all();
+            return response()->json($divisions);
+        }
     }
 
     /**
@@ -20,8 +23,7 @@ class RegistroCriminalController extends Controller
      */
     public function create()
     {
-        $registroCriminal = new RegistroCriminal();
-        return view('registro-criminal.formulario', compact('registroCriminal'));
+        //
     }
 
     /**
@@ -29,7 +31,11 @@ class RegistroCriminalController extends Controller
      */
     public function store(Request $request)
     {
-        return $request->all();
+        $request->validate([
+            'division' => 'required|string|max:255',
+        ]);
+        $division = Division::create($request->all());
+        return response()->json(['success' => true, 'message' => 'División creada correctamente', 'data' => $division]);
     }
 
     /**

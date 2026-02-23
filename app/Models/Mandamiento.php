@@ -120,7 +120,7 @@ class Mandamiento extends Model
             ->leftJoin('tipo_mandamiento', 'mandamiento.id_tipo_mandamiento', '=', 'tipo_mandamiento.id')
             ->leftJoin('multimedia', 'mandamiento.id', '=', 'multimedia.id_mandamiento')
             ->addSelect([
-                'nombre_completo' => DB::raw("CONCAT(COALESCE(persona.nombre, ''), ' ', COALESCE(persona.paterno, ''), ' ', COALESCE(persona.materno, '')) as nombre_completo"),
+                'nombre_completo' => DB::raw("CONCAT(COALESCE(persona.nombres, ''), ' ', COALESCE(persona.apellidos, '')) as nombre_completo"),
                 'ci' => 'persona.ci',
                 'nombre_delito' => 'delito.nombre_delito',
                 'nombre_juzgado' => 'juzgado.nombre_juzgado',
@@ -135,17 +135,16 @@ class Mandamiento extends Model
         if ($search) {
             $search= str_replace(' ', '%', $search); // Reemplazar espacios por comodines para mejorar la búsqueda
             $query->where(function ($q) use ($search) {
-                $q->where('persona.nombre', 'like', "%$search%")
-                    ->orWhere('persona.paterno', 'like', "%$search%")
-                    ->orWhere('persona.materno', 'like', "%$search%")
+                $q->where('persona.nombres', 'like', "%$search%")
+                    ->orWhere('persona.apellidos', 'like', "%$search%")
                     ->orWhere('persona.ci', 'like', "%$search%")
                     ->orWhere('delito.nombre_delito', 'like', "%$search%")
                     ->orWhere('juzgado.nombre_juzgado', 'like', "%$search%")
                     ->orWhere('tipo_mandamiento.tipo_mandamiento', 'like', "%$search%")
                     ->orWhere('mandamiento.hoja_ruta', 'like', "%$search%")
-                    ->orWhereRaw("CONCAT(COALESCE(persona.nombre, ''), ' ', COALESCE(persona.paterno, ''), ' ', COALESCE(persona.materno, '')) like ?", ["%$search%"])
-                    ->orWhereRaw("CONCAT(COALESCE(persona.ci, ''), ' ', COALESCE(persona.nombre, ''), ' ', COALESCE(persona.paterno, ''), ' ', COALESCE(persona.materno, '')) like ?", ["%$search%"])
-                    ->orWhereRaw("CONCAT(COALESCE(persona.nombre, ''), ' ', COALESCE(persona.paterno, ''), ' ', COALESCE(persona.materno, ''), ' ', COALESCE(persona.ci, '')) like ?", ["%$search%"]);
+                    ->orWhereRaw("CONCAT(COALESCE(persona.nombres, ''), ' ', COALESCE(persona.apellidos, '')) like ?", ["%$search%"])
+                    ->orWhereRaw("CONCAT(COALESCE(persona.ci, ''), ' ', COALESCE(persona.nombres, ''), ' ', COALESCE(persona.apellidos, '')) like ?", ["%$search%"])
+                    ->orWhereRaw("CONCAT(COALESCE(persona.nombres, ''), ' ', COALESCE(persona.apellidos, ''), ' ', COALESCE(persona.ci, '')) like ?", ["%$search%"]);
 
             });
 

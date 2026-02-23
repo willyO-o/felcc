@@ -3,16 +3,18 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\RegistroCriminal;
-
-class RegistroCriminalController extends Controller
+use App\Models\Pais;
+class PaisController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('registro-criminal.index');
+        if (request()->ajax()) {
+            $paises = Pais::all();
+            return response()->json($paises);
+        }
     }
 
     /**
@@ -20,8 +22,7 @@ class RegistroCriminalController extends Controller
      */
     public function create()
     {
-        $registroCriminal = new RegistroCriminal();
-        return view('registro-criminal.formulario', compact('registroCriminal'));
+        //
     }
 
     /**
@@ -29,7 +30,7 @@ class RegistroCriminalController extends Controller
      */
     public function store(Request $request)
     {
-        return $request->all();
+        //
     }
 
     /**

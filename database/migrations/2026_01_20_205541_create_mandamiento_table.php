@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('mandamiento', function (Blueprint $table) {
             $table->id();
-            $table->string('hoja_ruta', 100);
+            $table->string('hoja_ruta', 100)->nullable();
             $table->string('estado', 20);
             $table->date('fecha_ejecucion')->nullable();
             $table->text('detalle_ejecucion')->nullable();
@@ -27,6 +27,7 @@ return new class extends Migration
             $table->foreignId('id_tipo_mandamiento')->constrained('tipo_mandamiento')->onDelete('cascade');
             $table->foreignId('id_persona')->constrained('persona')->onDelete('cascade');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

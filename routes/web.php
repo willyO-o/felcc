@@ -26,6 +26,8 @@ Route::resource('tipos-mandamientos', App\Http\Controllers\TipoMandamientoContro
 Route::resource('personas', PersonaController::class);
 Route::resource('juzgados', App\Http\Controllers\JuzgadoController::class);
 Route::resource('delitos', App\Http\Controllers\DelitoController::class);
+Route::resource('paises', App\Http\Controllers\PaisController::class);
+Route::resource('divisiones', App\Http\Controllers\DivisionController::class);
 Route::get('/personas-search', [PersonaController::class, 'search'])->name('personas.search');
 
 

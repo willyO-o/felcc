@@ -864,7 +864,7 @@
                         results: data.map(function (persona) {
                             return {
                                 id: persona.id,
-                                text: `${persona.nombre} ${persona.paterno || ""} ${persona.materno || ""} - CI: ${persona.ci || ""}`
+                                text: `${persona.nombres} ${persona.apellidos || ""} - CI: ${persona.ci || ""}`
                             };
                         })
                     };
@@ -897,14 +897,12 @@
             html: /*html */`
                 <form id="swal-persona-form" enctype="multipart/form-data" action="#" method="POST">
                     <input type="text" id="swal-ci" name="ci" class="form-control form-control-sm txtMayuscula mb-2" placeholder="Cédula de Identidad (opcional)" >
-                    <input type="text" id="swal-nombre" name="nombre" class="form-control form-control-sm txtMayuscula mb-2" placeholder="Nombre" required>
-                    <input type="text" id="swal-paterno" name="paterno" class="form-control form-control-sm txtMayuscula mb-2" placeholder="Apellido Paterno" required>
-                    <input type="text" id="swal-materno" name="materno" class="form-control form-control-sm txtMayuscula mb-2" placeholder="Apellido Materno (opcional)" >
+                    <input type="text" id="swal-nombres" name="nombres" class="form-control form-control-sm txtMayuscula mb-2" placeholder="Nombres" required>
+                    <input type="text" id="swal-apellidos" name="apellidos" class="form-control form-control-sm txtMayuscula mb-2" placeholder="Apellidos" required>
                     <input type="number" id="swal-celular" name="celular" class="form-control form-control-sm txtMayuscula mb-2" placeholder="Número de Celular (opcional)" >
                     <input type="date" id="swal-fecha_nacimiento" name="fecha_nacimiento" class="form-control form-control-sm mb-2" placeholder="Fecha de Nacimiento (opcional)">
                     <textarea id="swal-direccion" name="direccion" class="form-control form-control-sm mb-2" rows="3" placeholder="Dirección (opcional)"></textarea>
                     <input type="file" id="swal-foto" name="fotos" class="form-control form-control-sm mb-2" multiple accept="image/*" data-allow-reorder="true" data-max-file-size="3MB" data-max-files="3">
-
                 </form>
             `,
             focusConfirm: false,
@@ -1036,7 +1034,7 @@
                     // cerrar popup de agregar persona
 
                     // agregar la nueva persona al select del formulario principal
-                    const newOption = new Option(`${response.data.nombre} ${response.data.paterno} ${response.data.materno || ''} - ${response.data.ci || ''}`, response.data.id, true, true);
+                    const newOption = new Option(`${response.data.nombres} ${response.data.apellidos || ''} - ${response.data.ci || ''}`, response.data.id, true, true);
                     $('#id_persona').append(newOption).trigger('change');
 
                     setTimeout(() => {

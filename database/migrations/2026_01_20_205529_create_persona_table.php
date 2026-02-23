@@ -13,13 +13,19 @@ return new class extends Migration
     {
         Schema::create('persona', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre', 150);
-            $table->string('paterno', 150)->nullable();
-            $table->string('materno', 150)->nullable();
+            $table->string('nombres', 150);
+            $table->string('apellidos', 150)->nullable();
             $table->string('ci', 20)->nullable()->unique();
             $table->text('domicilio')->nullable();
             $table->string('telefono', 25)->nullable();
             $table->date('fecha_nacimiento')->nullable();
+            $table->string('lugar_nacimiento', 250)->nullable();
+            $table->string('complemento', 40)->nullable();
+            $table->enum('genero', ['MASCULINO', 'FEMENINO'])->nullable();
+            $table->enum('estado_civil', ['SOLTERO', 'CASADO', 'DIVORCIADO', 'VIUDO', 'CONYUGUE'])->nullable();
+            $table->string('nombre_conyuge', 250)->nullable();
+            $table->string('ocupacion', 150)->nullable();
+            $table->foreignId('id_pais')->nullable()->constrained('pais')->onDelete('set null');
             $table->timestamps();
         });
     }

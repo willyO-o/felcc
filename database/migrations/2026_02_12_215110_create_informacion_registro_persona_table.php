@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
 
-        Schema::create('alias_registro', function (Blueprint $table) {
-            $table->id();
-            $table->string('alias', 100);
-            $table->foreignId('id_registro_criminal')->constrained('registro_criminal')->onDelete('restrict');
-            $table->foreignId('id_usuario')->constrained('users')->onDelete('restrict');
-            $table->timestamps();
-        });
+        // Schema::create('alias_registro', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->string('alias', 100);
+        //     $table->foreignId('id_registro_criminal')->constrained('registro_criminal')->onDelete('restrict');
+        //     $table->foreignId('id_usuario')->constrained('users')->onDelete('restrict');
+        //     $table->timestamps();
+        // });
 
 
         Schema::create('fotos_registro', function (Blueprint $table) {
@@ -31,30 +31,30 @@ return new class extends Migration
         });
 
 
-        Schema::create('observacion', function (Blueprint $table) {
-            $table->id();
-            $table->text('observacion');
-            $table->foreignId('id_registro_criminal')->constrained('registro_criminal')->onDelete('restrict');
-            $table->foreignId('id_usuario')->constrained('users')->onDelete('restrict');
-            $table->timestamps();
-        });
+        // Schema::create('observacion', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->text('observacion');
+        //     $table->foreignId('id_registro_criminal')->constrained('registro_criminal')->onDelete('restrict');
+        //     $table->foreignId('id_usuario')->constrained('users')->onDelete('restrict');
+        //     $table->timestamps();
+        // });
 
 
-        Schema::create('modus_operandi', function (Blueprint $table) {
-            $table->id();
-            $table->text('descripcion');
-            $table->foreignId('id_registro_criminal')->constrained('registro_criminal')->onDelete('restrict');
-            $table->foreignId('id_usuario')->constrained('users')->onDelete('restrict');
-            $table->timestamps();
-        });
+        // Schema::create('modus_operandi', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->text('descripcion');
+        //     $table->foreignId('id_registro_criminal')->constrained('registro_criminal')->onDelete('restrict');
+        //     $table->foreignId('id_usuario')->constrained('users')->onDelete('restrict');
+        //     $table->timestamps();
+        // });
 
-        Schema::create('zonas_operacion', function (Blueprint $table) {
-            $table->id();
-            $table->string('zona', 150);
-            $table->foreignId('id_registro_criminal')->constrained('registro_criminal')->onDelete('restrict');
-            $table->foreignId('id_usuario')->constrained('users')->onDelete('restrict');
-            $table->timestamps();
-        });
+        // Schema::create('zonas_operacion', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->string('zona', 150);
+        //     $table->foreignId('id_registro_criminal')->constrained('registro_criminal')->onDelete('restrict');
+        //     $table->foreignId('id_usuario')->constrained('users')->onDelete('restrict');
+        //     $table->timestamps();
+        // });
 
 
         Schema::create('documento', function (Blueprint $table) {
@@ -75,10 +75,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('documento');
-        Schema::dropIfExists('zonas_operacion');
-        Schema::dropIfExists('modus_operandi');
-        Schema::dropIfExists('observacion');
+        // Schema::dropIfExists('zonas_operacion');
+        // Schema::dropIfExists('modus_operandi');
+        // Schema::dropIfExists('observacion');
         Schema::dropIfExists('fotos_registro');
-        Schema::dropIfExists('alias_registro');
+        // Schema::dropIfExists('alias_registro');
     }
 };

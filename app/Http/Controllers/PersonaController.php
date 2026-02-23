@@ -30,15 +30,7 @@ class PersonaController extends Controller
     {
         // return response()->json(['success' => true, 'message' => 'Persona creada correctamente', 'data' => $request->all()],400);
 
-        $request->validate([
-            'nombre' => 'required|string|max:255',
-            'paterno' => 'required|string|max:255',
-            'materno' => 'nullable|string|max:255',
-            'ci' => 'nullable|string|max:20|unique:persona,ci',
-            'fecha_nacimiento' => 'nullable|date|before:today',
-            'fotos' => 'nullable|array',
-            'fotos.*' => 'file|mimes:jpeg,png,jpg,webp|max:2048',
-        ]);
+        $request->validate(Persona::$rules);
 
         try {
             DB::beginTransaction();
