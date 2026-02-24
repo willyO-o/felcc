@@ -314,8 +314,9 @@
                             <label class="form-label col-md-3 col-form-label" for="estado_civil">Estado civil</label>
                             <div class="col-md-9">
                                 {{-- 'SOLTERO','CASADO','DIVORCIADO','VIUDO','CONYUGUE' --}}
-                                <select name="estado_civil" id="estado_civil" class="form-select" data-choices
-                                    data-choices-search-false>
+                                <select name="estado_civil" id="estado_civil" class="form-select"
+                                    {{-- data-choices data-choices-search-false --}}
+                                    >
                                     <option value="">Seleccionar estado civil</option>
                                     <option value="SOLTERO">Soltero</option>
                                     <option value="CASADO">Casado</option>

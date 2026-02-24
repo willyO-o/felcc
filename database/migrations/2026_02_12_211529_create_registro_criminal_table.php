@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('alias', 20)->nullable();
             $table->string('especialidad', 250)->nullable();
             $table->string('edad_aproximada', 20)->nullable();
-            $table->string('nombre_conyugue', 250)->nullable();
+            $table->string('nombre_conyuge', 250)->nullable();
             $table->string('domicilio', 250)->nullable();
             $table->text('rasgos')->nullable();
             $table->text('modus_operandi')->nullable();
