@@ -324,6 +324,8 @@
     <link href="{{ url('/assets/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="/assets/libs/filepond/filepond.min.css" type="text/css" />
     <link rel="stylesheet" href="/assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.css">
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
     {{-- <link href="{{ url('/assets/css/select2-bootstrap.css') }}" rel="stylesheet" type="text/css" /> --}}
 @endsection
 
@@ -363,8 +365,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fslightbox/3.4.0-2/index.js"
         integrity="sha512-Vdge+4gAuFr0U/JCfFdR24aOl9R0c/3pCYgi5bt/nU+Hl6REetTWmOr6FYjOW/7JdyQt27U8x7XJcE+IS8vKMA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+
 
     <script src="{{ url('/assets/js/mandamientos/index.js') }}"></script>
 

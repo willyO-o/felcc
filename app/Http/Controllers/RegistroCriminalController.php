@@ -17,8 +17,20 @@ class RegistroCriminalController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+
+        if ($request->ajax()) {
+            $registros = RegistroCriminal::getRegistros($request->all())
+                ->paginate($request->get('size', 10), ['*'], 'page', $request->get('page', 1));
+
+            return response()->json([
+                'datos' => $registros->items(),
+                'total' => $registros->total(),
+                'page' => $registros->currentPage(),
+            ]);
+        }
+
         return view('registro-criminal.index');
     }
 
@@ -91,7 +103,8 @@ class RegistroCriminalController extends Controller
             return response()->json(['message' => 'Registro creado exitosamente.'], 201);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Ocurrió un error al crear el registro. Detalles: ' . $e->getMessage()
+            return response()->json([
+                'error' => 'Ocurrió un error al crear el registro. Detalles: ' . $e->getMessage()
             ], 500);
         }
     }

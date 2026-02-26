@@ -6,7 +6,7 @@
     <div class="page-title-right">
         <ol class="breadcrumb m-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item active">Mandamientos</li>
+            <li class="breadcrumb-item active">Registro </li>
         </ol>
     </div>
 @endsection
@@ -16,7 +16,7 @@
     <div class="row">
         <div class="col-12 d-flex justify-content-end mb-2">
             <div class="flex-shrink-0">
-                <a value="" href="{{route('registro-criminal.create')}}" class="btn btn-primary " id="">
+                <a  href="{{route('registro-criminal.create')}}" class="btn btn-primary " id="">
                     <i class="ri-add-line align-middle me-1"></i> Nuevo Registro
                 </a>
             </div>
@@ -337,16 +337,6 @@
     {{-- <link href="{{ url('/assets/css/select2-bootstrap.css') }}" rel="stylesheet" type="text/css" /> --}}
 @endsection
 
-@section('page-title', 'Lista de Mandamientos')
-
-@section('breadcrumb')
-    <div class="page-title-right">
-        <ol class="breadcrumb m-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item active">Mandamientos</li>
-        </ol>
-    </div>
-@endsection
 
 @section('js')
     <!-- DataTables JS -->

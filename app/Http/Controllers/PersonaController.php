@@ -95,16 +95,15 @@ class PersonaController extends Controller
 
     public function search(Request $request)
     {
-        $query = $request->input('q');
+        $query = $request->input('q', $request->input('query', ''));
         $query = str_replace('%', ' ', $query);
 
-        $personas = Persona::where('nombre', 'LIKE', "%{$query}%")
-            ->orWhere('paterno', 'LIKE', "%{$query}%")
-            ->orWhere('materno', 'LIKE', "%{$query}%")
+        $personas = Persona::where('nombres', 'LIKE', "%{$query}%")
+            ->orWhere('apellidos', 'LIKE', "%{$query}%")
             ->orWhere('ci', 'LIKE', "%{$query}%")
-            ->orWhereRaw("CONCAT(COALESCE(nombre, ''), ' ', COALESCE(paterno, ''), ' ', COALESCE(materno, ''),' - ', COALESCE(ci, '')) LIKE ?", ["%{$query}%"])
-            ->orWhereRaw("CONCAT(COALESCE(paterno, ''), ' ', COALESCE(materno, ''), ' ', COALESCE(nombre, ''),' - ', COALESCE(ci, '')) LIKE ?", ["%{$query}%"])
-            ->orWhereRaw("CONCAT(COALESCE(materno, ''), ' ', COALESCE(paterno, ''), ' ', COALESCE(nombre, ''),' - ', COALESCE(ci, '')) LIKE ?", ["%{$query}%"])
+            ->orWhereRaw("CONCAT(COALESCE(nombres, ''), ' ', COALESCE(apellidos, ''),' - ', COALESCE(ci, '')) LIKE ?", ["%{$query}%"])
+            ->orWhereRaw("CONCAT(COALESCE(apellidos, ''), ' ', COALESCE(nombres, ''),' - ', COALESCE(ci, '')) LIKE ?", ["%{$query}%"])
+            ->orWhereRaw("CONCAT(COALESCE(ci, ''), ' - ', COALESCE(apellidos, ''), ' ', COALESCE(nombres, '')) LIKE ?", ["%{$query}%"])
             ->get();
 
         return response()->json($personas);

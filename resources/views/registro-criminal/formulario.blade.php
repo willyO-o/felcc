@@ -132,6 +132,29 @@
                     </div>
                 </div>
                 <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3 inp">
+                                    <label class="form-label" for="ci">Buscar Persona</label>
+                                    <div class="input-group mb-3">
+
+                                        <input type="search" class="form-control form-control" id="buscar_persona"
+                                            value=""
+                                            placeholder="Buscar por CI-complemento, Nombre, apellido, nombres o alias">
+                                        <span class="input-group-text btn btn-primary" id="basic-addon1">
+                                            <i class=" ri-search-line"></i></span>
+
+                                        <input type="hidden" id="id_persona" name="id_persona" value="">
+                                    </div>
+
+                                    <div class="invalid-feedback">Este campo es obligatorio.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
                     <div class="card-body ">
                         <div class="row">
                             <div class="col-md-6">
@@ -142,15 +165,15 @@
                                     <div class="invalid-feedback">Este campo es obligatorio.</div>
                                 </div>
                             </div>
+
                             <div class="col-md-8">
                                 <div class="mb-3 inp">
                                     <label class="form-label" for="ci">Nro. C.I.:</label>
-                                    <div class="input-group mb-3">
+                                    <div class=" mb-3">
 
                                         <input type="text" class="form-control form-control" id="ci"
                                             value="" placeholder="Ingrese número de C.I." name="ci" required>
-                                        <span class="input-group-text btn btn-primary" id="basic-addon1">
-                                            <i class=" ri-search-line"></i></span>
+
                                     </div>
 
                                     <div class="invalid-feedback">Este campo es obligatorio.</div>
@@ -199,40 +222,7 @@
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
                         </div>
-                        <div class="row mb-3">
-                            <label class="form-label col-md-3 col-form-label" for="especialidad">Especialidad</label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" id="especialidad" value=""
-                                    placeholder="(opcional)" name="especialidad" required>
-                                <div class="invalid-feedback">Este campo es obligatorio.</div>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <label class="form-label col-md-3 col-form-label" for="id_pais">Nacionalidad</label>
-                            <div class="col-md-9">
-                                <select name="id_pais" id="id_pais" class="form-select"></select>
-                                <div class="invalid-feedback">Este campo es obligatorio.</div>
 
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <label class="form-label col-md-3 col-form-label" for="lugar_nacimiento">Lugar de
-                                Nacimiento</label>
-                            <div class="col-md-9">
-                                <input type="text" class="form-control" id="lugar_nacimiento" value=""
-                                    placeholder="(opcional)" name="lugar_nacimiento">
-                                <div class="invalid-feedback">Este campo es obligatorio.</div>
-                            </div>
-                        </div>
-                        <div class="row mb-3">
-                            <label class="form-label col-md-3 col-form-label" for="fecha_nacimiento">Fecha de
-                                Nacimiento</label>
-                            <div class="col-md-9">
-                                <input type="date" class="form-control" id="fecha_nacimiento" value=""
-                                    placeholder="(opcional)" name="fecha_nacimiento" max="{{ now()->toDateString() }}">
-                                <div class="invalid-feedback">Este campo es obligatorio.</div>
-                            </div>
-                        </div>
 
                     </div>
                 </div>
@@ -282,6 +272,40 @@
                     <!-- end card body -->
                     <div class="card-body">
                         <div class="row mb-3">
+                            <label class="form-label col-md-3 col-form-label" for="especialidad">Especialidad</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="especialidad" value=""
+                                    placeholder="(opcional)" name="especialidad" required>
+                                <div class="invalid-feedback">Este campo es obligatorio.</div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label class="form-label col-md-3 col-form-label" for="id_pais">Nacionalidad</label>
+                            <div class="col-md-9">
+                                <select name="id_pais" id="id_pais" class="form-select"></select>
+                                <div class="invalid-feedback">Este campo es obligatorio.</div>
+
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label class="form-label col-md-3 col-form-label" for="lugar_nacimiento">Lugar de
+                                Nacimiento</label>
+                            <div class="col-md-9">
+                                <input type="text" class="form-control" id="lugar_nacimiento" value=""
+                                    placeholder="(opcional)" name="lugar_nacimiento">
+                                <div class="invalid-feedback">Este campo es obligatorio.</div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label class="form-label col-md-3 col-form-label" for="fecha_nacimiento">Fecha de
+                                Nacimiento</label>
+                            <div class="col-md-9">
+                                <input type="date" class="form-control" id="fecha_nacimiento" value=""
+                                    placeholder="(opcional)" name="fecha_nacimiento" max="{{ now()->toDateString() }}">
+                                <div class="invalid-feedback">Este campo es obligatorio.</div>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="edad_aproximada">
                                 Edad aproximada
                             </label>
@@ -314,9 +338,7 @@
                             <label class="form-label col-md-3 col-form-label" for="estado_civil">Estado civil</label>
                             <div class="col-md-9">
                                 {{-- 'SOLTERO','CASADO','DIVORCIADO','VIUDO','CONYUGUE' --}}
-                                <select name="estado_civil" id="estado_civil" class="form-select"
-                                    {{-- data-choices data-choices-search-false --}}
-                                    >
+                                <select name="estado_civil" id="estado_civil" class="form-select" {{-- data-choices data-choices-search-false --}}>
                                     <option value="">Seleccionar estado civil</option>
                                     <option value="SOLTERO">Soltero</option>
                                     <option value="CASADO">Casado</option>
@@ -415,6 +437,48 @@
     <link rel="stylesheet"
         href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 
+    <style>
+        /* Contenedor principal de las sugerencias */
+        .autocomplete-suggestions {
+            border: 1px solid #999;
+            background: #FFF;
+            overflow: auto;
+            cursor: default;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            /* Sombra para darle profundidad */
+            margin-top: 2px;
+        }
+
+        /* Cada ítem de sugerencia */
+        .autocomplete-suggestion {
+            padding: 10px 15px;
+            white-space: nowrap;
+            overflow: hidden;
+            font-size: 14px;
+            color: #333;
+        }
+
+        /* Estilo cuando pasas el mouse o navegas con las flechas */
+        .autocomplete-selected {
+            background: #F0F0F0;
+            cursor: pointer;
+        }
+
+        /* Estilo para el texto que coincide con lo que escribes (opcional) */
+        .autocomplete-suggestions strong {
+            font-weight: bold;
+            color: #007bff;
+            /* Color azul para resaltar la coincidencia */
+        }
+
+        /* Estilo cuando no hay resultados (si lo tienes configurado) */
+        .autocomplete-no-suggestion {
+            padding: 10px 15px;
+            color: #999;
+            font-style: italic;
+        }
+    </style>
+
 @endsection
 @section('js')
     <script src="/assets/libs/@ckeditor/ckeditor5-build-classic/build/ckeditor.js"></script>
@@ -461,6 +525,8 @@
             });
         });
     </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/devbridge-autocomplete@1.5.0/dist/jquery.autocomplete.min.js"></script>
 
     {{-- <script src="/assets/js/pages/ecommerce-product-create.init.js"></script> --}}
 @endsection

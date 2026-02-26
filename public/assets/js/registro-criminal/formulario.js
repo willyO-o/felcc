@@ -138,7 +138,7 @@ $(function () {
                             });
                         }
 
-                        notification(response.message,"División añadida");
+                        notification(response.message, "División añadida");
                     },
                     error: function (xhr) {
                         console.error('Error:', xhr);
@@ -175,6 +175,67 @@ $(function () {
         });
 
     })
+
+
+    $('#buscar_persona').autocomplete({
+        serviceUrl: '/personas-search',
+        minChars: 2,
+        onSelect: function (suggestion) {
+            console.log(suggestion);
+
+            $('#id_persona').val(suggestion.data);
+
+            //mapear datos a campos del formulario
+            $('#ci').val(suggestion.info.ci);
+            $('#complemento').val(suggestion.info.complemento);
+            $('#nombres').val(suggestion.info.nombres);
+            $('#apellidos').val(suggestion.info.apellidos);
+            $('#domicilio').val(suggestion.info.domicilio);
+            $('#lugar_nacimiento').val(suggestion.info.lugar_nacimiento);
+            $('#nombre_conyuge').val(suggestion.info.nombre_conyuge);
+            $('#ocupacion').val(suggestion.info.ocupacion);
+            $('#estado_civil').val(suggestion.info.estado_civil).trigger('change');
+            $('#id_pais').val(suggestion.info.id_pais).trigger('change');
+            //marcar el checkbox de genero
+            $('[name="genero"][value="' + suggestion.info.genero + '"]').prop('checked', true);
+            $("#fecha_nacimiento").val(fechaInput(suggestion.info.fecha_nacimiento));
+
+
+        },
+        transformResult: function (response) {
+            // convertir a json
+            if (typeof response === 'string') {
+                try {
+                    response = JSON.parse(response);
+                } catch (e) {
+                    console.error('Error al parsear la respuesta JSON:', e);
+                    return { suggestions: [] };
+                }
+            }
+            return {
+                suggestions: $.map(response, function (item) {
+                    return {
+                        value: `${item.nombres} ${item.apellidos} - ${item.ci || 'Sin CI'}`,
+                        data: item.id,
+                        info: item
+                    };
+                })
+            };
+        },
+        noCache: true,
+        onSearchStart: function () {
+           //mostrar un mensaje de cargando mientras se realiza la búsqueda
+              $('#buscar_persona').addClass('loading');
+        },
+        showNoSuggestionNotice: true,
+        noSuggestionNotice: 'No se encontraron resultados'
+    });
+
+    $('#buscar_persona').on('input', function () {
+        if ($(this).val() === '') {
+            $('#id_persona').val('');
+        }
+    });
 
 
 
