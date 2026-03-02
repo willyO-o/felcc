@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class RegistroCriminal extends Model
 {
@@ -79,18 +80,22 @@ class RegistroCriminal extends Model
             ->join('division', 'registro_criminal.id_division', '=', 'division.id')
             ->leftJoin('pais', 'persona.id_pais', '=', 'pais.id')
             ->addSelect(
-                ['persona.*',
-                 'division.division as division',
-                  'pais.gentilicio as gentilicio',
-                  'foto_frente' => FotosRegistro::select('ruta_archivo')
-                    ->whereColumn('id_registro_criminal', 'registro_criminal.id')
-                    ->where('tipo', 'FRONTAL')
-                    ->limit(1),
-                  'foto_perfil' => FotosRegistro::select('ruta_archivo')
-                    ->whereColumn('id_registro_criminal', 'registro_criminal.id')
-                    ->where('tipo', 'LATERAL')
-                    ->limit(1),
-                  ]);
+                [
+                    'persona' =>DB::raw('persona.nombres, persona.apellidos, persona.ci, persona.genero, persona.fecha_nacimiento'),
+                    'division.division as division',
+                    'pais.gentilicio as gentilicio',
+                    'foto_frente' => FotosRegistro::select('ruta_archivo')
+                        ->whereColumn('id_registro_criminal', 'registro_criminal.id')
+                        ->where('tipo', 'FRONTAL')
+                        ->limit(1),
+                    'foto_perfil' => FotosRegistro::select('ruta_archivo')
+                        ->whereColumn('id_registro_criminal', 'registro_criminal.id')
+                        ->where('tipo', 'LATERAL')
+                        ->limit(1),
+                    'imagenes' => DB::raw("(SELECT JSON_ARRAYAGG(ruta_archivo) FROM fotos_registro WHERE id_registro_criminal = registro_criminal.id) as imagenes")
+                ]
+            )->orderBy('registro_criminal.created_at', 'desc')
+            ;
 
 
 

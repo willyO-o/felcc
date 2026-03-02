@@ -40,6 +40,10 @@ $(function () {
             }),
 
         }).val("").trigger('change');
+
+        if($('#registro-nacionalidad').val()){
+            $('#id_pais').val($('#registro-nacionalidad').val()).trigger('change');
+        }
     }
 
     let divisiones = [];
@@ -151,6 +155,9 @@ $(function () {
 
         }).val("").trigger('change');
 
+        if($('#registro-division').val()){
+            $('#id_division').val($('#registro-division').val()).trigger('change');
+        }
     }
 
 

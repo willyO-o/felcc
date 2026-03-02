@@ -14,7 +14,15 @@ class Persona extends Model
         'ci',
         'domicilio',
         'telefono',
-        'fecha_nacimiento'
+        'fecha_nacimiento',
+        'lugar_nacimiento',
+        'complemento',
+        'genero',
+        'estado_civil',
+        'nombre_conyuge',
+        'ocupacion',
+        'id_pais'
+
     ];
 
     protected $casts = [

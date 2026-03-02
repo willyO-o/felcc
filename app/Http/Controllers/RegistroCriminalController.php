@@ -122,7 +122,10 @@ class RegistroCriminalController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $registroCriminal = RegistroCriminal::findOrFail($id);
+
+
+        return view('registro-criminal.formulario', compact('registroCriminal'));
     }
 
     /**
@@ -130,7 +133,92 @@ class RegistroCriminalController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        try {
+            DB::beginTransaction();
+
+            $registro = RegistroCriminal::findOrFail($id);
+            $persona = Persona::findOrFail($registro->persona->id);
+
+            $persona->update($request->only([
+                'nombres',
+                'apellidos',
+                'ci',
+                'domicilio',
+                'telefono',
+                'fecha_nacimiento',
+                'lugar_nacimiento',
+                'complemento',
+                'genero',
+                'estado_civil',
+                'nombre_conyuge',
+                'ocupacion',
+                'id_pais'
+            ]));
+
+
+
+            $registro->update($request->only([
+                'fecha_registro',
+                'nombre_supuesto',
+                'alias',
+                'especialidad',
+                'edad_aproximada',
+                'nombre_conyuge',
+                'domicilio',
+                'rasgos',
+                'modus_operandi',
+                'zonas_opera',
+                'observaciones',
+                'id_division',
+            ]));
+
+            if ($request->hasFile('foto_frente')) {
+                // Eliminar foto frontal anterior si existe
+                $fotoFrenteAnterior = $registro->getFotoFrenteAttribute();
+
+                // Guardar nueva foto frontal
+                $fotoFrentePath = $this->convertToWebp($request->file('foto_frente'), 'registro-criminal');
+                FotosRegistro::create([
+                    'tipo' => 'FRONTAL',
+                    'ruta_archivo' => $fotoFrentePath,
+                    'id_registro_criminal' => $registro->id,
+                    'id_usuario' => auth()->id(),
+                ]);
+
+                if ($fotoFrenteAnterior) {
+                    Storage::disk('public')->delete($fotoFrenteAnterior->ruta_archivo);
+                    $fotoFrenteAnterior->delete();
+                }
+            }
+
+
+            if ($request->hasFile('foto_perfil')) {
+                // Eliminar foto de perfil anterior si existe
+                $fotoPerfilAnterior = $registro->getFotoPerfilAttribute();
+                // Guardar nueva foto de perfil
+                $fotoPerfilPath = $this->convertToWebp($request->file('foto_perfil'), 'registro-criminal');
+                FotosRegistro::create([
+                    'tipo' => 'LATERAL',
+                    'ruta_archivo' => $fotoPerfilPath,
+                    'id_registro_criminal' => $registro->id,
+                    'id_usuario' => auth()->id(),
+                ]);
+
+                if ($fotoPerfilAnterior) {
+                    Storage::disk('public')->delete($fotoPerfilAnterior->ruta_archivo);
+                    $fotoPerfilAnterior->delete();
+                }
+            }
+
+            DB::commit();
+
+            return response()->json(['message' => 'Registro actualizado exitosamente.']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => 'Ocurrió un error al actualizar el registro. Detalles: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -150,6 +238,7 @@ class RegistroCriminalController extends Controller
 
         $webpName = 'img_' . Str::uuid()->toString() . '.webp';
 
+        $fullPath = $pathName . '/' . $webpName;
         $manager = new ImageManager(new ImagickDriver());
 
         $image = $manager->read($imageFile->getPathname());
@@ -158,8 +247,8 @@ class RegistroCriminalController extends Controller
         $webpEncoded = $image->toWebp(quality: 80);
 
         // Guardar con Storage (en disco 'public' por ejemplo)
-        Storage::disk('public')->put($pathName . "/{$webpName}", $webpEncoded);
+        Storage::disk('public')->put($fullPath, $webpEncoded);
 
-        return $webpName;
+        return $fullPath;
     }
 }

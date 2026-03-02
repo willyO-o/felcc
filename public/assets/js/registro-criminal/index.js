@@ -21,6 +21,7 @@
 
         if (imagenes.length > 0) {
             const lightbox = new FsLightbox();
+            // lightbox.props.sources = imagenes.map(img => '/storage/' + img);
             lightbox.props.sources = imagenes.map(img => '/storage/' + img);
             lightbox.open();
         }
@@ -88,21 +89,18 @@
                 <div data-id="${item.id}" class="${itemClasses}" style='opacity:${opacity};-moz-opacity: ${opacity};filter: alpha(opacity=${opacity});'>
                     <div class="${cardClasses}">
                         <div class="card-header border-0 pb-0 pt-3 align-items-center d-sm-flex">
-                            <h4 class="card-title mb-0 flex-grow-1 hr-label">HR: ${item.hoja_ruta || "-"} </h4>
+                            <h4 class="card-title mb-0 flex-grow-1 hr-label">NRO: ${item.id || "-"} </h4>
                             <div class="mt-2 mt-sm-0">
                                 <button type="button" value="${item.id}" class="btn btn-soft-secondary btn-sm shadow-none verDetalles" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Detalles">
                                     <i class="ri-eye-line"></i>
                                 </button>
-                                <button type="button" value="${item.id}"  class="btn btn-soft-secondary btn-sm shadow-none openModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Mandamiento">
+                                <a  href="/registro-criminal/${item.id}/edit"  class="btn btn-soft-secondary btn-sm shadow-none " data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Mandamiento">
                                     <i class="ri-pencil-line"></i>
-                                </button>
+                                </a>
                                 <button type="button" class="btn btn-soft-secondary btn-sm shadow-none btnDelete" value="${item.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Mandamiento">
                                     <i class="ri-delete-bin-2-line"></i>
                                 </button>
-                                ${item.ruta ? `
-                                    <button type="button" class="btn btn-soft-secondary btn-sm shadow-none btn-ver-img" data-img='${item.ruta}' data-bs-toggle="tooltip" data-bs-placement="top" title="Ver imagen mandamiento">
-                                        <i class="ri-image-line"></i>
-                                    </button>` : ''}
+
                             </div>
                         </div>
                         <div class="card-body">
@@ -112,26 +110,26 @@
                                     <div class="flex-shrink-0">
                                         <div class="avatar-xxl rounded">
 
-                                            <img src="${item.foto_frente ? ('/storage/registro-criminal/' + item.foto_frente) : '/assets/img/user-dummy-img.jpg'}" alt="imagen de la persona"
-                                                class="member-img img-fluid d-block rounded ${item.imagenes_persona ? 'cursor-pointer image-popup-zoom' : ''} " data-img='${item.imagenes_persona}'>
+                                            <img src="${item.foto_frente ? ('/storage/' + item.foto_frente) : '/assets/img/user-dummy-img.jpg'}" alt="imagen de la persona"
+                                                class="member-img img-fluid d-block rounded ${item.foto_frente ? 'cursor-pointer image-popup-zoom' : ''} " data-img='${item.imagenes}'>
                                         </div>
                                     </div>
                                     <div class="flex-grow-1 ms-3">
-                                        <a href="pages-profile">
-                                            <h5 class="fs-16 mb-1">${item.nombres} ${item.apellidos}</h5>
-                                            <h6 class="text-muted mb-2">C.I.: <strong>${item.ci || "-"}</strong></h6>
+                                        <a href="javascript:void(0);">
+                                            <h5 class="fs-16 mb-1">${item.nombres} ${item.apellidos} - ${item.genero || ""}</h5>
+                                            <h6 class=" mb-1">C.I.: <strong>${item.ci || "-"} ${item.complemento ? " - " + item.complemento : ""}</strong></h6>
                                         </a>
-                                        <p class="text-muted mb-2"> Alias: <strong>${item.alias || "-"}</strong></p>
-                                        <p class="text-muted mb-2"> <strong>${item.nombre_supuesto || "-"}</strong></p>
-                                        <div class="d-flex flex-wrap gap-2 align-items-center">Estado:
-                                            <div class="badge text-bg-${coloresEstados[item.estado] || 'secondary'}">${item.estado}</div>
-                                            <!-- <div class="text-muted">2.2k Ratings</div> -->
+                                        <p class=" mb-1"> Alias: <strong>${item.alias || "-"}</strong></p>
+                                        <p class=" mb-1">Nombre Sup: <strong>${item.nombre_supuesto || "-"}</strong></p>
+                                        <div class="d-flex flex-wrap gap-2 align-items-center">Especialidad:<strong> ${item.especialidad}</strong></div>
+                                        <div class=" gap-4 mt-1 text-muted">
+                                            <div>Nacionalidad: ${item.gentilicio || ""}</div>
                                         </div>
-                                        <div class=" gap-4 mt-2 text-muted">
-                                            <div><i class="ri-scales-line text-primary me-1 align-bottom"></i> ${item.nombre_juzgado || ""}</div>
-                                            <!-- <div><i class="ri-time-line text-primary me-1 align-bottom"></i><span
-                                                    class="badge badge-soft-danger">Part Time</span></div> -->
+                                        <div class=" gap-4 mt-1 text-muted">
+                                            <div> Edad : ${item.fecha_nacimiento ? calcularEdad(item.fecha_nacimiento) : " - "}</div>
                                         </div>
+                                        <p class=" mb-1"><i class="ri-calendar-line text-primary me-1 align-bottom"></i> <strong>${item.fecha_registro ? new Date(item.fecha_registro).toLocaleDateString('es-ES') : "-"}</strong></p>
+
                                     </div>
                                 </div>
                             </div>
@@ -139,34 +137,34 @@
                             <div class="list-view-content" style="display: ${listDisplay};">
                                 <div class="d-sm-flex align-items-center">
                                     <div class="flex-shrink-0">
-                                        <div class="avatar-lg height-auto rounded"><img src="${item.imagenes_persona ? ('/storage/' + primeraImagen(item.imagenes_persona)) : '/assets/img/user-dummy-img.jpg'}" alt=""
-                                                class="member-img img-fluid d-block rounded ${item.imagenes_persona ? 'cursor-pointer image-popup-zoom' : ''} " data-img='${item.imagenes_persona}'>
+                                        <div class="avatar-lg height-auto rounded"><img src="${item.foto_frente ? ('/storage/' + item.foto_frente) : '/assets/img/user-dummy-img.jpg'}" alt=""
+                                                class="member-img img-fluid d-block rounded ${item.imagenes ? 'cursor-pointer image-popup-zoom' : ''} " data-img='${item.imagenes}'>
                                             </div>
                                     </div>
                                     <div class="flex-grow-1 ms-md-3 mt-3 mt-md-0 d-md-flex align-items-center">
                                         <div class="ms-lg-3 my-3 my-lg-0">
                                             <a href="pages-profile">
-                                                <h5 class="fs-16 mb-2">${item.nombres} ${item.apellidos}</h5>
-                                                <h6 class="text-muted mb-2">C.I.: <strong>${item.ci || "-"}</strong></h6>
+                                                <h5 class="fs-16 mb-1">${item.nombres} ${item.apellidos}</h5>
+                                                <h6 class="text-muted mb-1">Genero: <strong>${item.genero || "-"}</strong></h6>
+                                                <h6 class="text-muted mb-1">C.I.: <strong>${item.ci || "-"}</strong></h6>
 
                                             </a>
-                                            <p class="text-muted mb-2"> Alias: <strong>${item.alias || "-"}</strong></p>
+                                            <p class="text-muted mb-1"> Alias: <strong>${item.alias || "-"}</strong></p>
+                                            <p class="text-muted mb-1"> Edad: <strong>${item.fecha_nacimiento ? calcularEdad(item.fecha_nacimiento) : " - "}</strong></p>
+                                            <p class="text-muted mb-1"> Nacionalidad: <strong>${item.gentilicio || "-"}</strong></p>
                                             <!-- <p class="text-muted mb-0">${item.tipo_mandamiento || "-"}</p> -->
                                         </div>
+                                        <div class="d-flex flex-wrap gap-2 align-items-center mx-auto my-1 my-lg-0">
+                                            <div> Nombre sup: <strong>${item.nombre_supuesto || "-"}</strong></div>
+                                        </div>
                                         <div class="d-flex gap-4 mt-0 text-muted mx-auto">
-                                            <div><i class="ri-auction-line text-primary me-1 align-bottom"></i> ${item.tipo_mandamiento || "-"}</div>
-                                            <!-- <div><i class="ri-map-pin-2-line text-primary me-1 align-bottom"></i> Cullera, Spain</div>
-                                            <div><i class="ri-time-line text-primary me-1 align-bottom"></i> <span
-                                                    class="badge badge-soft-danger">Part Time</span></div> -->
+                                            <div> Especialidad: <strong>${item.especialidad || "-"}</strong></div>
                                         </div>
-                                        <div class="d-flex flex-wrap gap-2 align-items-center mx-auto my-3 my-lg-0">
-                                            <!-- <div class="badge text-bg-success"><i class="mdi mdi-star me-1"></i>4.2</div>
-                                            <div class="text-muted">2.2k Ratings</div> -->
-                                            <div><i class="ri-scales-line text-primary me-1 align-bottom"></i> ${item.nombre_juzgado || ""}</div>
-                                        </div>
+
                                         <div>
-                                            Estado:
-                                            <div class="badge text-bg-${coloresEstados[item.estado] || 'secondary'}"> ${item.estado}</div>
+                                            <i class="ri-calendar-line text-primary me-1 align-bottom"></i>
+                                            <strong>${item.fecha_registro ? new Date(item.fecha_registro).toLocaleDateString('es-ES') : "-"}</strong>
+
                                             <!-- <div class="text-muted">${item.estado}</div> -->
                                             <!-- <a href="#!" class="btn btn-soft-success">View Details</a>
                                             <a href="#!" class="btn btn-ghost-danger btn-icon custom-toggle active"

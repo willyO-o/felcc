@@ -13,9 +13,17 @@
 @endsection
 
 @section('content')
+
+    <input type="hidden" id="registro-nacionalidad" value="{{ $registroCriminal->persona?->id_pais ?? '' }}">
+    <input type="hidden" id="registro-division" value="{{ $registroCriminal->id_division ?? '' }}">
+
     <form id="form-registro" autocomplete="off" class="needs-validation" novalidate
-        action="{{ route('registro-criminal.store') }}" method="POST" enctype="multipart/form-data">
+        action="{{ $registroCriminal->exists ? route('registro-criminal.update', $registroCriminal->id) : route('registro-criminal.store') }}" method="POST" enctype="multipart/form-data">
         @csrf
+        @if ($registroCriminal->exists)
+            @method('PUT')
+        @endif
+
         <div class="row">
             <div class="col-lg-6">
                 <div class="card">
@@ -45,7 +53,7 @@
                                         </div>
                                         <div class="avatar-xl w-100 h-auto ">
                                             <div class="avatar-title bg-light rounded w-100 " style="min-height: 150px">
-                                                <img src="" id="product-img" class="avatar-xl h-auto w-100"
+                                                <img src="{{ $registroCriminal->foto_frente ? '/storage/' . $registroCriminal->foto_frente : '' }}" id="product-img" class="avatar-xl h-auto w-100"
                                                     data-image-input-preview="product-image-input" />
                                             </div>
                                         </div>
@@ -74,7 +82,7 @@
                                         </div>
                                         <div class="avatar-xl w-100 h-auto ">
                                             <div class="avatar-title bg-light rounded w-100 " style="min-height: 150px">
-                                                <img src="" id="product-img2" class="avatar-xl h-auto w-100"
+                                                <img src="{{ $registroCriminal->foto_perfil ? '/storage/' . $registroCriminal->foto_perfil : '' }}" id="product-img2" class="avatar-xl h-auto w-100"
                                                     data-image-input-preview="product-image-input2" />
                                             </div>
                                         </div>
@@ -131,7 +139,7 @@
                         </div> --}}
                     </div>
                 </div>
-                <div class="card">
+                <div class="card {{ $registroCriminal->exists ? 'd-none' : '' }}">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-12">
@@ -161,7 +169,7 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="fecha_registro">Fecha de Registro</label>
                                     <input type="date" class="form-control" id="fecha_registro" name="fecha_registro"
-                                        value="{{ now()->toDateString() }}" required max="{{ now()->toDateString() }}">
+                                        value="{{ $registroCriminal->fecha_registro ?? now()->toDateString() }}" required max="{{ now()->toDateString() }}">
                                     <div class="invalid-feedback">Este campo es obligatorio.</div>
                                 </div>
                             </div>
@@ -171,8 +179,8 @@
                                     <label class="form-label" for="ci">Nro. C.I.:</label>
                                     <div class=" mb-3">
 
-                                        <input type="text" class="form-control form-control" id="ci"
-                                            value="" placeholder="Ingrese número de C.I." name="ci" required>
+                                        <input type="text" class="form-control form-control txtMayuscula" id="ci"
+                                            value="{{ $registroCriminal->persona->ci ?? '' }}" placeholder="Ingrese número de C.I." name="ci" required>
 
                                     </div>
 
@@ -182,8 +190,8 @@
                             <div class="col-md-4">
                                 <div class="mb-3">
                                     <label class="form-label" for="complemento">Complemento</label>
-                                    <input type="text" class="form-control" id="complemento" name="complemento"
-                                        value="" placeholder="Ingrese complemento">
+                                    <input type="text" class="form-control txtMayuscula" id="complemento" name="complemento"
+                                        value="{{ $registroCriminal->persona->complemento ?? '' }}" placeholder="Ingrese complemento">
                                 </div>
                             </div>
 
@@ -193,7 +201,7 @@
                         <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="nombres">Nombres</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control i" id="nombres" value=""
+                                <input type="text" class="form-control txtMayuscula" id="nombres" value="{{ $registroCriminal->persona->nombres ?? '' }}"
                                     placeholder="Ingrese nombre(s)" name="nombres" required>
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
@@ -201,7 +209,7 @@
                         <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="apellidos">Apellidos</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" id="apellidos" value=""
+                                <input type="text" class="form-control txtMayuscula" id="apellidos" value="{{ $registroCriminal->persona->apellidos ?? '' }}"
                                     placeholder="Ingrese apellido(s)" name="apellidos" required>
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
@@ -210,14 +218,14 @@
                             <label class="form-label col-md-3 col-form-label" for="nombre_supuesto">Nombre
                                 Supuesto</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" id="nombre_supuesto" value=""
+                                <input type="text" class="form-control txtMayuscula" id="nombre_supuesto" value="{{ $registroCriminal->nombre_supuesto ?? '' }}"
                                     placeholder="(opcional)" name="nombre_supuesto">
                             </div>
                         </div>
                         <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="alias">Alias</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" id="alias" value=""
+                                <input type="text" class="form-control txtMayuscula" id="alias" value="{{ $registroCriminal->alias ?? '' }}"
                                     placeholder="(opcional)" name="alias" required>
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
@@ -274,7 +282,7 @@
                         <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="especialidad">Especialidad</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" id="especialidad" value=""
+                                <input type="text" class="form-control txtMayuscula" id="especialidad" value="{{ $registroCriminal->especialidad ?? '' }}"
                                     placeholder="(opcional)" name="especialidad" required>
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
@@ -282,7 +290,10 @@
                         <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="id_pais">Nacionalidad</label>
                             <div class="col-md-9">
-                                <select name="id_pais" id="id_pais" class="form-select"></select>
+                                <select name="id_pais" id="id_pais" class="form-select">
+
+
+                                </select>
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
 
                             </div>
@@ -291,7 +302,7 @@
                             <label class="form-label col-md-3 col-form-label" for="lugar_nacimiento">Lugar de
                                 Nacimiento</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" id="lugar_nacimiento" value=""
+                                <input type="text" class="form-control txtMayuscula" id="lugar_nacimiento" value="{{ $registroCriminal->persona->lugar_nacimiento ?? '' }}"
                                     placeholder="(opcional)" name="lugar_nacimiento">
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
@@ -300,7 +311,7 @@
                             <label class="form-label col-md-3 col-form-label" for="fecha_nacimiento">Fecha de
                                 Nacimiento</label>
                             <div class="col-md-9">
-                                <input type="date" class="form-control" id="fecha_nacimiento" value=""
+                                <input type="date" class="form-control" id="fecha_nacimiento" value="{{ $registroCriminal->persona?->fecha_nacimiento->format('Y-m-d') ?? '' }}"
                                     placeholder="(opcional)" name="fecha_nacimiento" max="{{ now()->toDateString() }}">
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
@@ -310,8 +321,8 @@
                                 Edad aproximada
                             </label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" id="edad_aproximada" name="edad_aproximada"
-                                    value="" placeholder="(opcional)">
+                                <input type="text" class="form-control txtMayuscula" id="edad_aproximada" name="edad_aproximada"
+                                    value="{{ $registroCriminal->edad_aproximada ?? '' }}" placeholder="(opcional)">
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
                         </div>
@@ -320,14 +331,14 @@
                             <div class="col-md-9">
                                 <div class="form-check mb-2 form-check-inline">
                                     <input class="form-check-input" type="radio" name="genero" value="MASCULINO"
-                                        id="genero1" required>
+                                        id="genero1" required {{ $registroCriminal->persona?->genero === 'MASCULINO' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="genero1">
                                         Masculino
                                     </label>
                                 </div>
                                 <div class="form-check mb-2 form-check-inline">
                                     <input class="form-check-input" type="radio" name="genero" value="FEMENINO"
-                                        id="genero2" required>
+                                        id="genero2" required {{ $registroCriminal->persona?->genero === 'FEMENINO' ? 'checked' : '' }}>
                                     <label class="form-check-label" for="genero2">
                                         Femenino
                                     </label>
@@ -340,11 +351,11 @@
                                 {{-- 'SOLTERO','CASADO','DIVORCIADO','VIUDO','CONYUGUE' --}}
                                 <select name="estado_civil" id="estado_civil" class="form-select" {{-- data-choices data-choices-search-false --}}>
                                     <option value="">Seleccionar estado civil</option>
-                                    <option value="SOLTERO">Soltero</option>
-                                    <option value="CASADO">Casado</option>
-                                    <option value="DIVORCIADO">Divorciado</option>
-                                    <option value="VIUDO">Viudo</option>
-                                    <option value="CONYUGUE">Conyugue</option>
+                                    <option value="SOLTERO" {{ $registroCriminal->persona?->estado_civil === 'SOLTERO' ? 'selected' : '' }}>Soltero</option>
+                                    <option value="CASADO" {{ $registroCriminal->persona?->estado_civil === 'CASADO' ? 'selected' : '' }}>Casado</option>
+                                    <option value="DIVORCIADO" {{ $registroCriminal->persona?->estado_civil === 'DIVORCIADO' ? 'selected' : '' }}>Divorciado</option>
+                                    <option value="VIUDO" {{ $registroCriminal->persona?->estado_civil === 'VIUDO' ? 'selected' : '' }}>Viudo</option>
+                                    <option value="CONYUGUE" {{ $registroCriminal->persona?->estado_civil === 'CONYUGUE' ? 'selected' : '' }}>Conyugue</option>
                                 </select>
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
@@ -353,19 +364,19 @@
 
                         <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="nombre_conyuge">
-                                Nombre de l a conyuge
+                                Nombre de la conyuge
                             </label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" id="nombre_conyuge" name="nombre_conyuge"
-                                    value="" placeholder="(si correspondiera)">
+                                <input type="text" class="form-control txtMayuscula" id="nombre_conyuge" name="nombre_conyuge"
+                                    value="{{ $registroCriminal->nombre_conyuge ?? '' }}" placeholder="(si correspondiera)">
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="domicilio">Domicilio</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" id="domicilio" name="domicilio"
-                                    value="" placeholder="(opcional)">
+                                <input type="text" class="form-control txtMayuscula" id="domicilio" name="domicilio"
+                                    value="{{ $registroCriminal->domicilio ?? '' }}" placeholder="(opcional)">
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
                         </div>
@@ -383,15 +394,15 @@
                         <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="ocupacion">Ocupación</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" id="ocupacion" name="ocupacion"
-                                    value="" placeholder="(opcional)">
+                                <input type="text" class="form-control txtMayuscula" id="ocupacion" name="ocupacion"
+                                    value="{{ $registroCriminal->persona?->ocupacion ?? '' }}" placeholder="(opcional)">
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="rasgos">Rasgos</label>
                             <div class="col-md-9">
-                                <input type="text" class="form-control" id="rasgos" name="rasgos" value=""
+                                <input type="text" class="form-control txtMayuscula" id="rasgos" name="rasgos" value="{{ $registroCriminal->rasgos ?? '' }}"
                                     placeholder="(opcional)">
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
@@ -399,21 +410,21 @@
                         <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="modus_operandi">Modus Operandi</label>
                             <div class="col-md-9">
-                                <textarea name="modus_operandi" class="form-control" id="modus_operandi" rows="3"></textarea>
+                                <textarea name="modus_operandi" class="form-control txtMayuscula" id="modus_operandi" rows="3">{{ $registroCriminal->modus_operandi ?? '' }}</textarea>
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="zonas_opera">Zonas que Operan</label>
                             <div class="col-md-9">
-                                <textarea name="zonas_opera" class="form-control" id="zonas_opera" rows="3"></textarea>
+                                <textarea name="zonas_opera" class="form-control txtMayuscula" id="zonas_opera" rows="3">{{ $registroCriminal->zonas_opera ?? '' }}</textarea>
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="observaciones">Observaciones</label>
                             <div class="col-md-9">
-                                <textarea name="observaciones" class="form-control" id="observaciones" rows="3"></textarea>
+                                <textarea name="observaciones" class="form-control txtMayuscula" id="observaciones" rows="3">{{ $registroCriminal->observaciones ?? '' }}</textarea>
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
                         </div>
@@ -528,5 +539,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/devbridge-autocomplete@1.5.0/dist/jquery.autocomplete.min.js"></script>
 
+    <script src="{{asset('assets/js/registro-criminal/formulario.js')}}"></script>
     {{-- <script src="/assets/js/pages/ecommerce-product-create.init.js"></script> --}}
 @endsection
