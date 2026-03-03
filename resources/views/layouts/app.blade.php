@@ -13,7 +13,7 @@
     <!-- App favicon -->
     <link rel="shortcut icon" href="/assets/images/favicon.ico">
 
-    @include('velzon.partials.head-css')
+    @include('layouts.partials.head-css')
 
     @vite('resources/css/app.css')
 
@@ -23,8 +23,8 @@
 <body>
     <!-- Begin page -->
     <div id="layout-wrapper">
-        @include('velzon.partials.topbar')
-        @include('velzon.partials.sidebar')
+        @include('layouts.partials.topbar')
+        @include('layouts.partials.sidebar')
 
         <!-- ============================================================== -->
         <!-- Start right Content here -->
@@ -82,13 +82,13 @@
             </div>
             <!-- End Page-content -->
 
-            @include('velzon.partials.footer')
+            @include('layouts.partials.footer')
         </div>
         <!-- end main content-->
     </div>
     <!-- END layout-wrapper -->
 
-    @include('velzon.partials.customizer')
+    @include('layouts.partials.customizer')
 
     <!-- JAVASCRIPT -->
     <script src="/assets/libs/bootstrap/js/bootstrap.bundle.min.js"></script>
