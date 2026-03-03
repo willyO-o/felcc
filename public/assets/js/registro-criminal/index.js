@@ -89,7 +89,7 @@
                 <div data-id="${item.id}" class="${itemClasses}" style='opacity:${opacity};-moz-opacity: ${opacity};filter: alpha(opacity=${opacity});'>
                     <div class="${cardClasses}">
                         <div class="card-header border-0 pb-0 pt-3 align-items-center d-sm-flex">
-                            <h4 class="card-title mb-0 flex-grow-1 hr-label">NRO: ${item.id || "-"} </h4>
+                            <h4 class="card-title mb-0 flex-grow-1 hr-label">NRO: ${item.nro_registro || "-"} </h4>
                             <div class="mt-2 mt-sm-0">
                                 <button type="button" value="${item.id}" class="btn btn-soft-secondary btn-sm shadow-none verDetalles" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Detalles">
                                     <i class="ri-eye-line"></i>

@@ -5,12 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 class RegistroCriminal extends Model
 {
+    use SoftDeletes;
     protected $table = 'registro_criminal';
 
 
     protected $fillable = [
+        'nro_registro',
         'fecha_registro',
         'nombre_supuesto',
         'alias',
@@ -26,6 +30,9 @@ class RegistroCriminal extends Model
         'id_division',
         'id_usuario',
     ];
+
+
+
 
     public function persona()
     {
@@ -68,9 +75,16 @@ class RegistroCriminal extends Model
 
         static::creating(function ($registro) {
             $registro->id_usuario = auth()->id();
+            $registro->nro_registro = self::lastNroRegistro() + 1;
+
         });
     }
 
+    protected static function lastNroRegistro()
+    {
+        $ultimoRegistro = self::orderBy('nro_registro', 'desc')->first();
+        return $ultimoRegistro ? $ultimoRegistro->nro_registro : 0;
+    }
 
 
     static function getRegistros($filters = [])

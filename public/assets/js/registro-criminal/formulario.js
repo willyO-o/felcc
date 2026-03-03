@@ -41,7 +41,7 @@ $(function () {
 
         }).val("").trigger('change');
 
-        if($('#registro-nacionalidad').val()){
+        if ($('#registro-nacionalidad').val()) {
             $('#id_pais').val($('#registro-nacionalidad').val()).trigger('change');
         }
     }
@@ -155,7 +155,7 @@ $(function () {
 
         }).val("").trigger('change');
 
-        if($('#registro-division').val()){
+        if ($('#registro-division').val()) {
             $('#id_division').val($('#registro-division').val()).trigger('change');
         }
     }
@@ -167,7 +167,29 @@ $(function () {
 
     $("#form-registro").on("submit", function (e) {
         e.preventDefault();
+
+
+
+        //validar formulario
+        if (!this.checkValidity()) {
+            $(this).addClass('was-validated');
+            return;
+        }
+
         let formData = new FormData(this);
+
+        let accion=  e.originalEvent.submitter.value; // Obtener el valor del botón que se hizo clic
+
+        //desactivar botones para evitar envíos múltiples
+        let botones = $(this).find('.btn-accion');
+        botones.addClass('disabled').prop('disabled', true);
+
+        let botonAccion = $(this).find('button[type="submit"][value="' + accion + '"]');
+        let htmlOriginal = botonAccion.html();
+        botonAccion.html('<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Procesando...');
+
+
+
         $.ajax({
             url: $(this).attr('action'),
             method: $(this).attr('method'),
@@ -175,10 +197,34 @@ $(function () {
             processData: false,
             contentType: false,
         }).done(function (response) {
-            console.log(response);
+
+            notification(response.success, "Mandamiento Registrado")
+            if(accion === 'guardar_nuevo'){
+                $("#form-registro")[0].reset();
+                $('#id_persona').val('');
+                $('#buscar_persona').val('');
+                $('#id_pais').val("").trigger('change');
+                $('#id_division').val("").trigger('change');
+                //quitar foto previa
+                $('#product-img').attr('src', '');
+                $('#product-img2').attr('src', '');
+                //vaciar inputs de archivos
+                $('#product-image-input').val('');
+                $('#product-image-input2').val('');
+                $("#form-registro").removeClass('was-validated');
+            }else{
+                setTimeout(function () {
+                    window.location.href = '/registro-criminal';
+                }, 1500);
+            }
 
         }).fail(function (error) {
-            console.error(error);
+            processError(error);
+
+        }).always(function () {
+            botones.removeClass('disabled').prop('disabled', false);
+            botonAccion.html(htmlOriginal);
+
         });
 
     })
@@ -188,7 +234,6 @@ $(function () {
         serviceUrl: '/personas-search',
         minChars: 2,
         onSelect: function (suggestion) {
-            console.log(suggestion);
 
             $('#id_persona').val(suggestion.data);
 
@@ -231,8 +276,8 @@ $(function () {
         },
         noCache: true,
         onSearchStart: function () {
-           //mostrar un mensaje de cargando mientras se realiza la búsqueda
-              $('#buscar_persona').addClass('loading');
+            //mostrar un mensaje de cargando mientras se realiza la búsqueda
+            $('#buscar_persona').addClass('loading');
         },
         showNoSuggestionNotice: true,
         noSuggestionNotice: 'No se encontraron resultados'

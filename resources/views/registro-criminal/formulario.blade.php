@@ -144,7 +144,7 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3 inp">
-                                    <label class="form-label" for="ci">Buscar Persona</label>
+                                    <label class="form-label" for="buscar_persona">Buscar Persona</label>
                                     <div class="input-group mb-3">
 
                                         <input type="search" class="form-control form-control" id="buscar_persona"
@@ -180,7 +180,7 @@
                                     <div class=" mb-3">
 
                                         <input type="text" class="form-control form-control txtMayuscula" id="ci"
-                                            value="{{ $registroCriminal->persona->ci ?? '' }}" placeholder="Ingrese número de C.I." name="ci" required>
+                                            value="{{ $registroCriminal->persona->ci ?? '' }}" placeholder="Ingrese número de C.I." name="ci">
 
                                     </div>
 
@@ -226,7 +226,7 @@
                             <label class="form-label col-md-3 col-form-label" for="alias">Alias</label>
                             <div class="col-md-9">
                                 <input type="text" class="form-control txtMayuscula" id="alias" value="{{ $registroCriminal->alias ?? '' }}"
-                                    placeholder="(opcional)" name="alias" required>
+                                    placeholder="(opcional)" name="alias" >
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
                         </div>
@@ -236,9 +236,17 @@
                 </div>
                 <!-- end card -->
                 <div class="text-end mb-3">
-                    <button type="submit" class="btn btn-primary w-sm">
+                    <button type="submit" name="accion" value="guardar" class="btn btn-primary w-sm btn-accion">
                         <i class="ri-save-3-line align-middle me-1"></i> Guardar
                     </button>
+                    @if (!$registroCriminal->exists)
+                    <button type="submit" name="accion" value="guardar_nuevo" class="btn btn-primary w-sm btn-accion">
+                        <i class="ri-save-3-line align-middle me-1"></i> Guardar y Crear Nuevo
+                    </button>
+                    @endif
+                    <a href="{{ route('registro-criminal.index') }}" class="btn btn-secondary w-sm btn-accion">
+                        <i class="ri-arrow-go-back-line align-middle me-1"></i> Cancelar
+                    </a>
                 </div>
             </div>
             <!-- end col -->
@@ -342,8 +350,11 @@
                                     <label class="form-check-label" for="genero2">
                                         Femenino
                                     </label>
+
                                 </div>
+
                             </div>
+
                         </div>
                         <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="estado_civil">Estado civil</label>
@@ -383,8 +394,7 @@
                         <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="id_division">División</label>
                             <div class="col-md-9">
-                                {{-- 'SOLTERO','CASADO','DIVORCIADO','VIUDO','CONYUGUE' --}}
-                                <select name="id_division" id="id_division" class="form-select">
+                                <select name="id_division" id="id_division" class="form-select" required>
 
                                 </select>
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
@@ -410,14 +420,14 @@
                         <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="modus_operandi">Modus Operandi</label>
                             <div class="col-md-9">
-                                <textarea name="modus_operandi" class="form-control txtMayuscula" id="modus_operandi" rows="3">{{ $registroCriminal->modus_operandi ?? '' }}</textarea>
+                                <textarea name="modus_operandi" class="form-control txtMayuscula" id="modus_operandi" rows="3" required>{{ $registroCriminal->modus_operandi ?? '' }}</textarea>
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="zonas_opera">Zonas que Operan</label>
                             <div class="col-md-9">
-                                <textarea name="zonas_opera" class="form-control txtMayuscula" id="zonas_opera" rows="3">{{ $registroCriminal->zonas_opera ?? '' }}</textarea>
+                                <textarea name="zonas_opera" class="form-control txtMayuscula" id="zonas_opera" rows="3" required>{{ $registroCriminal->zonas_opera ?? '' }}</textarea>
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
                         </div>

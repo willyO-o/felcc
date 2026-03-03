@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 use Illuminate\Support\Str;
+use App\Http\Requests\GuardarRegistroCriminalRequest;
 
 class RegistroCriminalController extends Controller
 {
@@ -46,9 +47,9 @@ class RegistroCriminalController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(GuardarRegistroCriminalRequest $request)
     {
-        // return $request->all();
+        // return $request->file('foto_frente');
 
         try {
             DB::beginTransaction();
@@ -100,7 +101,7 @@ class RegistroCriminalController extends Controller
             }
 
             DB::commit();
-            return response()->json(['message' => 'Registro creado exitosamente.'], 201);
+            return response()->json(['success' => 'Registro creado exitosamente.'], 201);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -174,7 +175,7 @@ class RegistroCriminalController extends Controller
 
             if ($request->hasFile('foto_frente')) {
                 // Eliminar foto frontal anterior si existe
-                $fotoFrenteAnterior = $registro->getFotoFrenteAttribute();
+                $fotoFrenteAnterior = FotosRegistro::where('id_registro_criminal', $registro->id)->where('tipo', 'FRONTAL')->first();
 
                 // Guardar nueva foto frontal
                 $fotoFrentePath = $this->convertToWebp($request->file('foto_frente'), 'registro-criminal');
@@ -194,7 +195,7 @@ class RegistroCriminalController extends Controller
 
             if ($request->hasFile('foto_perfil')) {
                 // Eliminar foto de perfil anterior si existe
-                $fotoPerfilAnterior = $registro->getFotoPerfilAttribute();
+                $fotoPerfilAnterior = FotosRegistro::where('id_registro_criminal', $registro->id)->where('tipo', 'LATERAL')->first();
                 // Guardar nueva foto de perfil
                 $fotoPerfilPath = $this->convertToWebp($request->file('foto_perfil'), 'registro-criminal');
                 FotosRegistro::create([
@@ -212,7 +213,7 @@ class RegistroCriminalController extends Controller
 
             DB::commit();
 
-            return response()->json(['message' => 'Registro actualizado exitosamente.']);
+            return response()->json(['success' => 'Registro actualizado exitosamente.']);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
