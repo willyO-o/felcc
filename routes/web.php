@@ -35,3 +35,7 @@ Route::resource('registro-criminal', App\Http\Controllers\RegistroCriminalContro
 
 // Usuarios
 Route::resource('usuarios', App\Http\Controllers\UserController::class);
+
+// Perfil
+Route::get('/perfil', [App\Http\Controllers\ProfileController::class, 'index'])->name('perfil');
+Route::post('/perfil/password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('perfil.password');
