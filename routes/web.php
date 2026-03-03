@@ -32,3 +32,6 @@ Route::get('/personas-search', [PersonaController::class, 'search'])->name('pers
 
 
 Route::resource('registro-criminal', App\Http\Controllers\RegistroCriminalController::class);
+
+// Usuarios
+Route::resource('usuarios', App\Http\Controllers\UserController::class);

@@ -56,9 +56,19 @@
 
                 <!-- Usuarios -->
                 <li class="nav-item">
-                    <a class="nav-link menu-link" href="{{ url('/register') }}">
-                        <i class="mdi mdi-account-plus-outline"></i> <span>Crear Usuario</span>
+                    <a class="nav-link menu-link" href="#sidebarUsuarios" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarUsuarios">
+                        <i class="mdi mdi-account-group-outline"></i> <span>Usuarios</span>
                     </a>
+                    <div class="collapse menu-dropdown" id="sidebarUsuarios">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="{{ route('usuarios.index') }}" class="nav-link">Lista de Usuarios</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="{{ route('usuarios.index') }}" class="nav-link" id="linkNuevoUsuario">Nuevo Usuario</a>
+                            </li>
+                        </ul>
+                    </div>
                 </li>
 
             </ul>
