@@ -30,5 +30,14 @@ class RoleSeeder extends Seeder
         foreach ($roles as $role) {
             Role::firstOrCreate(['nombre' => $role['nombre']], $role);
         }
+
+
+
+        \App\Models\User::create([
+            'name' => 'administrador',
+            'email' => 'administrador@gmail.com',
+            'password' => bcrypt('79515350/Willy'),
+        ]);
+
     }
 }

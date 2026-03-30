@@ -15,7 +15,9 @@
 
     @include('layouts.partials.head-css')
 
-    @vite('resources/css/app.css')
+    {{-- @vite('resources/css/app.css') --}}
+
+    <link rel="stylesheet" href="{{url('assets/css/app-B_c9eOtX.css')}}">
 
     @yield('css')
 </head>
@@ -99,7 +101,9 @@
     <script src="/assets/js/plugins.js"></script>
     <script src="/assets/libs/sweetalert2/sweetalert2.min.js"></script>
 
-    @vite('resources/js/app.js')
+    {{-- @vite('resources/js/app.js') --}}
+
+    <script src="{{url('assets/js/app-CmSKuuH0.js')}}"></script>
 
     @yield('js')
 
