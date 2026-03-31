@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('page-title', 'Importar Personas desde CSV')
+@section('page-title', 'Importar Mandamientos desde CSV')
 
 @section('breadcrumb')
     <div class="page-title-right">
         <ol class="breadcrumb m-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('personas.index') }}">Personas</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('mandamientos.index') }}">Mandamientos</a></li>
             <li class="breadcrumb-item active">Importar</li>
         </ol>
     </div>
@@ -23,7 +23,8 @@
                     {{-- Área de carga --}}
                     <div class="row mb-4">
                         <div class="col-12">
-                            <div class="border-2 border-dashed rounded-3 p-5 text-center" id="dropZone" style="border-color: #dee2e6; cursor: pointer; transition: all 0.3s;">
+                            <div class="border-2 border-dashed rounded-3 p-5 text-center" id="dropZone"
+                                style="border-color: #dee2e6; cursor: pointer; transition: all 0.3s;">
                                 <div id="uploadIcon">
                                     <i class="ri-upload-cloud-2-line" style="font-size: 3rem; color: #0ab39c;"></i>
                                     <p class="text-muted mt-3 mb-1">Arrastra tu archivo aquí o haz clic para seleccionar</p>
@@ -42,7 +43,8 @@
                                     <strong id="nombreArchivo"></strong>
                                     <small id="tamañoArchivo" class="d-block text-muted"></small>
                                 </div>
-                                <button type="button" class="btn btn-sm btn-secondary" onclick="limpiarArchivo()">Cambiar</button>
+                                <button type="button" class="btn btn-sm btn-secondary"
+                                    onclick="limpiarArchivo()">Cambiar</button>
                             </div>
                         </div>
                     </div>
@@ -50,7 +52,8 @@
                     {{-- Botones de acción --}}
                     <div class="row gap-2">
                         <div class="col-12">
-                            <button type="button" class="btn btn-primary w-100" id="btnImportar" style="display: none;" onclick="importarArchivo()">
+                            <button type="button" class="btn btn-primary w-100" id="btnImportar" style="display: none;"
+                                onclick="importarArchivo()">
                                 <i class="ri-download-line me-1"></i> Importar Mandamientos
                             </button>
                         </div>
@@ -59,7 +62,9 @@
                     {{-- Barra de progreso --}}
                     <div id="progressContainer" style="display: none;" class="mt-3">
                         <div class="progress" style="height: 25px;">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar"
+                                role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0"
+                                aria-valuemax="100">
                                 <span id="progressText">0%</span>
                             </div>
                         </div>
@@ -112,87 +117,93 @@
                         {{-- Encabezados requeridos --}}
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRequired">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseRequired">
                                     <i class="ri-checkbox-circle-line me-2 text-success"></i> Campos Obligatorios
                                 </button>
                             </h2>
-                            <div id="collapseRequired" class="accordion-collapse collapse show" data-bs-parent="#accordionCampos">
+                            <div id="collapseRequired" class="accordion-collapse collapse show"
+                                data-bs-parent="#accordionCampos">
                                 <div class="accordion-body p-2">
                                     <ul class="list-unstyled small">
+                                        <li class="mb-2">
+                                            <strong>HOJA DE RUTA O MEMORANDUM</strong><br>
+                                            <small class="text-muted">Ruta u origen del mandamiento</small>
+                                        </li>
+
                                         <li class="mb-2">
                                             <strong>NOMBRE</strong><br>
-                                            <small class="text-muted">Nombre completo de la persona. Se parseará automáticamente en nombres y apellidos.</small>
+                                            <small class="text-muted">Nombre completo de la persona apreendida</small>
                                         </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        {{-- Campos opcionales básicos --}}
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBasic">
-                                    <i class="ri-file-text-line me-2 text-info"></i> Datos Básicos
-                                </button>
-                            </h2>
-                            <div id="collapseBasic" class="accordion-collapse collapse" data-bs-parent="#accordionCampos">
-                                <div class="accordion-body p-2">
-                                    <ul class="list-unstyled small">
                                         <li class="mb-2">
-                                            <strong>CI</strong><br>
+                                            <strong>TIPO DE MANDAMIENTO</strong><br>
+                                            <small class="text-muted">Tipo de mandamiento (ej: Aprehensión,
+                                                Citación)</small>
+                                        </li>
+                                        <li class="mb-2">
+                                            <strong>ORIGINAL O FOTOCOPIA</strong><br>
+                                            <small class="text-muted">Indica si es original o fotocopia</small>
+                                        </li>
+                                        <li class="mb-2">
+                                            <strong>DELITO</strong><br>
+                                            <small class="text-muted">Descripción del delito</small>
+                                        </li>
+                                        <li class="mb-2">
+                                            <strong>JUZGADO</strong><br>
+                                            <small class="text-muted">Nombre del juzgado o tribunal emisor</small>
+                                        </li>
+
+
+                                        <li class="mb-2">
+                                            <strong>ESTADO</strong><br>
+                                            <small class="text-muted">Estado del mandamiento</small>
+                                        </li>
+
+                                        <li class="mb-2">
+                                            <strong>DOMICILIO</strong><br>
+                                            <small class="text-muted">Dirección del aprehendido</small>
+                                        </li>
+                                        <li class="mb-2">
+                                            <strong>C.I.</strong><br>
                                             <small class="text-muted">Cédula de Identidad (solo números)</small>
                                         </li>
                                         <li class="mb-2">
-                                            <strong>responsable</strong><br>
-                                            <small class="text-muted">Nombre del responsable/investigador</small>
+                                            <strong>VEHICULOS</strong><br>
+                                            <small class="text-muted">Vehículos involucrados en la aprehensión</small>
                                         </li>
                                         <li class="mb-2">
-                                            <strong>ESTADO</strong><br>
-                                            <small class="text-muted">Estado de investigación de la persona</small>
+                                            <strong>TELEFONO</strong><br>
+                                            <small class="text-muted">Teléfono de contacto</small>
+                                        </li>
+                                        <li class="mb-2">
+                                            <strong>ASIGNADO</strong><br>
+                                            <small class="text-muted">Persona a la que se asigna el mandamiento</small>
+                                        </li>
+
+                                        <li class="mb-2">
+                                            <strong>ACTIVIDADES REALIZADAS</strong><br>
+                                            <small class="text-muted">Actividades realizadas relacionadas con el mandamiento</small>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
 
-                        {{-- Datos SEGIP --}}
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSEGIP">
-                                    <i class="ri-identity-card-line me-2 text-primary"></i> Datos SEGIP
-                                </button>
-                            </h2>
-                            <div id="collapseSEGIP" class="accordion-collapse collapse" data-bs-parent="#accordionCampos">
-                                <div class="accordion-body p-2">
-                                    <p class="small text-muted mb-2">🔄 <strong>Parsing Automático</strong></p>
-                                    <p class="small mb-2">La columna <strong>DATOS_SEGIP</strong> contiene toda la información del SEGIP. El sistema extrae automáticamente:</p>
-                                    <ul class="list-unstyled small">
-                                        <li>✓ Fecha de Nacimiento</li>
-                                        <li>✓ Lugar de Nacimiento</li>
-                                        <li>✓ Domicilio</li>
-                                        <li>✓ Teléfono</li>
-                                        <li>✓ Género</li>
-                                        <li>✓ Estado Civil</li>
-                                        <li>✓ Nombre del Cónyuge</li>
-                                        <li>✓ Ocupación</li>
-                                        <li>✓ País</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
 
                         {{-- Ejemplo de formato --}}
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseExample">
                                     <i class="ri-file-csv-line me-2 text-warning"></i> Ejemplo CSV
                                 </button>
                             </h2>
-                            <div id="collapseExample" class="accordion-collapse collapse" data-bs-parent="#acordionCampos">
+                            <div id="collapseExample" class="accordion-collapse collapse"
+                                data-bs-parent="#acordionCampos">
                                 <div class="accordion-body p-2">
-                                    <pre class="small bg-light p-2 rounded" style="overflow-x: auto;"><code>N REGISTRO;NOMBRE;CI;DATOS_SEGIP;responsable;ESTADO
-1;JUAN PEREZ GARCIA;1234567;Fecha de Nacimiento: 15/01/1990...;JHONY;En investigación
-2;MARIA LOPEZ QUISPE;7654321;Fecha de Nacimiento: 22/03/1985...;ENZO;Pendiente</code></pre>
+                                    <pre class="small bg-light p-2 rounded" style="overflow-x: auto;"><code>N;RUTA O;FECHA;NOMBRE;C.I.;TIPO DE MANDAMIENTO;FOTOCOPIA;DELITO;JUZGADO O TRIBUNAL;OBSERVACIO;A CARGO;TELEFONO;ASIGNADO
+1;LA PAZ;15/01/2026;JUAN PEREZ GARCIA;1234567;Aprehensión;Sí;Robo;Juzgado de La Paz;Peligroso;Juan López;4445555;Carlos Mendez
+2;COCHABAMBA;22/01/2026;MARIA LOPEZ QUISPE;7654321;Aprehensión;No;Hurto;Tribunal Cochabamba;Antecedentes;Maria Yañez;4446666;Ana Sánchez</code></pre>
                                 </div>
                             </div>
                         </div>
@@ -200,17 +211,21 @@
                         {{-- Validaciones --}}
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseValidation">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseValidation">
                                     <i class="ri-error-warning-line me-2 text-danger"></i> Validaciones
                                 </button>
                             </h2>
-                            <div id="collapseValidation" class="accordion-collapse collapse" data-bs-parent="#acordionCampos">
+                            <div id="collapseValidation" class="accordion-collapse collapse"
+                                data-bs-parent="#acordionCampos">
                                 <div class="accordion-body p-2">
                                     <ul class="list-unstyled small">
-                                        <li class="mb-2">⚠️ Los CIs duplicados se actualizarán</li>
-                                        <li class="mb-2">✓ Las fechas se validan automáticamente</li>
-                                        <li class="mb-2">✓ Los géneros se normalizan (MASCULINO/FEMENINO)</li>
-                                        <li class="mb-2">✓ Los países se buscan en la BD</li>
+                                        <li class="mb-2">✓ Los campos NOMBRE, C.I. y DELITO son obligatorios</li>
+                                        <li class="mb-2">✓ Las fechas se validan automáticamente (DD/MM/YYYY)</li>
+                                        <li class="mb-2">✓ Los CIs duplicados se actualizarán en lugar de duplicarse</li>
+                                        <li class="mb-2">✓ El archivo debe estar en formato CSV (separador: punto y coma
+                                            ;)</li>
+                                        <li class="mb-2">✓ La primera fila debe contener los encabezados</li>
                                         <li class="mb-2">✓ Los registros vacíos se ignoran</li>
                                     </ul>
                                 </div>
@@ -220,7 +235,7 @@
 
                     {{-- Descargar plantilla --}}
                     <div class="mt-3">
-                        <a href="{{ route('personas.importar.plantilla') }}" class="btn btn-sm btn-outline-primary w-100">
+                        <a href="" class="btn btn-sm btn-outline-primary w-100">
                             <i class="ri-download-line me-1"></i> Descargar Plantilla
                         </a>
                     </div>
@@ -236,8 +251,8 @@
                     <div class="row g-2">
                         <div class="col-6">
                             <div class="text-center p-2 bg-light rounded">
-                                <div class="fw-bold">{{ \App\Models\Persona::count() }}</div>
-                                <small class="text-muted">Total Personas</small>
+                                <div class="fw-bold">{{ \App\Models\Mandamiento::count() }}</div>
+                                <small class="text-muted">Total Mandamientos</small>
                             </div>
                         </div>
                         <div class="col-6">
@@ -330,7 +345,7 @@
             formData.append('_token', '{{ csrf_token() }}');
 
             document.getElementById('progressContainer').style.display = 'block';
-            // document.getElementById('btnImportar').disabled = true;
+            document.getElementById('btnImportar').disabled = true;
 
             // Simular progreso
             let progress = 0;
@@ -342,13 +357,13 @@
             }, 200);
 
             fetch('{{ route('importar.mandamientos.importar') }}', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
-            })
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
                 .then(res => res.json())
                 .then(data => {
                     clearInterval(progressInterval);
@@ -387,31 +402,20 @@
                 alert.innerHTML = `<i class="ri-check-circle-line me-2"></i> ${data.success}`;
 
                 // Estadísticas
+                const mandamientosImportados = data.data || 0;
                 statsContent.innerHTML = `
-                    <div class="row g-3">
-                        <div class="col-md-4">
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-12">
                             <div class="text-center p-3 bg-success bg-opacity-10 rounded">
-                                <div class="h4 text-success mb-0">${data.importadas}</div>
-                                <small class="text-muted">Importadas</small>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-center p-3 bg-info bg-opacity-10 rounded">
-                                <div class="h4 text-info mb-0">${data.total}</div>
-                                <small class="text-muted">Total</small>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="text-center p-3 ${data.errores.length > 0 ? 'bg-warning' : 'bg-success'} bg-opacity-10 rounded">
-                                <div class="h4 ${data.errores.length > 0 ? 'text-warning' : 'text-success'} mb-0">${data.errores.length}</div>
-                                <small class="text-muted">Errores</small>
+                                <div class="h3 text-success mb-1">${mandamientosImportados}</div>
+                                <small class="text-muted">Mandamientos Importados Exitosamente</small>
                             </div>
                         </div>
                     </div>
                 `;
 
                 // Errores si los hay
-                if (data.errores.length > 0) {
+                if (data.errores && data.errores.length > 0) {
                     erroresContent.style.display = 'block';
                     const tbody = document.querySelector('#tablaErrores tbody');
                     tbody.innerHTML = '';

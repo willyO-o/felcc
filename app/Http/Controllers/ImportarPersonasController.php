@@ -354,7 +354,7 @@ class ImportarPersonasController extends Controller
     /**
      * Separar nombre y apellidos
      */
-    private function separarNombreApellidos($nombreCompleto, $alterno=false)
+    private function separarNombreApellidos($nombreCompleto, $alterno = false)
     {
         if (empty($nombreCompleto) && !$alterno) {
             return ['nombres' => 'Sin', 'apellidos' => 'Nombre'];
@@ -448,7 +448,10 @@ class ImportarPersonasController extends Controller
         }
 
 
-        return response()->json(['success' => true, 'message' => 'Migración de mandamientos completada, Se importaron ' . $resultado . ' mandamientos'], 200);
+        return response()->json([
+            'success' => 'Migración de mandamientos completada, Se importaron ' . $resultado . ' mandamientos',
+            'data' => $resultado,
+        ], 200);
     }
 
     private function convertirCabeceras($cells)
@@ -472,13 +475,13 @@ class ImportarPersonasController extends Controller
             foreach ($data as $index => $fila) {
 
 
-                $nombreCompleto = $this->separarNombreApellidos($fila['NOMBRE'] ?? '' , true);
+                $nombreCompleto = $this->separarNombreApellidos($fila['NOMBRE'] ?? '', true);
 
                 $datos  = [
-                    'hoja_ruta' => campoDB($fila['HR'] ?? null),
+                    'hoja_ruta' => campoDB($fila['HOJA_DE_RUTA_O_MEMORANDUM'] ?? null),
                     'id_persona' => Persona::idPersonaDatos(['nombres' => $nombreCompleto['nombres'], 'apellidos' => $nombreCompleto['apellidos'], 'ci' => campoDB($fila['CI'] ?? null)]),
-                    'id_tipo_mandamiento' => TipoMandamiento::idtipoMandamientoNombre(campoDB($fila['TIPO_MANDAMIENTO']) ?? null),
-                    'tipo_documento' => campoDB($fila['TIPO_DOCUMENTO'] ?? null),
+                    'id_tipo_mandamiento' => TipoMandamiento::idtipoMandamientoNombre(campoDB($fila['TIPO_DE_MANDAMIENTO']) ?? null),
+                    'tipo_documento' => campoDB($fila['ORIGINAL_O_FOTOCOPIA'] ?? null),
                     'id_delito' => Delito::idDelitoNombre(campoDB($fila['DELITO']) ?? null),
                     'id_juzgado' => Juzgado::idJuzgadoNombre(campoDB($fila['JUZGADO']) ?? null),
                     'estado' => campoDB($fila['ESTADO'] ?? null),
