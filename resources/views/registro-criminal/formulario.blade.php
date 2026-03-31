@@ -319,7 +319,7 @@
                             <label class="form-label col-md-3 col-form-label" for="fecha_nacimiento">Fecha de
                                 Nacimiento</label>
                             <div class="col-md-9">
-                                <input type="date" class="form-control" id="fecha_nacimiento" value="{{ $registroCriminal->persona?->fecha_nacimiento->format('Y-m-d') ?? '' }}"
+                                <input type="date" class="form-control" id="fecha_nacimiento" value="{{ $registroCriminal->persona?->fecha_nacimiento?->format('Y-m-d') ?? '' }}"
                                     placeholder="(opcional)" name="fecha_nacimiento" max="{{ now()->toDateString() }}">
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
