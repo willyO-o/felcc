@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Persona;
+use App\Models\Pais;
 use Illuminate\Support\Facades\DB;
 use App\Models\Multimedia;
 use Illuminate\Support\Facades\Storage;
@@ -12,29 +13,95 @@ class PersonaController extends Controller
 {
     /**
      * Display a listing of the resource.
+     * Soporta listar y las solicitudes AJAX para DataTable.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        if ($request->ajax()) {
+            $query = Persona::with('multimedia')
+                ->when($request->filled('search'), function ($q) use ($request) {
+                    $search = $request->search;
+                    $q->where(function ($q2) use ($search) {
+                        $q2->where('nombres', 'like', "%{$search}%")
+                           ->orWhere('apellidos', 'like', "%{$search}%")
+                           ->orWhere('ci', 'like', "%{$search}%");
+                    });
+                })
+                ->when($request->filled('genero'), function ($q) use ($request) {
+                    $q->where('genero', $request->genero);
+                })
+                ->when($request->filled('estado_civil'), function ($q) use ($request) {
+                    $q->where('estado_civil', $request->estado_civil);
+                })
+                ->orderBy('id', 'desc');
+
+            $personas = $query->paginate($request->get('size', 10), ['*'], 'page', $request->get('page', 1));
+
+            return response()->json([
+                'datos' => $personas->items(),
+                'total' => $personas->total(),
+                'page' => $personas->currentPage(),
+            ]);
+        }
+
+        return view('personas.index');
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create() {}
+    public function create()
+    {
+        $persona = new Persona();
+        $paises = Pais::all();
+        return view('personas.formulario', compact('persona', 'paises'));
+    }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        // return response()->json(['success' => true, 'message' => 'Persona creada correctamente', 'data' => $request->all()],400);
+        $reglas = [
+            'nombres' => 'required|string|max:255',
+            'apellidos' => 'nullable|string|max:255',
+            'ci' => 'nullable|string|max:20|unique:persona,ci',
+            'fecha_nacimiento' => 'nullable|date|before:today',
+            'domicilio' => 'nullable|string|max:500',
+            'telefono' => 'nullable|string|max:25',
+            'lugar_nacimiento' => 'nullable|string|max:250',
+            'complemento' => 'nullable|string|max:40',
+            'genero' => 'nullable|in:MASCULINO,FEMENINO',
+            'estado_civil' => 'nullable|in:SOLTERO,CASADO,DIVORCIADO,VIUDO,CONYUGUE',
+            'nombre_conyuge' => 'nullable|string|max:250',
+            'ocupacion' => 'nullable|string|max:150',
+            'id_pais' => 'nullable|exists:pais,id',
+            'fotos' => 'nullable|array',
+            'fotos.*' => 'file|mimes:jpeg,png,jpg,webp|max:2048',
+        ];
 
-        $request->validate(Persona::$rules);
+        $request->validate($reglas);
 
         try {
             DB::beginTransaction();
-            $persona = Persona::create($request->all());
+
+            $data = $request->only([
+                'nombres',
+                'apellidos',
+                'ci',
+                'fecha_nacimiento',
+                'domicilio',
+                'telefono',
+                'lugar_nacimiento',
+                'complemento',
+                'genero',
+                'estado_civil',
+                'nombre_conyuge',
+                'ocupacion',
+                'id_pais',
+            ]);
+
+            $persona = Persona::create($data);
 
             $fotos = $request->file('fotos');
             if ($fotos) {
@@ -54,10 +121,17 @@ class PersonaController extends Controller
 
             DB::commit();
 
-            return response()->json(['success' => true, 'message' => 'Persona creada correctamente', 'data' => $persona], 201);
+            $persona->load('multimedia');
+
+            return response()->json([
+                'success' => 'Persona creada correctamente.',
+                'datos' => $persona,
+            ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => 'Error al crear la persona: ' . $e->getMessage()], 500);
+            return response()->json([
+                'error' => 'Error al crear la persona: ' . $e->getMessage(),
+            ], 500);
         }
     }
 
@@ -66,7 +140,8 @@ class PersonaController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $persona = Persona::with('multimedia')->findOrFail($id);
+        return response()->json(['datos' => $persona], 200);
     }
 
     /**
@@ -74,7 +149,9 @@ class PersonaController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $persona = Persona::with('multimedia')->findOrFail($id);
+        $paises = Pais::all();
+        return view('personas.formulario', compact('persona', 'paises'));
     }
 
     /**
@@ -82,7 +159,80 @@ class PersonaController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $persona = Persona::findOrFail($id);
+
+        $reglas = [
+            'nombres' => 'required|string|max:255',
+            'apellidos' => 'nullable|string|max:255',
+            'ci' => 'nullable|string|max:20|unique:persona,ci,' . $id,
+            'fecha_nacimiento' => 'nullable|date|before:today',
+            'domicilio' => 'nullable|string|max:500',
+            'telefono' => 'nullable|string|max:25',
+            'lugar_nacimiento' => 'nullable|string|max:250',
+            'complemento' => 'nullable|string|max:40',
+            'genero' => 'nullable|in:MASCULINO,FEMENINO',
+            'estado_civil' => 'nullable|in:SOLTERO,CASADO,DIVORCIADO,VIUDO,CONYUGUE',
+            'nombre_conyuge' => 'nullable|string|max:250',
+            'ocupacion' => 'nullable|string|max:150',
+            'id_pais' => 'nullable|exists:pais,id',
+            'fotos' => 'nullable|array',
+            'fotos.*' => 'file|mimes:jpeg,png,jpg,webp|max:2048',
+        ];
+
+        $request->validate($reglas);
+
+        try {
+            DB::beginTransaction();
+
+            $data = $request->only([
+                'nombres',
+                'apellidos',
+                'ci',
+                'fecha_nacimiento',
+                'domicilio',
+                'telefono',
+                'lugar_nacimiento',
+                'complemento',
+                'genero',
+                'estado_civil',
+                'nombre_conyuge',
+                'ocupacion',
+                'id_pais',
+            ]);
+
+            $persona->update($data);
+
+            // Procesar nuevas fotos si las hay
+            $fotos = $request->file('fotos');
+            if ($fotos) {
+                foreach ($fotos as $foto) {
+                    $nombreArchivo = $foto->hashName();
+                    $ruta = $foto->storeAs('personas', $nombreArchivo, 'public');
+                    if (Storage::disk('public')->exists('personas/' . $nombreArchivo)) {
+                        Multimedia::create([
+                            'tipo' => 'persona',
+                            'ruta' => $ruta,
+                            'nombre_archivo' => $nombreArchivo,
+                            'id_persona' => $persona->id,
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit();
+
+            $persona->load('multimedia');
+
+            return response()->json([
+                'success' => 'Persona actualizada correctamente.',
+                'datos' => $persona,
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => 'Error al actualizar la persona: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -90,7 +240,28 @@ class PersonaController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $persona = Persona::findOrFail($id);
+
+            // Eliminar multimedia asociada
+            $multimedia = Multimedia::where('id_persona', $id)->get();
+            foreach ($multimedia as $file) {
+                if (Storage::disk('public')->exists($file->ruta)) {
+                    Storage::disk('public')->delete($file->ruta);
+                }
+                $file->delete();
+            }
+
+            $persona->delete();
+
+            return response()->json([
+                'success' => 'Persona eliminada correctamente.',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al eliminar la persona: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function search(Request $request)

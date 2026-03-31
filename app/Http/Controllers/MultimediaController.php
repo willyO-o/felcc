@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Multimedia;
+use Illuminate\Support\Facades\Storage;
 
 class MultimediaController extends Controller
 {
@@ -59,6 +61,23 @@ class MultimediaController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        try {
+            $multimedia = Multimedia::findOrFail($id);
+
+            // Eliminar archivo del storage
+            if (Storage::disk('public')->exists($multimedia->ruta)) {
+                Storage::disk('public')->delete($multimedia->ruta);
+            }
+
+            $multimedia->delete();
+
+            return response()->json([
+                'success' => 'Archivo eliminado correctamente.',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al eliminar el archivo: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

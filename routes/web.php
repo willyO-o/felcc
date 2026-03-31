@@ -29,6 +29,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('mandamientos', App\Http\Controllers\MandamientoController::class);
     Route::resource('tipos-mandamientos', App\Http\Controllers\TipoMandamientoController::class);
     Route::resource('personas', PersonaController::class);
+    Route::delete('/multimedia/{id}', [App\Http\Controllers\MultimediaController::class, 'destroy'])->name('multimedia.destroy');
     Route::resource('juzgados', App\Http\Controllers\JuzgadoController::class);
     Route::resource('delitos', App\Http\Controllers\DelitoController::class);
     Route::resource('paises', App\Http\Controllers\PaisController::class);

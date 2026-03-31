@@ -54,6 +54,11 @@
                         <i class="mdi mdi-file-document-outline"></i> <span>Registro Criminal</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="{{ route('personas.index') }}">
+                        <i class="mdi mdi-account"></i> <span>Personas</span>
+                    </a>
+                </li>
 
 
 
