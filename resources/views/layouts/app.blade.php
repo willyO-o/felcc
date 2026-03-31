@@ -103,7 +103,7 @@
 
     {{-- @vite('resources/js/app.js') --}}
 
-    <script src="{{url('assets/js/app-CmSKuuH0.js')}}"></script>
+    <script src="{{url('assets/js/app-CpgepwMh.js')}}"></script>
 
     @yield('js')
 

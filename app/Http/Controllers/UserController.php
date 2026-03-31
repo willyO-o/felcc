@@ -29,6 +29,9 @@ class UserController extends Controller
                     $q->where('role_id', $request->role_id);
                 })
                 ->orderBy('id', 'desc');
+            $query->whereHas('role', function ($q) {
+                $q->whereNotIn('nombre', ['superadmin']);
+            });
 
             $users = $query->paginate($request->get('size', 10), ['*'], 'page', $request->get('page', 1));
 
@@ -39,7 +42,7 @@ class UserController extends Controller
             ]);
         }
 
-        $roles = Role::all();
+        $roles = Role::whereNotIn('nombre', ['superadmin'])->get();
         return view('usuarios.index', compact('roles'));
     }
 
@@ -49,7 +52,7 @@ class UserController extends Controller
     public function create()
     {
         $user = new User();
-        $roles = Role::all();
+        $roles = Role::whereNotIn('nombre', ['superadmin'])->get();
         return view('usuarios.formulario', compact('user', 'roles'));
     }
 

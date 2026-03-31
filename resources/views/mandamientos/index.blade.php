@@ -5,10 +5,12 @@
 @section('content')
     <div class="row">
         <div class="col-12 d-flex justify-content-end mb-2">
-            <div class="flex-shrink-0">
-                <button value="" class="btn btn-primary openModal" id="mandamientosBtn">
-                    <i class="ri-add-line align-middle me-1"></i> Nuevo Mandamiento
-                </button>
+            @canany(['superadmin', 'administrador'])
+                <div class="flex-shrink-0">
+                    <button value="" class="btn btn-primary openModal" id="mandamientosBtn">
+                        <i class="ri-add-line align-middle me-1"></i> Nuevo Mandamiento
+                    </button>
+                @endcanany
             </div>
         </div>
     </div>

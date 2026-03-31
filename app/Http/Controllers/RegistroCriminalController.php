@@ -40,6 +40,7 @@ class RegistroCriminalController extends Controller
      */
     public function create()
     {
+        $this->authorize('acceso-total');
         $registroCriminal = new RegistroCriminal();
         return view('registro-criminal.formulario', compact('registroCriminal'));
     }

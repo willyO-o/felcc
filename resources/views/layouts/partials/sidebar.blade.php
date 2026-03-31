@@ -3,7 +3,7 @@
     <!-- LOGO -->
     <div class="navbar-brand-box mt-3">
         <!-- Dark Logo-->
-        <a href="/dashboard" class="logo logo-dark">
+        <a href="{{ route('dashboard') }}" class="logo logo-dark">
             <span class="logo-sm">
                 <img src="/felcc/img/felcc.png" alt="" width="40">
             </span>
@@ -12,7 +12,7 @@
             </span>
         </a>
         <!-- Light Logo-->
-        <a href="/dashboard" class="logo logo-light">
+        <a href="{{ route('dashboard') }}" class="logo logo-light">
             <span class="logo-sm">
                 <img src="/felcc/img/felcc.png" alt="" width="40">
             </span>
@@ -20,7 +20,8 @@
                 <img src="/felcc/img/felcc.png" alt="" width="70">
             </span>
         </a>
-        <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover" id="vertical-hover">
+        <button type="button" class="btn btn-sm p-0 fs-20 header-item float-end btn-vertical-sm-hover"
+            id="vertical-hover">
             <i class="ri-record-circle-line"></i>
         </button>
     </div>
@@ -40,13 +41,6 @@
                     </a>
                 </li>
 
-                <!-- Registro Criminal -->
-                <li class="nav-item">
-                    <a class="nav-link menu-link" href="{{ route('registro-criminal.index') }}">
-                        <i class="mdi mdi-file-document-outline"></i> <span>Registro Criminal</span>
-                    </a>
-                </li>
-
                 <!-- Mandamientos -->
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="{{ route('mandamientos.index') }}">
@@ -54,22 +48,35 @@
                     </a>
                 </li>
 
-                <!-- Usuarios -->
+                <!-- Registro Criminal -->
                 <li class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebarUsuarios" data-bs-toggle="collapse" role="button" aria-expanded="false" aria-controls="sidebarUsuarios">
-                        <i class="mdi mdi-account-group-outline"></i> <span>Usuarios</span>
+                    <a class="nav-link menu-link" href="{{ route('registro-criminal.index') }}">
+                        <i class="mdi mdi-file-document-outline"></i> <span>Registro Criminal</span>
                     </a>
-                    <div class="collapse menu-dropdown" id="sidebarUsuarios">
-                        <ul class="nav nav-sm flex-column">
-                            <li class="nav-item">
-                                <a href="{{ route('usuarios.index') }}" class="nav-link">Lista de Usuarios</a>
-                            </li>
-                            <li class="nav-item">
-                                <a href="{{ route('usuarios.index') }}" class="nav-link" id="linkNuevoUsuario">Nuevo Usuario</a>
-                            </li>
-                        </ul>
-                    </div>
                 </li>
+
+
+
+                @canany(['superadmin', 'administrador','tecnico'])
+                    <!-- Usuarios -->
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="#sidebarUsuarios" data-bs-toggle="collapse" role="button"
+                            aria-expanded="false" aria-controls="sidebarUsuarios">
+                            <i class="mdi mdi-account-group-outline"></i> <span>Usuarios</span>
+                        </a>
+                        <div class="collapse menu-dropdown" id="sidebarUsuarios">
+                            <ul class="nav nav-sm flex-column">
+                                <li class="nav-item">
+                                    <a href="{{ route('usuarios.index') }}" class="nav-link">Lista de Usuarios</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('usuarios.index') }}" class="nav-link" id="linkNuevoUsuario">Nuevo
+                                        Usuario</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </li>
+                @endcanany
 
             </ul>
         </div>
