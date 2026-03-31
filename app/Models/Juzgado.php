@@ -20,4 +20,14 @@ class Juzgado extends Model
     {
         return $this->hasMany(Mandamiento::class, 'id_juzgado');
     }
+
+    static function idJuzgadoNombre($nombre)
+    {
+        // fisrtor create
+        if(empty($nombre)){
+            return null;
+        }
+        $juzgado = static::firstOrCreate(['nombre_juzgado' => $nombre]);
+        return $juzgado->id;
+    }
 }

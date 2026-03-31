@@ -5,20 +5,52 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Persona;
 use App\Models\Pais;
+use App\Models\Mandamiento;
+use App\Models\TipoMandamiento;
+use App\Models\Juzgado;
+use App\Models\Delito;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use OpenSpout\Reader\CSV\Reader as CSVReader;
 use OpenSpout\Reader\XLSX\Reader as XLSXReader;
 use Carbon\Carbon;
+use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
+
+
 
 class ImportarPersonasController extends Controller
 {
+
+    // protected $cabeceras  = [
+    //     'hoja_ruta' => 'HR',
+    //     'id_persona' => 'ID_PERSONA',
+    //     'nombres' => 'NOMBRE',
+    //     'apellidos' => 'APELLIDOS',
+    //     'id_tipo_mandamiento' => 'ID_TIPO_MANDAMIENTO',
+    //     'tipo_mandamiento' => 'TIPO_MANDAMIENTO',
+    //     'tipo_documento' => 'ORIGINAL_FOTOCOPIA',
+    //     'id_delito' => 'ID_DELITO',
+    //     'delito' => 'DELITO',
+    //     'id_juzgado' => 'ID_JUZGADO',
+    //     'juzgado' => 'JUZGADO',
+    //     'estado' => 'ESTADO',
+    //     'domicilio' => 'DOMICILIO',
+    //     'ci' => 'CI',
+    //     'vehiculos' => 'VEHICULOS',
+    //     'telefono' => 'TELEFONO',
+    //     'asignado' => 'ASIGNADO',
+    //     'actividades_realizadas' => 'ACTIVIDADES_REALIZADAS',
+
+    //     'fecha_ejecucion' => 'FECHA_EJECUCION',
+    //     'detalle_ejecucion' => 'DETALLE_EJECUCION',
+    // ];
     /**
      * Mostrar vista de importación
      */
     public function index()
     {
-        return view('personas.importar.index');
+        return view('importar.index');
     }
 
     /**
@@ -32,19 +64,19 @@ class ImportarPersonasController extends Controller
 
         $ejemplo = [
             [1, 'JUAN PEREZ GARCIA', '1234567', 'Nombres y Apellidos: JUAN PEREZ GARCIA
-Fecha de Nacimiento: 15/01/1990
-Domicilio: Calle Principal 123
-Género: MASCULINO
-Estado Civil: SOLTERO
-Profesión: Ingeniero
-País: BOLIVIA', 'JHONY', 'En investigación'],
+            Fecha de Nacimiento: 15/01/1990
+            Domicilio: Calle Principal 123
+            Género: MASCULINO
+            Estado Civil: SOLTERO
+            Profesión: Ingeniero
+            País: BOLIVIA', 'JHONY', 'En investigación'],
             [2, 'MARIA LOPEZ QUISPE', '7654321', 'Nombres y Apellidos: MARIA LOPEZ QUISPE
-Fecha de Nacimiento: 22/03/1985
-Domicilio: Calle Secundaria 456
-Género: FEMENINO
-Estado Civil: CASADA
-Profesión: Abogada
-País: BOLIVIA', 'ENZO', 'Pendiente']
+            Fecha de Nacimiento: 22/03/1985
+            Domicilio: Calle Secundaria 456
+            Género: FEMENINO
+            Estado Civil: CASADA
+            Profesión: Abogada
+            País: BOLIVIA', 'ENZO', 'Pendiente']
         ];
 
         $handle = fopen('php://memory', 'w');
@@ -322,26 +354,25 @@ País: BOLIVIA', 'ENZO', 'Pendiente']
     /**
      * Separar nombre y apellidos
      */
-    private function separarNombreApellidos($nombreCompleto)
+    private function separarNombreApellidos($nombreCompleto, $alterno=false)
     {
-        $nombreCompleto = trim($nombreCompleto);
+        if (empty($nombreCompleto) && !$alterno) {
+            return ['nombres' => 'Sin', 'apellidos' => 'Nombre'];
+        }
+        $nombreCompleto = convertirMayusculas(eliminarEspaciosMultiples($nombreCompleto));
         $partes = explode(' ', $nombreCompleto);
 
         // Asumir que los últimos dos elementos son apellidos cuando son más de 2 palabras
         if (count($partes) > 2) {
-            $apellidos = implode(' ', array_slice($partes, -2));
-            $nombres = implode(' ', array_slice($partes, 0, -2));
-        } elseif (count($partes) == 2) {
-            $nombres = $partes[0];
-            $apellidos = $partes[1];
+            $apellidos = array_slice($partes, -2);
+            $nombres = array_slice($partes, 0, -2);
         } else {
-            $nombres = $partes[0] ?? '';
-            $apellidos = '';
+            $nombres = array_slice($partes, 0, 1);
+            $apellidos = array_slice($partes, 1);
         }
-
         return [
-            'nombres' => trim($nombres),
-            'apellidos' => trim($apellidos)
+            'nombres' => trim(implode(' ', $nombres)),
+            'apellidos' => trim(implode(' ', $apellidos))
         ];
     }
 
@@ -355,4 +386,127 @@ País: BOLIVIA', 'ENZO', 'Pendiente']
     }
 
 
+
+    public function indexMandamientoImportar()
+    {
+        return view('importar.indexMandamientoImportar');
+    }
+
+    public function importarMandamientos(Request $request)
+    {
+
+        $request->validate([
+            'archivo' => 'required|file|extensions:csv|max:10240',
+        ], [
+            'archivo.required' => 'El archivo es obligatorio',
+            'archivo.extensions' => 'El archivo debe ser CSV',
+            'archivo.max' => 'El archivo no debe exceder 10MB',
+        ]);
+
+        $path = $request->file('archivo')->storeAs(
+            'csv_imports',
+            $request->file('archivo')->getClientOriginalName(),
+            'local'
+        );
+
+        $reader = ReaderEntityFactory::createReaderFromFile(Storage::disk('local')->path($path));
+
+        $reader->setFieldDelimiter(';');
+
+        $reader->open(Storage::disk('local')->path($path));
+
+        $data = [];
+        $cabeceras = [];
+        foreach ($reader->getSheetIterator() as $sheet) {
+
+            foreach ($sheet->getRowIterator() as $index => $row) {
+                $cells = $row->toArray();
+
+
+                if ($index === 1) {
+                    $cabeceras = $this->convertirCabeceras($cells);
+                    continue;
+                }
+
+                $filaAsociativa = array_combine($cabeceras, $cells);
+
+                // if (empty($cells)) {
+                //     return "vacioo"; // Saltar filas vacías
+                // }
+
+                $data[] =   $filaAsociativa;
+            }
+            break; // Solo la primera hoja
+        }
+
+        $resultado = $this->registrarDatosMandamientos($data);
+
+        if (!is_numeric($resultado)) {
+            return response()->json([
+                'error' => "No se pudieron importar los mandamientos. Error: { $resultado[error] }"
+            ], 500);
+        }
+
+
+        return response()->json(['success' => true, 'message' => 'Migración de mandamientos completada, Se importaron ' . $resultado . ' mandamientos'], 200);
+    }
+
+    private function convertirCabeceras($cells)
+    {
+        $cabecerasNormalizadas = array_map(function ($celda) {
+            return  str_replace([' ', '.'], ['_', ''], convertirMayusculas(eliminarEspaciosMultiples($celda)));
+        }, $cells);
+
+        return $cabecerasNormalizadas;
+    }
+
+
+    private function registrarDatosMandamientos($data)
+    {
+
+        try {
+            DB::beginTransaction();
+
+            $contador = 0;
+
+            foreach ($data as $index => $fila) {
+
+
+                $nombreCompleto = $this->separarNombreApellidos($fila['NOMBRE'] ?? '' , true);
+
+                $datos  = [
+                    'hoja_ruta' => campoDB($fila['HR'] ?? null),
+                    'id_persona' => Persona::idPersonaDatos(['nombres' => $nombreCompleto['nombres'], 'apellidos' => $nombreCompleto['apellidos'], 'ci' => campoDB($fila['CI'] ?? null)]),
+                    'id_tipo_mandamiento' => TipoMandamiento::idtipoMandamientoNombre(campoDB($fila['TIPO_MANDAMIENTO']) ?? null),
+                    'tipo_documento' => campoDB($fila['TIPO_DOCUMENTO'] ?? null),
+                    'id_delito' => Delito::idDelitoNombre(campoDB($fila['DELITO']) ?? null),
+                    'id_juzgado' => Juzgado::idJuzgadoNombre(campoDB($fila['JUZGADO']) ?? null),
+                    'estado' => campoDB($fila['ESTADO'] ?? null),
+                    'domicilio' => $fila['DOMICILIO'] ?? null,
+                    'vehiculos' => $fila['VEHICULOS'] ?? null,
+                    'telefono' => $fila['TELEFONO'] ?? null,
+                    'asignado' => campoDB($fila['ASIGNADO'] ?? null),
+                    'actividades_realizadas' => $fila['ACTIVIDADES_REALIZADAS'] ?? null,
+                    // 'fecha_ejecucion' => !empty($fila['FECHA_EJECUCION']) ? Carbon::parse(campoDB($fila['FECHA_EJECUCION'])) : null,
+                    'detalle_ejecucion' => nuloSiVacio($fila['DETALLE_EJECUCION'] ?? null),
+                ];
+
+                $mandamient = Mandamiento::create($datos);
+
+                if (!$mandamient) {
+                    throw new \Exception("Error al crear mandamiento en fila " . ($index + 2));
+                }
+                $contador++;
+            }
+
+
+            DB::commit();
+
+            return $contador;
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+            return ["error" => $e->getMessage()];
+        }
+    }
 }

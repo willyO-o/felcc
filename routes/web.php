@@ -26,6 +26,9 @@ Route::group(['middleware' => ['auth']], function () {
     // Dashboard
     Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     // Mandamientos
+
+    Route::get('mandamientos/importar', [App\Http\Controllers\ImportarPersonasController::class, 'indexMandamientoImportar'])->name('importar.mandamientos.index');
+    Route::post('mandamientos/importar', [App\Http\Controllers\ImportarPersonasController::class, 'importarMandamientos'])->name('importar.mandamientos.importar');
     Route::resource('mandamientos', App\Http\Controllers\MandamientoController::class);
     Route::resource('tipos-mandamientos', App\Http\Controllers\TipoMandamientoController::class);
     Route::delete('/multimedia/{id}', [App\Http\Controllers\MultimediaController::class, 'destroy'])->name('multimedia.destroy');

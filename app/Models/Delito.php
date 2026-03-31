@@ -21,4 +21,15 @@ class Delito extends Model
     {
         return $this->hasMany(Mandamiento::class, 'id_delito');
     }
+
+
+    static function idDelitoNombre($nombre)
+    {
+        // fisrtor create
+        if(empty($nombre)){
+            return null;
+        }
+        $delito = static::firstOrCreate(['nombre_delito' => $nombre]);
+        return $delito->id;
+    }
 }

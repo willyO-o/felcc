@@ -69,4 +69,25 @@ class Persona extends Model
         'fotos' => 'nullable|array',
         'fotos.*' => 'file|mimes:jpeg,png,jpg,webp|max:2048',
     ];
+
+
+    static function idPersonaDatos($datos)
+    {
+        $persona = null;
+        if (!empty($datos['ci'])) {
+            $persona = static::where('ci', $datos['ci'])->first();
+        }
+
+        if(!$persona && !empty($datos['nombre']))
+        {
+            $persona = static::whereRaw("CONCAT(nombres, ' ', apellidos) = ?", [$datos['nombre']. ' ' . $datos['apellidos']])->first();
+        }
+
+
+        if (!$persona) {
+            $persona = static::create($datos);
+        }
+
+        return $persona->id;
+    }
 }

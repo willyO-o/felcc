@@ -65,6 +65,28 @@
                 @canany(['superadmin', 'administrador','tecnico'])
                     <!-- Usuarios -->
                     <li class="nav-item">
+                        <a class="nav-link menu-link" href="#sidebarImportar" data-bs-toggle="collapse" role="button"
+                            aria-expanded="false" aria-controls="sidebarImportar">
+                            <i class="mdi mdi-upload"></i> <span>Importar</span>
+                        </a>
+                        <div class="collapse menu-dropdown" id="sidebarImportar">
+                            <ul class="nav nav-sm flex-column">
+                                <li class="nav-item d-none">
+                                    <a href="{{ route('personas.importar.index') }}" class="nav-link">Importar Personas</a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a href="{{ route('importar.mandamientos.index') }}" class="nav-link">Importar Mandamientos</a>
+                                </li>
+
+                                <li class="nav-item d-none">
+                                    <a href="{{ route('usuarios.index') }}" class="nav-link">Importar Registro</a>
+                                </li>
+
+                            </ul>
+                        </div>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link menu-link" href="#sidebarUsuarios" data-bs-toggle="collapse" role="button"
                             aria-expanded="false" aria-controls="sidebarUsuarios">
                             <i class="mdi mdi-account-group-outline"></i> <span>Usuarios</span>

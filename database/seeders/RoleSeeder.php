@@ -22,6 +22,10 @@ class RoleSeeder extends Seeder
                 'descripcion' => 'Administrador con acceso a la gestión general',
             ],
             [
+                'nombre' => 'tecnico',
+                'descripcion' => 'Técnico con acceso limitado a operaciones',
+            ],
+            [
                 'nombre' => 'consultor',
                 'descripcion' => 'Consultor con acceso limitado a operaciones',
             ],
@@ -37,6 +41,7 @@ class RoleSeeder extends Seeder
             'name' => 'administrador',
             'email' => 'administrador@gmail.com',
             'password' => bcrypt('79515350/Willy'),
+            'role_id' => 1,
         ]);
 
     }

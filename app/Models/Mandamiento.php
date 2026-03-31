@@ -25,7 +25,11 @@ class Mandamiento extends Model
         'id_juzgado',
         'id_delito',
         'id_tipo_mandamiento',
-        'id_persona'
+        'id_persona',
+        'telefono',
+        'vehiculos',
+        'domicilio',
+
     ];
 
     protected $casts = [
