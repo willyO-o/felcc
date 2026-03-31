@@ -28,8 +28,14 @@ Route::group(['middleware' => ['auth']], function () {
     // Mandamientos
     Route::resource('mandamientos', App\Http\Controllers\MandamientoController::class);
     Route::resource('tipos-mandamientos', App\Http\Controllers\TipoMandamientoController::class);
-    Route::resource('personas', PersonaController::class);
     Route::delete('/multimedia/{id}', [App\Http\Controllers\MultimediaController::class, 'destroy'])->name('multimedia.destroy');
+
+    // Rutas de importación de personas
+    Route::get('/personas/importar', [App\Http\Controllers\ImportarPersonasController::class, 'index'])->name('personas.importar.index');
+    Route::post('/personas/importar', [App\Http\Controllers\ImportarPersonasController::class, 'store'])->name('personas.importar.store');
+    Route::get('/personas/importar/plantilla', [App\Http\Controllers\ImportarPersonasController::class, 'plantilla'])->name('personas.importar.plantilla');
+    Route::resource('personas', PersonaController::class);
+
     Route::resource('juzgados', App\Http\Controllers\JuzgadoController::class);
     Route::resource('delitos', App\Http\Controllers\DelitoController::class);
     Route::resource('paises', App\Http\Controllers\PaisController::class);

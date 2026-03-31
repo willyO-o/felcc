@@ -13,7 +13,12 @@
 
 @section('content')
     <div class="row">
-        <div class="col-12 d-flex justify-content-end mb-2">
+        <div class="col-12 d-flex justify-content-end gap-2 mb-2">
+            <div class="flex-shrink-0">
+                <a href="{{ route('personas.importar.index') }}" class="btn btn-outline-info">
+                    <i class="ri-download-cloud-line align-middle me-1"></i> Importar CSV
+                </a>
+            </div>
             <div class="flex-shrink-0">
                 <button class="btn btn-primary" id="btnNuevaPersona">
                     <i class="ri-add-line align-middle me-1"></i> Nueva Persona

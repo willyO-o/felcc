@@ -1,0 +1,91 @@
+N REGISTRO;NOMBRE;CI;DATOS_SEGIP;responsable;ESTADO
+1;JUAN CARLOS PEREZ GARCIA;1234567;Nombres y Apellidos: JUAN CARLOS PEREZ GARCIA
+Fecha de Nacimiento: 15/01/1990
+Domicilio: Calle Principal 123, Apartamento 4
+Género: MASCULINO
+Estado Civil: SOLTERO
+Profesión: Ingeniero de Sistemas
+Localidad: La Paz
+País: BOLIVIA
+;JHONY QUISPE;En investigación
+2;MARIA ROSA LOPEZ CONDORI;7654321;Nombres y Apellidos: MARIA ROSA LOPEZ CONDORI
+Fecha de Nacimiento: 22/03/1985
+Domicilio: Avenida Ballivián 456
+Género: FEMENINO
+Estado Civil: CASADA
+Profesión: Abogada
+Localidad: Cochabamba
+País: BOLIVIA
+;ENZO MARTINEZ;Pendiente
+3;CARLOS RAMON GUTIERREZ FLORES;9876543;Nombres y Apellidos: CARLOS RAMON GUTIERREZ FLORES
+Fecha de Nacimiento: 08/07/1992
+Domicilio: Calle Ballivián 789
+Género: MASCULINO
+Estado Civil: DIVORCIADO
+Profesión: Contador
+Localidad: Santa Cruz
+País: BOLIVIA
+;MARIA FERNANDEZ;En investigación
+4;PATRICIA ELENA ORTIZ RAMOS;5432109;Nombres y Apellidos: PATRICIA ELENA ORTIZ RAMOS
+Fecha de Nacimiento: 03/11/1988
+Domicilio: Pasaje Los Andes 321
+Género: FEMENINO
+Estado Civil: VIUDA
+Profesión: Enfermera
+Localidad: Oruro
+País: BOLIVIA
+;ALEJANDRO ROJAS;Cerrado
+5;ERNESTO LUIS SALINAS VARGAS;2109876;Nombres y Apellidos: ERNESTO LUIS SALINAS VARGAS
+Fecha de Nacimiento: 17/05/1995
+Domicilio: Calle 6 de Agosto 654
+Género: MASCULINO
+Estado Civil: SOLTERO
+Profesión: Técnico Mecánico
+Localidad: Tarija
+País: BOLIVIA
+;LUIS TORRES;En investigación
+6;GLORIA ESTELA MONTOYA VILLEGAS;3456789;Nombres y Apellidos: GLORIA ESTELA MONTOYA VILLEGAS
+Fecha de Nacimiento: 29/09/1980
+Domicilio: Avenida Montes 987
+Género: FEMENINO
+Estado Civil: CASADA
+Profesión: Comerciante
+Localidad: Potosí
+País: BOLIVIA
+;PATRICIA RUIZ;Pendiente
+7;FRANCISCO JAVIER RIOS CRUZ;6789012;Nombres y Apellidos: FRANCISCO JAVIER RIOS CRUZ
+Fecha de Nacimiento: 12/02/1993
+Domicilio: Calle Libertad 147
+Género: MASCULINO
+Estado Civil: SOLTERO
+Profesión: Chofer
+Localidad: La Paz
+País: BOLIVIA
+;CARLOS MENDEZ;En investigación
+8;SOPHIA GABRIELA ZAMORA LOPEZ;4321098;Nombres y Apellidos: SOPHIA GABRIELA ZAMORA LOPEZ
+Fecha de Nacimiento: 25/06/1991
+Domicilio: Avenida Republica 258
+Género: FEMENINO
+Estado Civil: CASADA
+Profesión: Diseñadora Gráfica
+Localidad: Cochabamba
+País: BOLIVIA
+;JUAN SORIA;Pendiente
+9;DANIEL ARMANDO FLORES MIRANDA;7890123;Nombres y Apellidos: DANIEL ARMANDO FLORES MIRANDA
+Fecha de Nacimiento: 10/04/1987
+Domicilio: Calle Sucre 369
+Género: MASCULINO
+Estado Civil: DIVORCIADO
+Profesión: Profesor
+Localidad: Santa Cruz
+País: BOLIVIA
+;MANUEL GARCIA;En investigación
+10;VERONICA ISABEL QUINTANILLA SOTO;8901234;Nombres y Apellidos: VERONICA ISABEL QUINTANILLA SOTO
+Fecha de Nacimiento: 31/12/1986
+Domicilio: Pasaje 21 de Julio 741
+Género: FEMENINO
+Estado Civil: VIUDA
+Profesión: Secretaria
+Localidad: Oruro
+País: BOLIVIA
+;ROSA HERNANDEZ;Cerrado
