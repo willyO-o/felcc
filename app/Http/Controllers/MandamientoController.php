@@ -30,11 +30,12 @@ class MandamientoController extends Controller
                 'total' => $mandamientos->total(),
                 'page' => $mandamientos->currentPage(),
             ]);
-
         }
 
         // Si no es AJAX, mostrar la vista
-        return view('mandamientos.index');
+        $estados = Mandamiento::select('estado')->groupBy('estado')->get()->pluck('estado');
+
+        return view('mandamientos.index', compact('estados'));
     }
 
 
@@ -54,6 +55,7 @@ class MandamientoController extends Controller
      */
     public function store(Request $request)
     {
+
         $request->validate(Mandamiento::$rules);
 
 
@@ -66,8 +68,13 @@ class MandamientoController extends Controller
 
             if ($imagenMandamiento) {
                 $nombreArchivo = $imagenMandamiento->hashName();
-                $ruta =  $imagenMandamiento->storeAs('mandamientos', $nombreArchivo, 'public');
-                if (!Storage::disk('public')->exists('mandamientos/' . $nombreArchivo)) {
+
+                $extension = $request->file('imagen_mandamiento')->getClientOriginalExtension();
+                $directorio = $extension == 'pdf' ? 'mandamientos-pdf' : 'mandamientos';
+
+
+                $ruta =  $imagenMandamiento->storeAs($directorio, $nombreArchivo, 'public');
+                if (!Storage::disk('public')->exists($directorio . '/' . $nombreArchivo)) {
                     throw new \Exception('Error al guardar la imagen del mandamiento.');
                 }
                 $multimedia = Multimedia::create([
@@ -75,7 +82,27 @@ class MandamientoController extends Controller
                     'ruta' => $ruta,
                     'nombre_archivo' => $nombreArchivo,
                     'id_mandamiento' => $mandamiento->id, // Se asignará después de crear el mandamiento
+                    'tipo_archivo' => $extension,
                 ]);
+            }
+
+            $actaEjecucion = $request->file('acta_ejecucion');
+            if ($actaEjecucion) {
+                $extensionActa = $request->file('acta_ejecucion')->getClientOriginalExtension();
+                $directorioActa =  $extensionActa == 'pdf' ? 'mandamientos-pdf-actas' : 'mandamientos-img-actas';
+                $nombreArchivoActa = $actaEjecucion->hashName();
+                $rutaActa =  $actaEjecucion->storeAs($directorioActa, $nombreArchivoActa, 'public');
+                if (!Storage::disk('public')->exists($directorioActa . '/' . $nombreArchivoActa)) {
+                    throw new \Exception('Error al guardar el acta de ejecución.');
+                }
+                $multimediaActa = Multimedia::create([
+                    'tipo' => 'acta_ejecucion',
+                    'ruta' => $rutaActa,
+                    'nombre_archivo' => $nombreArchivoActa,
+                    'id_mandamiento' => $mandamiento->id,
+                    'tipo_archivo' => $extensionActa,
+                ]);
+
             }
 
 
@@ -125,6 +152,8 @@ class MandamientoController extends Controller
      */
     public function update(Request $request, string $id)
     {
+
+
         try {
             DB::beginTransaction();
             $mandamiento = Mandamiento::findOrFail($id);
@@ -132,11 +161,14 @@ class MandamientoController extends Controller
 
             if ($imagenMandamiento) {
 
-                $imagenExistente = Multimedia::where('id_mandamiento', $mandamiento->id)->first();
+                $imagenExistente = Multimedia::where('id_mandamiento', $mandamiento->id)->where('tipo', 'mandamiento')->first();
+
+                $extension = $request->file('imagen_mandamiento')->getClientOriginalExtension();
+                $directorio = $extension == 'pdf' ? 'mandamientos-pdf' : 'mandamientos';
 
                 $nombreArchivo = $imagenMandamiento->hashName();
-                $ruta =  $imagenMandamiento->storeAs('mandamientos', $nombreArchivo, 'public');
-                if (!Storage::disk('public')->exists('mandamientos/' . $nombreArchivo)) {
+                $ruta =  $imagenMandamiento->storeAs($directorio, $nombreArchivo, 'public');
+                if (!Storage::disk('public')->exists($directorio . '/' . $nombreArchivo)) {
                     throw new \Exception('Error al guardar la imagen del mandamiento.');
                 }
                 $multimedia = Multimedia::create([
@@ -144,6 +176,7 @@ class MandamientoController extends Controller
                     'ruta' => $ruta,
                     'nombre_archivo' => $nombreArchivo,
                     'id_mandamiento' => $mandamiento->id, // Se asignará después de crear el mandamiento
+                    'tipo_archivo' => $extension,
                 ]);
 
                 if ($imagenExistente) {
@@ -155,6 +188,34 @@ class MandamientoController extends Controller
                     $imagenExistente->delete();
                 }
             }
+
+            $actaEjecucion = $request->file('acta_ejecucion');
+            if ($actaEjecucion) {
+                $actaExistente = Multimedia::where('id_mandamiento', $mandamiento->id)->where('tipo_archivo', 'acta_ejecucion')->first();
+                $extensionActa = $request->file('acta_ejecucion')->getClientOriginalExtension();
+                $directorioActa =  $extensionActa == 'pdf' ? 'mandamientos-pdf-actas' : 'mandamientos-img-actas';
+                $nombreArchivoActa = $actaEjecucion->hashName();
+                $rutaActa =  $actaEjecucion->storeAs($directorioActa, $nombreArchivoActa, 'public');
+                if (!Storage::disk('public')->exists($directorioActa . '/' . $nombreArchivoActa)) {
+                    throw new \Exception('Error al guardar el acta de ejecución.');
+                }
+                $multimediaActa = Multimedia::create([
+                    'tipo' => 'acta_ejecucion',
+                    'ruta' => $rutaActa,
+                    'nombre_archivo' => $nombreArchivoActa,
+                    'id_mandamiento' => $mandamiento->id,
+                    'tipo_archivo' => $extensionActa,
+                ]);
+                if ($actaExistente) {
+                    // Eliminar el acta anterior del almacenamiento
+                    if (Storage::disk('public')->exists($actaExistente->ruta)) {
+                        Storage::disk('public')->delete($actaExistente->ruta);
+                    }
+                    // Eliminar el registro del acta anterior en la base de datos
+                    $actaExistente->delete();
+                }
+            }
+
 
             $mandamiento->update($request->all());
 

@@ -31,13 +31,27 @@
 
                                 </div>
                                 <hr>
-                                <h6>Imagen del Mandamiento</h6>
+                                <h6>Imagen/PDF del Mandamiento</h6>
                                 <div class="">
 
-                                    @if ($mandamiento->ruta)
-                                        <div class="swiper-slide mb-1">
-                                            <img src="{{ asset('/storage/' . $mandamiento->ruta) }}" alt=""
-                                                class="img-fluid d-block" />
+                                    @if ($mandamiento->archivo_mandamiento)
+                                        @php
+                                            $mandamientoArchivo = json_decode($mandamiento->archivo_mandamiento);
+                                        @endphp
+                                        <div class="swiper-slide mb-1 text-center">
+
+                                            @if ($mandamientoArchivo->tipo_archivo !== 'pdf')
+                                                <img src="{{ asset('/storage/' . $mandamientoArchivo->ruta) }}"
+                                                    alt="" class="img-fluid d-block" />
+                                            @else
+                                                <a href="{{ asset('/storage/' . $mandamientoArchivo->ruta) }}"
+                                                    target="_blank" class="btn btn-link btn-sm shadow-none"
+                                                    data-bs-toggle="tooltip" data-bs-placement="top"
+                                                    title="Ver imagen mandamiento">
+                                                    <i class="ri-file-pdf-line"></i> Ver PDF
+                                                </a>
+                                            @endif
+
                                         </div>
                                     @else
                                         <div class="swiper-slide py-4">
@@ -64,7 +78,8 @@
                                     <h4>{{ $mandamiento->persona?->nombre_completo }}</h4>
                                     <div class="hstack gap-3 flex-wrap">
                                         <div><a href="#" class="text-primary d-block"><span
-                                                    class="text-muted fw-medium">C.I.: </span>{{ $mandamiento->persona?->ci }}</a>
+                                                    class="text-muted fw-medium">C.I.:
+                                                </span>{{ $mandamiento->persona?->ci }}</a>
                                         </div>
                                         <div class="vr"></div>
                                         <div class="text-muted">TIPO : <span
@@ -207,7 +222,8 @@
                                     <div class="mt-3">
                                         <h5 class="fs-14">
                                             <i class="ri-user-line me-1 align-middle"></i>
-                                            Datos del imputado :</h5>
+                                            Datos del imputado :
+                                        </h5>
                                         <div class="table-responsive">
                                             <table class="table mb-0">
                                                 <tbody>
@@ -231,7 +247,7 @@
 
                                                     <tr>
                                                         <th scope="row">Nro Celular</th>
-                                                        <td>{{ $mandamiento->persona->telefono }}</td>
+                                                        <td>{{ $mandamiento->telefono }}</td>
                                                     </tr>
                                                     <tr>
                                                         <th scope="row">Edad</th>
@@ -240,11 +256,11 @@
                                                     </tr>
                                                     <tr>
                                                         <th scope="row">Domicilio</th>
-                                                        <td>{{ $mandamiento->persona?->domicilio }}</td>
+                                                        <td>{{ $mandamiento->domicilio }}</td>
                                                     </tr>
                                                     <tr>
                                                         <th scope="row">Vehiculos</th>
-                                                        <td>{{ $mandamiento->persona?->vehiculos }}</td>
+                                                        <td>{{ $mandamiento->vehiculos }}</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -266,10 +282,28 @@
                                         <tbody>
                                             <tr>
                                                 <th scope="row" style="width: 200px;">
-                                                Nro Hoja de Ruta / Memorandum
+                                                    Nro Hoja de Ruta / Memorandum
                                                 </th>
                                                 <td>{{ $mandamiento->hoja_ruta }}</td>
                                             </tr>
+                                            <tr>
+                                                <th scope="row">Actividades Realizadas</th>
+                                                <td>{{ $mandamiento->actividades_realizadas }}</td>
+                                            </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <div class="product-content mt-5">
+                                <h5 class="fs-14 mb-3">
+                                    <i class="ri-file-list-line me-1 align-middle"></i>
+                                    Estado de Ejecución :
+                                </h5>
+                                <div class="table-responsive">
+                                    <table class="table mb-0">
+                                        <tbody>
                                             <tr>
                                                 <th scope="row">Estado</th>
                                                 <td>{{ $mandamiento->estado }}</td>
@@ -279,18 +313,31 @@
                                                 <td>{{ $mandamiento->fecha_ejecucion?->format('d/m/Y') }}</td>
                                             </tr>
                                             <tr>
-                                                <th scope="row">Actividades Realizadas</th>
-                                                <td>{{ $mandamiento->actividades_realizadas }}</td>
+                                                <th scope="row">Ejecutado por</th>
+                                                <td>{{ $mandamiento->ejecutado_por }}</td>
                                             </tr>
                                             <tr>
-                                                <th scope="row">Asignado a</th>
-                                                <td>{{ $mandamiento->asignado }}</td>
+                                                <th scope="row">Acta de Ejecución</th>
+                                                <td>
+                                                    @if ($mandamiento->acta_ejecucion)
+                                                        @php
+                                                            $actaEjecucion = json_decode($mandamiento->acta_ejecucion);
+                                                        @endphp
+                                                        <a href="{{ asset('/storage/' . $actaEjecucion->ruta ?? '') }}"
+                                                            target="_blank" class="btn btn-link btn-sm shadow-none"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            title="Ver acta de ejecución">
+                                                            <i class="ri-file-pdf-line"></i> Ver Acta
+                                                        </a>
+                                                    @endif
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
                                 <nav class="d-none">
-                                    <ul class="nav nav-tabs nav-tabs-custom nav-success" id="nav-tab" role="tablist">
+                                    <ul class="nav nav-tabs nav-tabs-custom nav-success" id="nav-tab"
+                                        role="tablist">
                                         <li class="nav-item">
                                             <a class="nav-link active" id="nav-speci-tab" data-bs-toggle="tab"
                                                 href="#nav-speci" role="tab" aria-controls="nav-speci"

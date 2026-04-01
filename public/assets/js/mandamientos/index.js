@@ -84,6 +84,9 @@
         const listDisplay = isGridMode ? 'none' : 'block';
         const cardClasses = isGridMode ? 'card h-100' : 'card h-100 mb-0';
 
+        const archivoMandamiento = item.archivo_mandamiento ? JSON.parse(item.archivo_mandamiento) : null;
+        const actaEjecucion = item.acta_ejecucion ? JSON.parse(item.acta_ejecucion) : null;
+
         let html =/*html*/ `
                 <div data-id="${item.id}" class="${itemClasses}" style='opacity:${opacity};-moz-opacity: ${opacity};filter: alpha(opacity=${opacity});'>
                     <div class="${cardClasses}">
@@ -94,17 +97,21 @@
                                     <i class="ri-eye-line"></i>
                                 </button>
 
-                                ${ ['superadmin', 'administrador'].includes(window.role) ? /*html */`<button type="button" value="${item.id}"  class="btn btn-soft-secondary btn-sm shadow-none openModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Mandamiento">
+                                ${['superadmin', 'administrador'].includes(window.role) ? /*html */`<button type="button" value="${item.id}"  class="btn btn-soft-secondary btn-sm shadow-none openModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Mandamiento">
                                     <i class="ri-pencil-line"></i>
                                 </button>
                                 <button type="button" class="btn btn-soft-secondary btn-sm shadow-none btnDelete" value="${item.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Mandamiento">
                                     <i class="ri-delete-bin-2-line"></i>
-                                </button>` : '' }
+                                </button>` : ''}
 
-                                ${item.ruta ? /*html */`
-                                    <button type="button" class="btn btn-soft-secondary btn-sm shadow-none btn-ver-img" data-img='${item.ruta}' data-bs-toggle="tooltip" data-bs-placement="top" title="Ver imagen mandamiento">
+                                ${archivoMandamiento && archivoMandamiento.tipo_archivo !=='pdf' ? /*html */`
+                                    <button type="button" class="btn btn-soft-secondary btn-sm shadow-none btn-ver-img" data-img='${archivoMandamiento.ruta}' data-bs-toggle="tooltip" data-bs-placement="top" title="Ver imagen mandamiento">
                                         <i class="ri-image-line"></i>
                                     </button>` : ''}
+                                ${archivoMandamiento && archivoMandamiento.tipo_archivo =='pdf' ? /*html */`
+                                    <a href="${window.location.origin}/storage/${archivoMandamiento.ruta}" target="_blank" class="btn btn-soft-secondary btn-sm shadow-none" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver imagen mandamiento">
+                                        <i class="ri-image-line"></i>
+                                    </a>` : ''}
                             </div>
                         </div>
                         <div class="card-body">
@@ -379,6 +386,7 @@
             $("#mandamientoForm").attr('action', id ? `/mandamientos/${id}` : '/mandamientos');
             $("#formMethod").val('POST');
 
+            $(".requerido_ejecutado").hide().find('input').attr('required', false);
 
 
             const miModal = new bootstrap.Modal(document.getElementById('miModal'));
@@ -398,6 +406,11 @@
                         Object.entries(datos).forEach(function ([key, value]) {
 
 
+                            if(key == 'acta_ejecucion'){
+                                //saltar campo
+
+                                return;
+                            }
 
                             $(`#${key}`).val(value).trigger('change');
                             // para loc checkboxes o radio buttons
@@ -414,7 +427,17 @@
                             }
 
 
+
                         });
+
+                        if ($('#estado').val().includes('EJECUTADO')) {
+                            $(".requerido_ejecutado").show().find('input').attr('required', true);
+
+                        }
+
+                        if(datos.acta_ejecucion){
+                            $(".requerido_ejecutado").show().find('input[type="file"]').attr('required', false);
+                        }
 
                         $("#formMethod").val('PUT');
                     })
@@ -1057,5 +1080,27 @@
 
 
     })
+
+
+    $(document).on('input', '#estado', function () {
+        const valor = $(this).val();
+
+        // verificar si en la cadena ingresada se encuentra la palabra "EJECUTADO" o "CANCELADO"
+
+        if (!valor) {
+            return;
+        }
+
+        if (valor.toUpperCase().includes('EJECUTADO')) {
+
+            $(".requerido_ejecutado").show().find('input').attr('required', true);
+        } else {
+            $(".requerido_ejecutado").hide().find('input').attr('required', false);
+        }
+
+
+    })
+
+
 
 })();

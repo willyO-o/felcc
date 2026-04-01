@@ -13,7 +13,8 @@ class Multimedia extends Model
         'ruta',
         'nombre_archivo',
         'id_mandamiento',
-        'id_persona'
+        'id_persona',
+        'tipo_archivo',
     ];
 
     /**

@@ -29,6 +29,7 @@ class Mandamiento extends Model
         'telefono',
         'vehiculos',
         'domicilio',
+        'ejecutado_por',
 
     ];
 
@@ -38,7 +39,7 @@ class Mandamiento extends Model
 
 
     static $rules = [
-        'estado' => 'required|in:PENDIENTE,EJECUTADO,CANCELADO',
+        'estado' => 'required|string|max:200',
         'id_juzgado' => 'required|exists:juzgado,id',
         'id_delito' => 'required|exists:delito,id',
         'id_tipo_mandamiento' => 'required|exists:tipo_mandamiento,id',
@@ -47,6 +48,8 @@ class Mandamiento extends Model
         'fecha_ejecucion' => 'nullable|date|before_or_equal:today',
         'tipo_documento' => 'nullable|string|max:255',
         'asignado' => 'nullable|string|max:255',
+        'ejecutado_por' => 'nullable|required_if:estado,EJECUTADO|string|max:200',
+        'acta_ejecucion'=> 'nullable|file|mimes:jpg,jpeg,png,webp,pdf|max:2048',
     ];
 
     /**
@@ -124,17 +127,28 @@ class Mandamiento extends Model
             ->leftJoin('delito', 'mandamiento.id_delito', '=', 'delito.id')
             ->leftJoin('juzgado', 'mandamiento.id_juzgado', '=', 'juzgado.id')
             ->leftJoin('tipo_mandamiento', 'mandamiento.id_tipo_mandamiento', '=', 'tipo_mandamiento.id')
-            ->leftJoin('multimedia', 'mandamiento.id', '=', 'multimedia.id_mandamiento')
+            // ->leftJoin('multimedia', 'mandamiento.id', '=', 'multimedia.id_mandamiento')
             ->addSelect([
                 'nombre_completo' => DB::raw("CONCAT(COALESCE(persona.nombres, ''), ' ', COALESCE(persona.apellidos, '')) as nombre_completo"),
                 'ci' => 'persona.ci',
                 'nombre_delito' => 'delito.nombre_delito',
                 'nombre_juzgado' => 'juzgado.nombre_juzgado',
                 'tipo_mandamiento' => 'tipo_mandamiento.tipo_mandamiento',
-                'ruta_multimedia' => 'multimedia.ruta',
+                'archivo_mandamiento' => DB::raw("(SELECT JSON_OBJECT('ruta', m.ruta, 'tipo_archivo', m.tipo_archivo)
+                                            FROM multimedia m
+                                            WHERE m.id_mandamiento = mandamiento.id AND m.tipo  = 'mandamiento'
+                                            ORDER BY m.created_at DESC
+                                            LIMIT 1) as archivo_mandamiento"),
                 'imagenes' => DB::raw("(SELECT JSON_ARRAYAGG(m.ruta)
                                             FROM multimedia m
                                             WHERE m.id_persona = persona.id) as imagenes_persona")
+            ])
+            ->addSelect([
+                'acta_ejecucion' => DB::raw("(SELECT JSON_OBJECT('ruta', m1.ruta, 'tipo_archivo', m1.tipo_archivo)
+                                            FROM multimedia m1
+                                            WHERE m1.id_mandamiento = mandamiento.id AND m1.tipo  = 'acta_ejecucion'
+                                            ORDER BY m1.created_at DESC
+                                            LIMIT 1) as acta_ejecucion")
             ])
             ->orderBy('mandamiento.id', 'desc');
 
