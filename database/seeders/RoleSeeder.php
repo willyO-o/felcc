@@ -40,7 +40,7 @@ class RoleSeeder extends Seeder
         \App\Models\User::create([
             'name' => 'administrador',
             'email' => 'administrador@gmail.com',
-            'password' => bcrypt('79515350/Willy'),
+            'password' => bcrypt('79515350/WillyWonka2026'),
             'role_id' => 1,
         ]);
 
