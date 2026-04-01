@@ -215,6 +215,17 @@ class Mandamiento extends Model
             $query->where('mandamiento.estado', $estado);
         }
 
+        // Filtro de rango de fechas de ejecución
+        $fechaInicio = $filtros['fecha_inicio'] ?? null;
+        $fechaFin = $filtros['fecha_fin'] ?? null;
+
+        if ($fechaInicio && $fechaFin) {
+            $query->whereBetween('mandamiento.fecha_ejecucion', [$fechaInicio, $fechaFin]);
+        } elseif ($fechaInicio) {
+            $query->whereDate('mandamiento.fecha_ejecucion', '>=', $fechaInicio);
+        } elseif ($fechaFin) {
+            $query->whereDate('mandamiento.fecha_ejecucion', '<=', $fechaFin);
+        }
 
         if ($idMandamiento) {
             $query->where('mandamiento.id', $idMandamiento);

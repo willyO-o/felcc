@@ -45,12 +45,14 @@
                             </select>
                         </div>
                         <div class="col">
-                            <select name="filtroEstado" id="filtroEstado" class="form-select">
-                                <option value="">Filtrar por Estado</option>
-                                <option value="PENDIENTE">PENDIENTE</option>
-                                <option value="EJECUTADO">EJECUTADO</option>
-                                <option value="CANCELADO">CANCELADO</option>
-                            </select>
+                            <div class="input-group">
+                                <span class="input-group-text btn btn-primary"><i class="ri-calendar-line"></i></span>
+                                <input type="text" id="filtroFechas" class="form-control" placeholder="Fecha de ejecución"
+                                    data-toggle="daterangepicker" aria-label="Rango de fechas" autocomplete="off">
+                                <button type="button" class="btn btn-outline-danger" id="btnLimpiarFechas" title="Limpiar filtro de fechas">
+                                    <i class="ri-close-line"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="btn-group " role="group">
                             <button type="button" class="btn btn-outline-primary active" id="btn-grid-view">
@@ -380,9 +382,8 @@
     <link rel="stylesheet" href="/assets/libs/filepond/filepond.min.css" type="text/css" />
     <link rel="stylesheet" href="/assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.css">
     <link rel="stylesheet" href="{{ url('assets/css/select2-bootstrap-5-theme.min.css') }}" type="text/css" />
-    {{-- <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" /> --}}
-    {{-- <link href="{{ url('/assets/css/select2-bootstrap.css') }}" rel="stylesheet" type="text/css" /> --}}
+    <!-- DateRangePicker CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 @endsection
 
 @section('page-title', 'Lista de Mandamientos')
@@ -425,6 +426,11 @@
     {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/fslightbox/3.4.0-2/index.js"
         integrity="sha512-Vdge+4gAuFr0U/JCfFdR24aOl9R0c/3pCYgi5bt/nU+Hl6REetTWmOr6FYjOW/7JdyQt27U8x7XJcE+IS8vKMA=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script> --}}
+
+    <!-- DateRangePicker Scripts -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/moment@2.29.4/locale/es.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
 
     <script src="{{ url('/assets/js/mandamientos/index.js?v=' . config('app.aplicacion.version')) }}"></script>

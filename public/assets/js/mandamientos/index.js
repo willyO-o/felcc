@@ -44,13 +44,13 @@
         'search': '',
         // '_token': crfToken,
         'id_bloque': $('#id_bloque').val() || null,
+        'fecha_inicio': null,
+        'fecha_fin': null,
     }
 
     function getDataFilter() {
 
         dataScroll.tipo_filtro = $("#tipo_filtro").val();
-        dataScroll.estado = $("#filtroEstado").val();
-
         dataScroll.search = $("#searchMandamientos").val();
 
         return dataScroll;
@@ -70,6 +70,34 @@
         'loadingText': `<div  class=" text-center"><i class="mdi mdi-loading mdi-spin fs-20 align-middle me-2"></i><span class="text-muted">Cargando...</span></div>`,
         'loadingNomoreText': '<h6 class="text-danger text-center">No se encontraron más Resultados</h6>',
 
+    });
+
+    // Inicializar DateRangePicker
+    $('#filtroFechas').daterangepicker({
+        locale: {
+            format: 'YYYY-MM-DD',
+            separator: ' - ',
+            applyLabel: 'Aplicar',
+            cancelLabel: 'Cancelar',
+            fromLabel: 'Desde',
+            toLabel: 'Hasta',
+            monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+            daysOfWeek: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa'],
+            firstDay: 1
+        },
+        autoUpdateInput: false,
+        timePicker: false,
+        timePickerIncrement: 1,
+        startDate: moment().subtract(30, 'days'),
+        endDate: moment(),
+        ranges: {
+            'Hoy': [moment(), moment()],
+            'Últimos 7 días': [moment().subtract(6, 'days'), moment()],
+            'Últimos 30 días': [moment().subtract(29, 'days'), moment()],
+            'Este mes': [moment().startOf('month'), moment().endOf('month')],
+            'Mes anterior': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+            'Últimos 90 días': [moment().subtract(89, 'days'), moment()]
+        }
     });
 
 
@@ -209,10 +237,30 @@
 
     });
 
-    $("#filtroEstado").on('change', function (e) {
-        e.preventDefault();
+    $("#filtroFechas").on('apply.daterangepicker', function(ev, picker) {
+        // Capturar las fechas seleccionadas
+        dataScroll.fecha_inicio = picker.startDate.format('YYYY-MM-DD');
+        dataScroll.fecha_fin = picker.endDate.format('YYYY-MM-DD');
         scrollPersonal.resetScrollPagination(getDataFilter());
     });
+
+    $("#filtroFechas").on('cancel.daterangepicker', function(ev, picker) {
+        // Limpiar los filtros de fecha cuando se cancela
+        dataScroll.fecha_inicio = null;
+        dataScroll.fecha_fin = null;
+        $(this).val('');
+        scrollPersonal.resetScrollPagination(getDataFilter());
+    });
+
+    // Evento para el botón de limpiar filtro de fechas
+    $("#btnLimpiarFechas").on('click', function(e) {
+        e.preventDefault();
+        dataScroll.fecha_inicio = null;
+        dataScroll.fecha_fin = null;
+        $("#filtroFechas").val('');
+        scrollPersonal.resetScrollPagination(getDataFilter());
+    });
+
     const btnGridView = document.getElementById('btn-grid-view');
     const btnListView = document.getElementById('btn-list-view');
     const candidateList = document.getElementById('listadoMandamientos');
