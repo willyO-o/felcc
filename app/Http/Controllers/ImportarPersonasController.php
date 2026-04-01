@@ -418,24 +418,40 @@ class ImportarPersonasController extends Controller
 
         $data = [];
         $cabeceras = [];
+        $filasVaciasConsecutivas = 0;
+        $umbralFilasVacias = 20; // Si encuentra 20 filas vacías seguidas, se detiene
+
         foreach ($reader->getSheetIterator() as $sheet) {
 
             foreach ($sheet->getRowIterator() as $index => $row) {
                 $cells = $row->toArray();
-
 
                 if ($index === 1) {
                     $cabeceras = $this->convertirCabeceras($cells);
                     continue;
                 }
 
+                // Verificar si la fila está completamente vacía
+                $filaVacia = empty(array_filter($cells, function($celda) {
+                    return $celda !== null && trim($celda) !== '';
+                }));
+
+                if ($filaVacia) {
+                    $filasVaciasConsecutivas++;
+
+                    // Si hay más de X filas vacías seguidas, detener
+                    if ($filasVaciasConsecutivas > $umbralFilasVacias) {
+                        break 2; // Rompe ambos foreach
+                    }
+
+                    continue; // Saltar fila vacía pero continuar leyendo
+                }
+
+                // Si encontramos datos, resetear el contador de filas vacías
+                $filasVaciasConsecutivas = 0;
+
                 $filaAsociativa = array_combine($cabeceras, $cells);
-
-                // if (empty($cells)) {
-                //     return "vacioo"; // Saltar filas vacías
-                // }
-
-                $data[] =   $filaAsociativa;
+                $data[] = $filaAsociativa;
             }
             break; // Solo la primera hoja
         }
