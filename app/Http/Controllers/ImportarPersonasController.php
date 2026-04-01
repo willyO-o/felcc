@@ -411,7 +411,8 @@ class ImportarPersonasController extends Controller
 
         $reader = ReaderEntityFactory::createReaderFromFile(Storage::disk('local')->path($path));
 
-        $reader->setFieldDelimiter(';');
+        $delimiter = $this->detectDelimiter(Storage::disk('local')->path($path));
+        $reader->setFieldDelimiter($delimiter);
 
         $reader->open(Storage::disk('local')->path($path));
 
@@ -443,7 +444,7 @@ class ImportarPersonasController extends Controller
 
         if (!is_numeric($resultado)) {
             return response()->json([
-                'error' => "No se pudieron importar los mandamientos. Error: { $resultado[error] }"
+                'message' => "No se pudieron importar los mandamientos. Error: { $resultado[error] }"
             ], 500);
         }
 
@@ -452,6 +453,24 @@ class ImportarPersonasController extends Controller
             'success' => 'Migración de mandamientos completada, Se importaron ' . $resultado . ' mandamientos',
             'data' => $resultado,
         ], 200);
+    }
+
+    private function detectDelimiter($filePath)
+    {
+        $file = fopen($filePath, 'r');
+        $firstLine = fgets($file);
+        fclose($file);
+
+        if (!$firstLine) return ','; // Valor por defecto
+
+        $delimiters = [
+            ',' => substr_count($firstLine, ','),
+            ';' => substr_count($firstLine, ';'),
+            "\t" => substr_count($firstLine, "\t"),
+        ];
+
+        // Retorna el que tenga más apariciones
+        return array_search(max($delimiters), $delimiters);
     }
 
     private function convertirCabeceras($cells)

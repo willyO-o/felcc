@@ -182,7 +182,8 @@
 
                                         <li class="mb-2">
                                             <strong>ACTIVIDADES REALIZADAS</strong><br>
-                                            <small class="text-muted">Actividades realizadas relacionadas con el mandamiento</small>
+                                            <small class="text-muted">Actividades realizadas relacionadas con el
+                                                mandamiento</small>
                                         </li>
                                     </ul>
                                 </div>
@@ -190,23 +191,6 @@
                         </div>
 
 
-                        {{-- Ejemplo de formato --}}
-                        <div class="accordion-item">
-                            <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
-                                    data-bs-target="#collapseExample">
-                                    <i class="ri-file-csv-line me-2 text-warning"></i> Ejemplo CSV
-                                </button>
-                            </h2>
-                            <div id="collapseExample" class="accordion-collapse collapse"
-                                data-bs-parent="#acordionCampos">
-                                <div class="accordion-body p-2">
-                                    <pre class="small bg-light p-2 rounded" style="overflow-x: auto;"><code>N;RUTA O;FECHA;NOMBRE;C.I.;TIPO DE MANDAMIENTO;FOTOCOPIA;DELITO;JUZGADO O TRIBUNAL;OBSERVACIO;A CARGO;TELEFONO;ASIGNADO
-1;LA PAZ;15/01/2026;JUAN PEREZ GARCIA;1234567;Aprehensión;Sí;Robo;Juzgado de La Paz;Peligroso;Juan López;4445555;Carlos Mendez
-2;COCHABAMBA;22/01/2026;MARIA LOPEZ QUISPE;7654321;Aprehensión;No;Hurto;Tribunal Cochabamba;Antecedentes;Maria Yañez;4446666;Ana Sánchez</code></pre>
-                                </div>
-                            </div>
-                        </div>
 
                         {{-- Validaciones --}}
                         <div class="accordion-item">
@@ -221,12 +205,10 @@
                                 <div class="accordion-body p-2">
                                     <ul class="list-unstyled small">
                                         <li class="mb-2">✓ Los campos NOMBRE, C.I. y DELITO son obligatorios</li>
-                                        <li class="mb-2">✓ Las fechas se validan automáticamente (DD/MM/YYYY)</li>
-                                        <li class="mb-2">✓ Los CIs duplicados se actualizarán en lugar de duplicarse</li>
+                                        <li class="mb-2">✓ El formato debe ser según el modelo o plantilla</li>
                                         <li class="mb-2">✓ El archivo debe estar en formato CSV (separador: punto y coma
-                                            ;)</li>
+                                            ;) o comas</li>
                                         <li class="mb-2">✓ La primera fila debe contener los encabezados</li>
-                                        <li class="mb-2">✓ Los registros vacíos se ignoran</li>
                                     </ul>
                                 </div>
                             </div>
@@ -235,7 +217,9 @@
 
                     {{-- Descargar plantilla --}}
                     <div class="mt-3">
-                        <a href="" class="btn btn-sm btn-outline-primary w-100">
+                        <a href="{{ url('plantillas/plantilla-importacion-mandamientos.xlsx') }}"
+                            download="plantilla-importacion-mandamientos.xlsx"
+                            class="btn btn-sm btn-outline-primary w-100">
                             <i class="ri-download-line me-1"></i> Descargar Plantilla
                         </a>
                     </div>
@@ -284,6 +268,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         let archivoSeleccionado = null;
+        let importacionEnCurso = false;
 
         const dropZone = document.getElementById('dropZone');
         const archivoInput = document.getElementById('archivoInput');
@@ -316,6 +301,11 @@
         });
 
         function seleccionarArchivo(archivo) {
+            if (importacionEnCurso) {
+                Swal.fire('Advertencia', 'Espera a que termine la importación actual', 'warning');
+                return;
+            }
+
             archivoSeleccionado = archivo;
             document.getElementById('uploadIcon').style.display = 'none';
             document.getElementById('infoArchivo').style.display = 'block';
@@ -332,6 +322,9 @@
             document.getElementById('uploadIcon').style.display = 'block';
             document.getElementById('infoArchivo').style.display = 'none';
             document.getElementById('btnImportar').style.display = 'none';
+            document.getElementById('btnImportar').disabled = false;
+            dropZone.style.pointerEvents = 'auto';
+            dropZone.style.opacity = '1';
         }
 
         function importarArchivo() {
@@ -340,12 +333,20 @@
                 return;
             }
 
+            if (importacionEnCurso) {
+                Swal.fire('Advertencia', 'Ya hay una importación en curso', 'warning');
+                return;
+            }
+
+            importacionEnCurso = true;
             const formData = new FormData();
             formData.append('archivo', archivoSeleccionado);
             formData.append('_token', '{{ csrf_token() }}');
 
             document.getElementById('progressContainer').style.display = 'block';
             document.getElementById('btnImportar').disabled = true;
+            dropZone.style.pointerEvents = 'none';
+            dropZone.style.opacity = '0.6';
 
             // Simular progreso
             let progress = 0;
@@ -364,20 +365,40 @@
                         'Accept': 'application/json'
                     }
                 })
-                .then(res => res.json())
-                .then(data => {
+                .then(res => {
+                    // Parsear JSON independientemente del status
+                    return res.json().then(data => {
+                        return {
+                            status: res.status,
+                            ok: res.ok,
+                            data: data
+                        };
+                    });
+                })
+                .then(response => {
                     clearInterval(progressInterval);
                     actualizarProgreso(100);
 
                     setTimeout(() => {
                         document.getElementById('progressContainer').style.display = 'none';
-                        mostrarResultados(data);
-                        document.getElementById('btnImportar').disabled = false;
+
+                        // Si el status es >= 400, es un error
+                        if (response.status >= 400) {
+                            mostrarError(response.data);
+                        } else {
+                            mostrarResultados(response.data);
+                        }
+
+                        importacionEnCurso = false;
                     }, 500);
                 })
                 .catch(err => {
                     clearInterval(progressInterval);
+                    document.getElementById('progressContainer').style.display = 'none';
                     document.getElementById('btnImportar').disabled = false;
+                    dropZone.style.pointerEvents = 'auto';
+                    dropZone.style.opacity = '1';
+                    importacionEnCurso = false;
                     Swal.fire('Error', 'Error al importar: ' + err.message, 'error');
                 });
         }
@@ -386,6 +407,61 @@
             document.getElementById('progressBar').style.width = valor + '%';
             document.getElementById('progressBar').setAttribute('aria-valuenow', valor);
             document.getElementById('progressText').textContent = Math.round(valor) + '%';
+        }
+
+        function mostrarError(data) {
+            const container = document.getElementById('resultContainer');
+            const alert = document.getElementById('resultAlert');
+            const statsContent = document.getElementById('statsContent');
+            const erroresContent = document.getElementById('erroresContent');
+
+            // Limpiar contenido previo
+            statsContent.innerHTML = '';
+            erroresContent.style.display = 'none';
+            document.querySelector('#tablaErrores tbody').innerHTML = '';
+
+            // Mostrar mensaje de error
+            alert.className = 'alert alert-danger';
+
+            // Construir mensaje de error
+            let mensajeError = data.message || 'Error al importar el archivo';
+
+            // Si hay errores de validación
+            if (data.errors && typeof data.errors === 'object') {
+                const erroresArray = [];
+
+                for (const [campo, mensajes] of Object.entries(data.errors)) {
+                    if (Array.isArray(mensajes)) {
+                        mensajes.forEach(msg => {
+                            erroresArray.push(`${campo}: ${msg}`);
+                        });
+                    } else {
+                        erroresArray.push(`${campo}: ${mensajes}`);
+                    }
+                }
+
+                if (erroresArray.length > 0) {
+                    mensajeError = erroresArray.join('<br>');
+                }
+            }
+
+            alert.innerHTML = `<i class="ri-error-warning-line me-2"></i> ${mensajeError}`;
+
+            // Mostrar botón para reintentar
+            statsContent.innerHTML = `
+                <div class="mt-3">
+                    <button type="button" class="btn btn-secondary" onclick="limpiarResultados()">
+                        <i class="ri-refresh-line me-1"></i> Reintentar
+                    </button>
+                </div>
+            `;
+
+            // Reabilitar para que pueda intentar de nuevo
+            document.getElementById('btnImportar').disabled = false;
+            dropZone.style.pointerEvents = 'auto';
+            dropZone.style.opacity = '1';
+
+            container.style.display = 'block';
         }
 
         function mostrarResultados(data) {
@@ -397,6 +473,10 @@
             if (data.error) {
                 alert.className = 'alert alert-danger';
                 alert.innerHTML = `<i class="ri-error-warning-line me-2"></i> ${data.error}`;
+                // En caso de error, reabilitar la importación
+                document.getElementById('btnImportar').disabled = false;
+                dropZone.style.pointerEvents = 'auto';
+                dropZone.style.opacity = '1';
             } else {
                 alert.className = 'alert alert-success';
                 alert.innerHTML = `<i class="ri-check-circle-line me-2"></i> ${data.success}`;
@@ -431,6 +511,11 @@
                 } else {
                     erroresContent.style.display = 'none';
                 }
+
+                // Ocultar por completo la sección de carga cuando sea exitoso
+                document.getElementById('uploadIcon').style.display = 'none';
+                document.getElementById('infoArchivo').style.display = 'none';
+                document.getElementById('btnImportar').style.display = 'none';
             }
 
             container.style.display = 'block';
