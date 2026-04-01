@@ -48,7 +48,7 @@
 
     function getDataFilter() {
 
-        dataScroll.id_delito = $("#filtroDelito").val();
+        dataScroll.tipo_filtro = $("#tipo_filtro").val();
         dataScroll.estado = $("#filtroEstado").val();
 
         dataScroll.search = $("#searchMandamientos").val();
@@ -124,7 +124,7 @@
                                         <p class="text-muted mb-2"> Delito: <strong>${item.nombre_delito || "-"}</strong></p>
                                         <p class="text-muted mb-2"> <strong>${item.tipo_mandamiento || "-"}</strong></p>
                                         <div class="d-flex flex-wrap gap-2 align-items-center">Estado:
-                                            <div class="badge text-bg-${coloresEstados[item.estado] || 'secondary'}">${item.estado}</div>
+                                            <div class="badge text-bg-${coloresEstados[item.estado] || 'secondary'}">${item.estado || "-"}</div>
                                             <!-- <div class="text-muted">2.2k Ratings</div> -->
                                         </div>
                                         <div class=" gap-4 mt-2 text-muted">
@@ -166,7 +166,7 @@
                                         </div>
                                         <div>
                                             Estado:
-                                            <div class="badge text-bg-${coloresEstados[item.estado] || 'secondary'}"> ${item.estado}</div>
+                                            <div class="badge text-bg-${coloresEstados[item.estado] || 'secondary'}"> ${item.estado || "-"}</div>
                                             <!-- <div class="text-muted">${item.estado}</div> -->
                                             <!-- <a href="#!" class="btn btn-soft-success">View Details</a>
                                             <a href="#!" class="btn btn-ghost-danger btn-icon custom-toggle active"
@@ -192,7 +192,7 @@
     $("#searchMandamientos").on('input', function (e) {
         e.preventDefault();
         clearTimeout(timerSearch);
-        if ($(this).val().trim() != '' && $(this).val().trim().length < 3) return;
+        if ($(this).val().trim() != '' && $(this).val().trim().length < 2) return;
         timerSearch = setTimeout(function () {
 
             scrollPersonal.resetScrollPagination(getDataFilter());
@@ -200,7 +200,7 @@
 
     });
 
-    $("#filtroDelito,#filtroEstado").on('change', function (e) {
+    $("#filtroEstado").on('change', function (e) {
         e.preventDefault();
         scrollPersonal.resetScrollPagination(getDataFilter());
     });
@@ -322,6 +322,9 @@
 
         datos.append('_token', $('meta[name="csrf-token"]').attr('content'));
 
+        const boton = form.find('button[type="submit"]');
+
+        boton.prop('disabled', true).find('i').removeClass('ri-save-line').addClass('fa-solid fa-spinner fa-spin');
 
         $.ajax({
             url: form.attr('action'),
@@ -344,11 +347,12 @@
             $('#miModal').modal('hide');
 
 
-
         }).fail(function (xhr) {
             console.error('Error:', xhr);
             processError(xhr);
-        });
+        }).always(function () {
+            boton.prop('disabled', false).find('i').removeClass('fa-solid fa-spinner fa-spin').addClass('ri-save-line');
+        })
 
 
     });
@@ -703,23 +707,6 @@
 
         });
 
-        $("#filtroDelito").select2({
-            placeholder: 'Filtrar por delito',
-            theme: 'bootstrap-5',
-            allowClear: true,
-            language: {
-                noResults: function () {
-                    return "No se encontraron delitos";
-                }
-            },
-            width: '100%',
-            data: tiposDelitos.map(function (delito) {
-                return {
-                    id: delito.id,
-                    text: delito.nombre_delito
-                };
-            }),
-        });
     }
 
 

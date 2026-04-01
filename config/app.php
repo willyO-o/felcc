@@ -123,4 +123,12 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /* informacion de la empresa */
+    'aplicacion' => [
+        'nombre' => 'Sistema de Mandamientos Judiciales',
+        'sigla' => 'SMJ-DACI',
+        'version' => '1.0.1',
+        'empresa' => 'Felcc',
+        'autor' => 'Willy Chana',
+    ],
 ];

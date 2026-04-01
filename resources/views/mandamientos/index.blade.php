@@ -30,8 +30,18 @@
 
                         </div>
                         <div class="col-md-4">
-                            <select name="filtroDelito" id="filtroDelito" class="">
-                                <option value="">Filtrar por Delito</option>
+                            <select name="tipo_filtro" id="tipo_filtro" class="form-select">
+                                <option value="">Filtrar por</option>
+                                <option value="hoja_ruta">Hoja de Ruta</option>
+                                <option value="nombre_persona">Nombre</option>
+                                <option value="apellidos">Apellidos</option>
+                                <option value="ci">C.I.</option>
+                                <option value="estado">Estado</option>
+                                <option value="nombre_delito">Delito</option>
+                                <option value="tipo_mandamiento">Tipo de Mandamiento</option>
+                                <option value="nombre_juzgado">Juzgado</option>
+                                <option value="encargardo">Encargado</option>
+
                             </select>
                         </div>
                         <div class="col">
@@ -223,28 +233,17 @@
                                 </div>
                             </div><!--end col-->
 
-                            <div class="col-lg-12">
-                                <label for="estado" class="form-label">Estado</label>
+                            <div class="col-lg-6">
                                 <div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="estado" id="inlineRadio2"
-                                            value="PENDIENTE" checked>
-                                        <label class="form-check-label" for="inlineRadio2">PENDIENTE</label>
-                                    </div>
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="estado" id="inlineRadio1"
-                                            value="EJECUTADO">
-                                        <label class="form-check-label" for="inlineRadio1">EJECUTADO</label>
-                                    </div>
 
-                                    <div class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" name="estado" id="inlineRadio3"
-                                            value="CANCELADO">
-                                        <label class="form-check-label" for="inlineRadio3">CANCELADO</label>
-                                    </div>
+                                    <label for="estado" class="form-label">Estado</label>
+                                    <input type="text" class="form-control" id="estado"
+                                        placeholder="Ingrese estado" name="estado" value="">
+
+
                                 </div>
                             </div><!--end col-->
-                            <div class="col-md-4 caja">
+                            <div class="col-lg-6 ">
                                 <div>
                                     <label for="fecha_ejecucion" class="form-label">Fecha Ejecución/Cancelación</label>
                                     <input type="date" class="form-control" id="fecha_ejecucion"
@@ -252,17 +251,36 @@
                                         name="fecha_ejecucion" value="">
                                 </div>
                             </div><!--end col-->
-                            <div class="col ">
+                            <div class="col-lg-6 ">
                                 <div>
                                     <label for="asignado" class="form-label">Asignado A</label>
                                     <input type="text" class="form-control" id="asignado"
-                                        placeholder="Ingrese asignado" name="asignado" value="">
+                                        placeholder="persona a cargo" name="asignado" value="">
+                                </div>
+                            </div><!--end col-->
+                            <div class="col-lg-6 ">
+                                <div>
+                                    <label for="telefono" class="form-label">Teléfono</label>
+                                    <input type="text" class="form-control" id="telefono"
+                                        placeholder="Ingrese teléfono" name="telefono" value="">
                                 </div>
                             </div><!--end col-->
                             <div class="col-12 ">
                                 <div>
                                     <label for="actividades_realizadas" class="form-label">Actividades realizadas</label>
                                     <textarea name="actividades_realizadas" id="actividades_realizadas" class="form-control" rows="3"></textarea>
+                                </div>
+                            </div><!--end col-->
+                            <div class="col-lg-6 ">
+                                <div>
+                                    <label for="domicilio" class="form-label">Domicilio</label>
+                                    <textarea name="domicilio" id="domicilio" class="form-control" rows="3"></textarea>
+                                </div>
+                            </div><!--end col-->
+                            <div class="col-lg-6 ">
+                                <div>
+                                    <label for="vehiculos" class="form-label">Vehículos</label>
+                                    <textarea name="vehiculos" id="vehiculos" class="form-control" rows="3"></textarea>
                                 </div>
                             </div><!--end col-->
 
@@ -326,8 +344,9 @@
     <link href="{{ url('/assets/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="/assets/libs/filepond/filepond.min.css" type="text/css" />
     <link rel="stylesheet" href="/assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.css">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <link rel="stylesheet" href="{{ url('assets/css/select2-bootstrap-5-theme.min.css') }}" type="text/css" />
+    {{-- <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" /> --}}
     {{-- <link href="{{ url('/assets/css/select2-bootstrap.css') }}" rel="stylesheet" type="text/css" /> --}}
 @endsection
 
@@ -356,19 +375,21 @@
 
     <!-- Custom DataTable Script -->
 
-    <script src="/assets/libs/filepond/filepond.min.js"></script>
-    <script src="/assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js"></script>
-    <script src="/assets/libs/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js"></script>
-    <script src="/assets/libs/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js">
+    <script src="{{ url('/assets/libs/filepond/filepond.min.js') }}"></script>
+    <script src="{{ url('/assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js') }}"></script>
+    <script src="{{ url('/assets/libs/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js') }}"></script>
+    <script src="{{ url('/assets/libs/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js') }}">
     </script>
-    <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
+    {{-- <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script> --}}
 
-    <script src="/assets/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/fslightbox/3.4.0-2/index.js"
+    <script src="{{ url('assets/libs/filepond/filepond-plugin-file-validate-type.js') }}"></script>
+    <script src="{{ url('/assets/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js') }}"></script>
+    <script src="{{ url('assets/libs/ligthbox/index.js') }}"></script>
+    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/fslightbox/3.4.0-2/index.js"
         integrity="sha512-Vdge+4gAuFr0U/JCfFdR24aOl9R0c/3pCYgi5bt/nU+Hl6REetTWmOr6FYjOW/7JdyQt27U8x7XJcE+IS8vKMA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script> --}}
 
 
-    <script src="{{ url('/assets/js/mandamientos/index.js') }}"></script>
+    <script src="{{ url('/assets/js/mandamientos/index.js?v=' . config('app.aplicacion.version')) }}"></script>
 
 @endsection

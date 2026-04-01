@@ -15,7 +15,7 @@
     <div class="row">
         <div class="col-12 d-flex justify-content-end gap-2 mb-2">
             <div class="flex-shrink-0">
-                <a href="{{ route('personas.importar.index') }}" class="btn btn-outline-info">
+                <a href="{{ route('personas.importar.index') }}" class="btn btn-outline-info d-none">
                     <i class="ri-download-cloud-line align-middle me-1"></i> Importar CSV
                 </a>
             </div>

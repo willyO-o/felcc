@@ -44,5 +44,12 @@ class RoleSeeder extends Seeder
             'role_id' => 1,
         ]);
 
+        \App\Models\User::create([
+            'name' => 'admin',
+            'email' => 'admin@gmail.com',
+            'password' => bcrypt('73054483/administrador2026'),
+            'role_id' => 2,
+        ]);
+
     }
 }

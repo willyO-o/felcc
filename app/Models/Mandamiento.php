@@ -114,6 +114,8 @@ class Mandamiento extends Model
 
         $search = $filtros['search'] ?? null;
 
+        $tipoFiltro = $filtros['tipo_filtro'] ?? null;
+
 
 
 
@@ -136,7 +138,7 @@ class Mandamiento extends Model
             ])
             ->orderBy('mandamiento.id', 'desc');
 
-        if ($search) {
+        if ($search && empty($tipoFiltro)) {
             $search= str_replace(' ', '%', $search); // Reemplazar espacios por comodines para mejorar la búsqueda
             $query->where(function ($q) use ($search) {
                 $q->where('persona.nombres', 'like', "%$search%")
@@ -152,6 +154,41 @@ class Mandamiento extends Model
 
             });
 
+        }else if ($search && !empty($tipoFiltro)) {
+            $search= str_replace(' ', '%', $search); // Reemplazar espacios por comodines para mejorar la búsqueda
+            switch ($tipoFiltro) {
+                case 'nombre_persona':
+                    $query->where(function ($q) use ($search) {
+                        $q->where('persona.nombres', 'like', "%$search%")
+                            ->orWhere('persona.apellidos', 'like', "%$search%")
+                            ->orWhereRaw("CONCAT(COALESCE(persona.nombres, ''), ' ', COALESCE(persona.apellidos, '')) like ?", ["%$search%"]);
+                    });
+                    break;
+                case 'ci':
+                    $query->where('persona.ci', 'like', "%$search%");
+                    break;
+                case 'nombre_delito':
+                    $query->where('delito.nombre_delito', 'like', "%$search%");
+                    break;
+                case 'nombre_juzgado':
+                    $query->where('juzgado.nombre_juzgado', 'like', "%$search%");
+                    break;
+                case 'tipo_mandamiento':
+                    $query->where('tipo_mandamiento.tipo_mandamiento', 'like', "%$search%");
+                    break;
+                case 'hoja_ruta':
+                    $query->where('mandamiento.hoja_ruta', 'like', "%$search%");
+                    break;
+                case 'estado':
+                    $query->where('mandamiento.estado', 'like', "%$search%");
+                    break;
+                case 'apellidos':
+                    $query->where('persona.apellidos', 'like', "%$search%");
+                    break;
+                case 'encargado':
+                    $query->where('mandamiento.asignado', 'like', "%$search%");
+                    break;
+            }
         }
 
         $idDelito = $filtros['id_delito'] ?? null;

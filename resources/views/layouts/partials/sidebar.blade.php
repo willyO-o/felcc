@@ -62,7 +62,7 @@
 
 
 
-                @canany(['superadmin', 'administrador','tecnico'])
+                @canany(['superadmin', 'administrador', 'tecnico'])
                     <!-- Usuarios -->
                     <li class="nav-item">
                         <a class="nav-link menu-link" href="#sidebarImportar" data-bs-toggle="collapse" role="button"
@@ -76,7 +76,8 @@
                                 </li>
 
                                 <li class="nav-item">
-                                    <a href="{{ route('importar.mandamientos.index') }}" class="nav-link">Importar Mandamientos</a>
+                                    <a href="{{ route('importar.mandamientos.index') }}" class="nav-link">Importar
+                                        Mandamientos</a>
                                 </li>
 
                                 <li class="nav-item d-none">
@@ -86,22 +87,13 @@
                             </ul>
                         </div>
                     </li>
+
+                    <li class="menu-title"><span data-key="t-menu">Seguridad</span></li>
+
                     <li class="nav-item">
-                        <a class="nav-link menu-link" href="#sidebarUsuarios" data-bs-toggle="collapse" role="button"
-                            aria-expanded="false" aria-controls="sidebarUsuarios">
+                        <a class="nav-link menu-link" href="{{ route('usuarios.index') }}">
                             <i class="mdi mdi-account-group-outline"></i> <span>Usuarios</span>
                         </a>
-                        <div class="collapse menu-dropdown" id="sidebarUsuarios">
-                            <ul class="nav nav-sm flex-column">
-                                <li class="nav-item">
-                                    <a href="{{ route('usuarios.index') }}" class="nav-link">Lista de Usuarios</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('usuarios.index') }}" class="nav-link" id="linkNuevoUsuario">Nuevo
-                                        Usuario</a>
-                                </li>
-                            </ul>
-                        </div>
                     </li>
                 @endcanany
 
