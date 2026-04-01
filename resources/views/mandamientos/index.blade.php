@@ -36,6 +36,7 @@
                                 <option value="nombre_persona">Nombre</option>
                                 <option value="apellidos">Apellidos</option>
                                 <option value="ci">C.I.</option>
+                                <option value="telefono">Teléfono</option>
                                 <option value="estado">Estado</option>
                                 <option value="nombre_delito">Delito</option>
                                 <option value="tipo_mandamiento">Tipo de Mandamiento</option>

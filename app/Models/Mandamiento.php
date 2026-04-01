@@ -202,6 +202,10 @@ class Mandamiento extends Model
                 case 'encargado':
                     $query->where('mandamiento.asignado', 'like', "%$search%");
                     break;
+                case 'telefono':
+                    $query->where('persona.telefono', 'like', "%$search%")
+                    ->orWhere('mandamiento.telefono', 'like', "%$search%");
+                    break;
             }
         }
 
