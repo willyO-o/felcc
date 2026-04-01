@@ -93,13 +93,15 @@
                                 <button type="button" value="${item.id}" class="btn btn-soft-secondary btn-sm shadow-none verDetalles" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Detalles">
                                     <i class="ri-eye-line"></i>
                                 </button>
-                                <button type="button" value="${item.id}"  class="btn btn-soft-secondary btn-sm shadow-none openModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Mandamiento">
+
+                                ${ ['superadmin', 'administrador'].includes(window.role) ? /*html */`<button type="button" value="${item.id}"  class="btn btn-soft-secondary btn-sm shadow-none openModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Mandamiento">
                                     <i class="ri-pencil-line"></i>
                                 </button>
                                 <button type="button" class="btn btn-soft-secondary btn-sm shadow-none btnDelete" value="${item.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Mandamiento">
                                     <i class="ri-delete-bin-2-line"></i>
-                                </button>
-                                ${item.ruta ? `
+                                </button>` : '' }
+
+                                ${item.ruta ? /*html */`
                                     <button type="button" class="btn btn-soft-secondary btn-sm shadow-none btn-ver-img" data-img='${item.ruta}' data-bs-toggle="tooltip" data-bs-placement="top" title="Ver imagen mandamiento">
                                         <i class="ri-image-line"></i>
                                     </button>` : ''}

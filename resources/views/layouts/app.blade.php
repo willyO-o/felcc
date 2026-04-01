@@ -19,6 +19,10 @@
 
     <link rel="stylesheet" href="{{url('assets/css/app-B_c9eOtX.css')}}">
 
+    <script>
+        window.role = '{{ auth()->check() ? auth()->user()->role->nombre : 'guest' }}';
+    </script>
+
     @yield('css')
 </head>
 

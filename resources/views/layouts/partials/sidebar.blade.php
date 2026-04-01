@@ -54,12 +54,32 @@
                         <i class="mdi mdi-file-document-outline"></i> <span>Registro Criminal</span>
                     </a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link menu-link" href="{{ route('personas.index') }}">
-                        <i class="mdi mdi-account"></i> <span>Personas</span>
-                    </a>
-                </li>
 
+
+
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="#sidebarInteligencia" data-bs-toggle="collapse" role="button"
+                        aria-expanded="false" aria-controls="sidebarInteligencia">
+                        <i class="mdi mdi-head-lightbulb-outline"></i> <span>EREBOR</span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarInteligencia">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item ">
+                                <a  href="{{ route('personas.index') }}" class="nav-link">Personas</a>
+                            </li>
+
+                            <li class="nav-item d-none">
+                                <a href="{{ route('importar.mandamientos.index') }}" class="nav-link">Importar
+                                    Mandamientos</a>
+                            </li>
+
+                            <li class="nav-item d-none">
+                                <a href="{{ route('usuarios.index') }}" class="nav-link">Importar Registro</a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </li>
 
 
                 @canany(['superadmin', 'administrador', 'tecnico'])
@@ -87,7 +107,9 @@
                             </ul>
                         </div>
                     </li>
+                @endcanany
 
+                @canany(['superadmin', 'administrador'])
                     <li class="menu-title"><span data-key="t-menu">Seguridad</span></li>
 
                     <li class="nav-item">
