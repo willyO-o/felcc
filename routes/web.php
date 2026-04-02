@@ -50,6 +50,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     // Usuarios
     Route::resource('usuarios', App\Http\Controllers\UserController::class);
+    Route::post('usuarios/{id}/toggle-status', [App\Http\Controllers\UserController::class, 'toggleStatus'])->name('usuarios.toggle-status');
 
     // Perfil
     Route::get('/perfil', [App\Http\Controllers\ProfileController::class, 'index'])->name('perfil');

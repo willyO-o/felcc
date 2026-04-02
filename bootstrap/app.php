@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'mandamientos',
             'mandamientos/*',
         ]);
+
+        // Agregar middleware para verificar si el usuario está activo
+        $middleware->web(\App\Http\Middleware\EnsureUserIsActive::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

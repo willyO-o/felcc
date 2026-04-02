@@ -202,4 +202,38 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Cambiar estado de usuario (activar/desactivar).
+     */
+    public function toggleStatus(string $id)
+    {
+        try {
+            $user = User::findOrFail($id);
+
+            // No permitir deshabilitar su propio usuario
+            if (auth()->id() === (int)$id) {
+                return response()->json([
+                    'error' => 'No puedes deshabilitar tu propia cuenta.',
+                ], 403);
+            }
+
+            // Cambiar estado
+            $user->is_active = !$user->is_active;
+            $user->save();
+
+            $mensaje = $user->is_active
+                ? 'Usuario activado correctamente.'
+                : 'Usuario desactivado correctamente.';
+
+            return response()->json([
+                'success' => $mensaje,
+                'datos' => $user,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al cambiar el estado: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
 }

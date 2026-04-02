@@ -9,6 +9,7 @@
     <meta content="Sistema de Gestión de Mandamientos de Aprehensión" name="description" />
     <meta content="FELCC" name="author" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="user-id" content="{{ auth()->id() }}">
 
     <!-- App favicon -->
     <link rel="shortcut icon" href="/assets/images/favicon.ico">

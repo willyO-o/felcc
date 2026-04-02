@@ -23,6 +23,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role_id',
+        'is_active',
     ];
 
     /**
@@ -45,6 +46,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_active' => 'boolean',
         ];
     }
 
@@ -78,5 +80,29 @@ class User extends Authenticatable
     public function isAdmin(): bool
     {
         return $this->hasRole('administrador') || $this->hasRole('superadmin');
+    }
+
+    /**
+     * Verificar si el usuario está activo.
+     */
+    public function isActive(): bool
+    {
+        return $this->is_active === true;
+    }
+
+    /**
+     * Activar usuario.
+     */
+    public function activate(): void
+    {
+        $this->update(['is_active' => true]);
+    }
+
+    /**
+     * Desactivar usuario.
+     */
+    public function deactivate(): void
+    {
+        $this->update(['is_active' => false]);
     }
 }
