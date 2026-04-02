@@ -5,64 +5,62 @@
 (function () {
     "use strict";
 
-    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute("content");
+    const csrfToken = $('meta[name="csrf-token"]').attr("content");
 
     let currentPage = 1;
     let pageSize = 10;
     let searchTimeout = null;
-    let deletePersonaId = null;
 
-    // Referencias DOM
-    const listado = document.getElementById("listadoPersonas");
-    const loading = document.getElementById("loadingPersonas");
-    const sinResultados = document.getElementById("sinResultados");
-    const paginacion = document.getElementById("paginacionPersonas");
-    const detallesPagina = document.getElementById("detalles-pagina");
-    const searchInput = document.getElementById("searchPersonas");
-    const filtroGenero = document.getElementById("filtroGenero");
-    const filtroEstadoCivil = document.getElementById("filtroEstadoCivil");
-    const btnNuevo = document.getElementById("btnNuevaPersona");
+    const $listado = $("#listadoPersonas");
+    const $loading = $("#loadingPersonas");
+    const $sinResultados = $("#sinResultados");
+    const $paginacion = $("#paginacionPersonas");
+    const $detallesPagina = $("#detalles-pagina");
+    const $searchInput = $("#searchPersonas");
+    const $filtroGenero = $("#filtroGenero");
+    const $filtroEstadoCivil = $("#filtroEstadoCivil");
+    const $btnNuevo = $("#btnNuevaPersona");
 
-    /**
-     * Cargar listado de personas
-     */
     function cargarPersonas(page = 1) {
         currentPage = page;
-        loading.style.display = "block";
-        sinResultados.style.display = "none";
-        listado.innerHTML = "";
+        $loading.show();
+        $sinResultados.hide();
+        $listado.empty();
 
-        const params = new URLSearchParams({
+        const params = {
             page: currentPage,
             size: pageSize,
-        });
+        };
 
-        if (searchInput.value.trim()) {
-            params.append("search", searchInput.value.trim());
+        if ($searchInput.val().trim()) {
+            params.search = $searchInput.val().trim();
         }
 
-        if (filtroGenero.value) {
-            params.append("genero", filtroGenero.value);
+        if ($filtroGenero.val()) {
+            params.genero = $filtroGenero.val();
         }
 
-        if (filtroEstadoCivil.value) {
-            params.append("estado_civil", filtroEstadoCivil.value);
+        if ($filtroEstadoCivil.val()) {
+            params.estado_civil = $filtroEstadoCivil.val();
         }
 
-        fetch(`/personas?${params.toString()}`, {
+        $.ajax({
+            url: "/personas",
+            type: "GET",
+            dataType: "json",
+            data: params,
             headers: {
                 "X-Requested-With": "XMLHttpRequest",
-                Accept: "application/json",
-            },
+                "Accept": "application/json",
+            }
         })
-            .then((res) => res.json())
-            .then((data) => {
-                loading.style.display = "none";
+            .done(function (data) {
+                $loading.hide();
 
                 if (!data.datos || data.datos.length === 0) {
-                    sinResultados.style.display = "block";
-                    paginacion.innerHTML = "";
-                    detallesPagina.textContent = "";
+                    $sinResultados.show();
+                    $paginacion.empty();
+                    $detallesPagina.text("");
                     return;
                 }
 
@@ -71,18 +69,15 @@
 
                 const desde = (currentPage - 1) * pageSize + 1;
                 const hasta = Math.min(currentPage * pageSize, data.total);
-                detallesPagina.textContent = `Mostrando ${desde} a ${hasta} de ${data.total} personas`;
+                $detallesPagina.text(`Mostrando ${desde} a ${hasta} de ${data.total} personas`);
             })
-            .catch((err) => {
-                loading.style.display = "none";
+            .fail(function (err) {
+                $loading.hide();
                 console.error("Error cargando personas:", err);
                 Swal.fire("Error", "Error al cargar personas", "error");
             });
     }
 
-    /**
-     * Renderizar filas de la tabla
-     */
     function renderPersonas(personas) {
         let html = "";
         personas.forEach((persona, index) => {
@@ -92,10 +87,10 @@
             const telefono = persona.telefono || "—";
             const fecha = persona.created_at
                 ? new Date(persona.created_at).toLocaleDateString("es-BO", {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                  })
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                })
                 : "—";
 
             const iniciales = nombreCompleto.split(" ").map(word => word.charAt(0).toUpperCase()).join("").substring(0, 2);
@@ -104,7 +99,7 @@
                 <tr>
                     <td>${(currentPage - 1) * pageSize + index + 1}</td>
                     <td>
-                        <div class="d-flex align-items-center gap-2 cursor-pointer" onclick="mostrarDetalles(${persona.id})">
+                        <div class="d-flex align-items-center gap-2 cursor-pointer" data-persona-id="${persona.id}">
                             <div class="avatar-xs flex-shrink-0">
                                 <div class="avatar-title bg-soft-primary text-primary rounded-circle fs-13">
                                     ${iniciales}
@@ -127,14 +122,14 @@
                     <td>${fecha}</td>
                     <td class="text-center">
                         <div class="d-flex gap-2 justify-content-center">
-                            <button class="btn btn-sm btn-soft-info btn-ver" data-id="${persona.id}"
-                                onclick="mostrarDetalles(${persona.id})" title="Ver detalles">
+                            <button class="btn btn-sm btn-soft-info btn-ver" value="${persona.id}"
+                                title="Ver detalles">
                                 <i class="ri-eye-fill align-bottom"></i>
                             </button>
-                            <button class="btn btn-sm btn-soft-warning btn-editar" data-id="${persona.id}" title="Editar">
+                            <button class="btn btn-sm btn-soft-warning btn-editar" value="${persona.id}" title="Editar">
                                 <i class="ri-pencil-fill align-bottom"></i>
                             </button>
-                            <button class="btn btn-sm btn-soft-danger btn-eliminar" data-id="${persona.id}" title="Eliminar">
+                            <button class="btn btn-sm btn-soft-danger btn-eliminar" value="${persona.id}" title="Eliminar">
                                 <i class="ri-delete-bin-fill align-bottom"></i>
                             </button>
                         </div>
@@ -142,18 +137,58 @@
                 </tr>
             `;
         });
-        listado.innerHTML = html;
+        $listado.html(html);
 
-        // Bind eventos
-        listado.querySelectorAll(".btn-editar").forEach((btn) => {
-            btn.addEventListener("click", () => abrirModalEditar(btn.dataset.id));
+        $listado.on("click", ".btn-ver", function () {
+            mostrarDetalles($(this).val());
         });
 
-        listado.querySelectorAll(".btn-eliminar").forEach((btn) => {
-            btn.addEventListener("click", () => abrirModalEliminar(btn.dataset.id));
+        $listado.on("click", ".btn-editar", function () {
+            abrirModalEditar($(this).val());
+        });
+
+
+
+        $listado.on("click", ".d-flex.cursor-pointer", function () {
+            const personaId = $(this).data("persona-id");
+            mostrarDetalles(personaId);
         });
     }
 
+
+    $(document).on("click", ".btn-eliminar", async function (e) {
+        e.preventDefault();
+
+        const personaId = $(this).val();
+
+        const confirmacion = await confirmarEnvio("Si, Eliminar", "¿Estás seguro de eliminar esta persona? Esta acción no se puede deshacer.");
+
+        if (!confirmacion) {
+            return;
+        }
+
+        const btn = $(this);
+
+        $.ajax({
+            url: `/personas/${personaId}`,
+            type: "DELETE",
+            dataType: "json",
+            headers: {
+                "X-CSRF-TOKEN": csrfToken,
+                "X-Requested-With": "XMLHttpRequest",
+                "Accept": "application/json",
+            }
+        }).done(function (body) {
+
+            notification(body.success);
+
+            btn.closest("tr").remove();
+        })
+            .fail(function (xhr) {
+                processError(xhr);
+
+            });
+    });
     /**
      * Obtener nombre completo de la persona
      */
@@ -188,19 +223,14 @@
         return estados[estado] || estado;
     }
 
-    /**
-     * Renderizar paginación
-     */
     function renderPaginacion(total, page, size) {
         const totalPages = Math.ceil(total / size);
         let html = "";
 
-        // Anterior
         html += `<li class="page-item ${page <= 1 ? "disabled" : ""}">
             <a class="page-link" href="#" data-page="${page - 1}">&laquo;</a>
         </li>`;
 
-        // Páginas
         let start = Math.max(1, page - 2);
         let end = Math.min(totalPages, page + 2);
 
@@ -220,73 +250,68 @@
             html += `<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">${totalPages}</a></li>`;
         }
 
-        // Siguiente
         html += `<li class="page-item ${page >= totalPages ? "disabled" : ""}">
             <a class="page-link" href="#" data-page="${page + 1}">&raquo;</a>
         </li>`;
 
-        paginacion.innerHTML = html;
+        $paginacion.html(html);
 
-        paginacion.querySelectorAll(".page-link[data-page]").forEach((link) => {
-            link.addEventListener("click", (e) => {
-                e.preventDefault();
-                const p = parseInt(link.dataset.page);
-                if (p >= 1 && p <= totalPages) {
-                    cargarPersonas(p);
-                }
-            });
+        $paginacion.on("click", ".page-link[data-page]", function (e) {
+            e.preventDefault();
+            const p = parseInt($(this).data("page"));
+            if (p >= 1 && p <= totalPages) {
+                cargarPersonas(p);
+            }
         });
     }
 
-    /**
-     * Abrir modal para nueva persona
-     */
     function abrirModalCrear() {
-        fetch("/personas/create", {
-            headers: { "X-Requested-With": "XMLHttpRequest" },
+        $.ajax({
+            url: "/personas/create",
+            type: "GET",
+            headers: { "X-Requested-With": "XMLHttpRequest" }
         })
-            .then((res) => res.text())
-            .then((html) => {
-                document.getElementById("modalPersonaContent").innerHTML = html;
+            .done(function (html) {
+                $("#modalPersonaContent").html(html);
                 const modal = new bootstrap.Modal(document.getElementById("modalPersona"));
                 modal.show();
                 bindFormulario();
             })
-            .catch((err) => {
+            .fail(function (err) {
                 console.error("Error:", err);
                 Swal.fire("Error", "No se pudo cargar el formulario", "error");
             });
     }
 
-    /**
-     * Abrir modal para editar persona
-     */
     function abrirModalEditar(id) {
-        fetch(`/personas/${id}/edit`, {
-            headers: { "X-Requested-With": "XMLHttpRequest" },
+        $.ajax({
+            url: `/personas/${id}/edit`,
+            type: "GET",
+            headers: { "X-Requested-With": "XMLHttpRequest" }
         })
-            .then((res) => res.text())
-            .then((html) => {
-                document.getElementById("modalPersonaContent").innerHTML = html;
+            .done(function (html) {
+                $("#modalPersonaContent").html(html);
                 const modal = new bootstrap.Modal(document.getElementById("modalPersona"));
                 modal.show();
                 bindFormulario();
             })
-            .catch((err) => {
+            .fail(function (err) {
                 console.error("Error:", err);
                 Swal.fire("Error", "No se pudo cargar el formulario", "error");
             });
     }
 
-    /**
-     * Mostrar detalles completos de la persona
-     */
     window.mostrarDetalles = function (id) {
-        fetch(`/personas/${id}`, {
-            headers: { "X-Requested-With": "XMLHttpRequest", Accept: "application/json" },
+        $.ajax({
+            url: `/personas/${id}`,
+            type: "GET",
+            dataType: "json",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "Accept": "application/json"
+            }
         })
-            .then((res) => res.json())
-            .then((data) => {
+            .done(function (data) {
                 if (data.datos) {
                     const persona = data.datos;
                     let html = `
@@ -365,83 +390,57 @@
                             ` : ""}
                         </div>
                     `;
-                    document.getElementById("modalDetallesContent").innerHTML = html;
+                    $("#modalDetallesContent").html(html);
                     const modal = new bootstrap.Modal(document.getElementById("modalDetalles"));
                     modal.show();
                 }
             })
-            .catch((err) => {
+            .fail(function (err) {
                 console.error("Error:", err);
                 Swal.fire("Error", "No se pudieron cargar los detalles", "error");
             });
     };
 
-    /**
-     * Abrir modal de confirmación de eliminación
-     */
-    function abrirModalEliminar(id) {
-        deletePersonaId = id;
-        const modal = new bootstrap.Modal(document.getElementById("modalEliminar"));
-        modal.show();
-    }
 
-    /**
-     * Bind eventos del formulario modal
-     */
+
     function bindFormulario() {
-        const form = document.getElementById("personaForm");
-        const btnGuardar = document.getElementById("btnGuardarPersona");
+        const $form = $("#personaForm");
+        const $btnGuardar = $("#btnGuardarPersona");
 
-        if (!form || !btnGuardar) return;
+        if ($form.length === 0 || $btnGuardar.length === 0) return;
 
-        btnGuardar.addEventListener("click", () => guardarPersona(form));
+        $btnGuardar.on("click", function () {
+            guardarPersona($form);
+        });
     }
 
-    /**
-     * Guardar persona (crear o actualizar)
-     */
-    function guardarPersona(form) {
-        // Limpiar errores previos
-        form.querySelectorAll(".is-invalid").forEach((el) => el.classList.remove("is-invalid"));
+    function guardarPersona($form) {
+        $form.find(".is-invalid").removeClass("is-invalid");
 
-        const formData = new FormData(form);
-        const url = form.getAttribute("action");
+        const formData = new FormData($form[0]);
+        const url = $form.attr("action");
+        const $btnGuardar = $("#btnGuardarPersona");
 
-        const btnGuardar = document.getElementById("btnGuardarPersona");
-        btnGuardar.disabled = true;
-        btnGuardar.innerHTML = '<i class="ri-loader-4-line align-middle me-1"></i> Guardando...';
+        $btnGuardar.prop("disabled", true);
+        $btnGuardar.html('<i class="ri-loader-4-line align-middle me-1"></i> Guardando...');
 
-        fetch(url, {
-            method: "POST",
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: "json",
             headers: {
                 "X-CSRF-TOKEN": csrfToken,
                 "X-Requested-With": "XMLHttpRequest",
-                Accept: "application/json",
-            },
-            body: formData,
+                "Accept": "application/json",
+            }
         })
-            .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
-            .then(({ status, body }) => {
-                btnGuardar.disabled = false;
-                btnGuardar.innerHTML = '<i class="ri-save-3-line align-middle me-1"></i> Guardar';
+            .done(function (body) {
+                $btnGuardar.prop("disabled", false);
+                $btnGuardar.html('<i class="ri-save-3-line align-middle me-1"></i> Guardar');
 
-                if (status === 422 && body.errors) {
-                    // Mostrar errores de validación
-                    Object.keys(body.errors).forEach((field) => {
-                        const input = form.querySelector(`[name="${field}"]`);
-                        const errorDiv = form.querySelector(`#error-${field}`);
-                        if (input) input.classList.add("is-invalid");
-                        if (errorDiv) errorDiv.textContent = body.errors[field][0];
-                    });
-                    return;
-                }
-
-                if (status >= 400) {
-                    Swal.fire("Error", body.error || "Ocurrió un error inesperado.", "error");
-                    return;
-                }
-
-                // Éxito
                 const modal = bootstrap.Modal.getInstance(document.getElementById("modalPersona"));
                 if (modal) modal.hide();
 
@@ -455,58 +454,28 @@
 
                 cargarPersonas(currentPage);
             })
-            .catch((err) => {
-                btnGuardar.disabled = false;
-                btnGuardar.innerHTML = '<i class="ri-save-3-line align-middle me-1"></i> Guardar';
-                console.error("Error:", err);
-                Swal.fire("Error", "Error de conexión. Intente nuevamente.", "error");
-            });
-    }
+            .fail(function (xhr) {
+                $btnGuardar.prop("disabled", false);
+                $btnGuardar.html('<i class="ri-save-3-line align-middle me-1"></i> Guardar');
 
-    /**
-     * Eliminar persona
-     */
-    function eliminarPersona() {
-        if (!deletePersonaId) return;
+                const body = xhr.responseJSON;
 
-        fetch(`/personas/${deletePersonaId}`, {
-            method: "DELETE",
-            headers: {
-                "X-CSRF-TOKEN": csrfToken,
-                "X-Requested-With": "XMLHttpRequest",
-                Accept: "application/json",
-            },
-        })
-            .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
-            .then(({ status, body }) => {
-                const modal = bootstrap.Modal.getInstance(document.getElementById("modalEliminar"));
-                if (modal) modal.hide();
-
-                if (status >= 400) {
-                    Swal.fire("Error", body.error || "No se pudo eliminar la persona.", "error");
+                if (xhr.status === 422 && body.errors) {
+                    Object.keys(body.errors).forEach((field) => {
+                        const $input = $form.find(`[name="${field}"]`);
+                        const $errorDiv = $form.find(`#error-${field}`);
+                        if ($input.length) $input.addClass("is-invalid");
+                        if ($errorDiv.length) $errorDiv.text(body.errors[field][0]);
+                    });
                     return;
                 }
 
-                Swal.fire({
-                    icon: "success",
-                    title: "Eliminado",
-                    text: body.success,
-                    timer: 2000,
-                    showConfirmButton: false,
-                });
-
-                cargarPersonas(currentPage);
-                deletePersonaId = null;
-            })
-            .catch((err) => {
-                console.error("Error:", err);
-                Swal.fire("Error", "Error de conexión.", "error");
+                Swal.fire("Error", body.error || "Ocurrió un error inesperado.", "error");
             });
     }
 
-    /**
-     * Eliminar foto individual
-     */
+
+
     window.eliminarFoto = function (fotoId) {
         Swal.fire({
             title: "¿Eliminar foto?",
@@ -517,19 +486,19 @@
             cancelButtonText: "Cancelar"
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`/multimedia/${fotoId}`, {
-                    method: "DELETE",
+                $.ajax({
+                    url: `/multimedia/${fotoId}`,
+                    type: "DELETE",
+                    dataType: "json",
                     headers: {
                         "X-CSRF-TOKEN": csrfToken,
                         "X-Requested-With": "XMLHttpRequest",
-                        Accept: "application/json",
-                    },
+                        "Accept": "application/json",
+                    }
                 })
-                    .then((res) => res.json())
-                    .then((data) => {
+                    .done(function (data) {
                         if (data.success) {
-                            // Remover elemento del DOM
-                            document.querySelector(`[data-foto-id="${fotoId}"]`)?.remove();
+                            $(`[data-foto-id="${fotoId}"]`).remove();
                             Swal.fire({
                                 icon: "success",
                                 title: "Eliminada",
@@ -543,45 +512,40 @@
         });
     };
 
-    // Helpers
     function escapeHtml(text) {
         if (!text) return "";
-        const div = document.createElement("div");
-        div.textContent = text;
-        return div.innerHTML;
+        return $("<div>").text(text).html();
     }
 
-    // Init
-    document.addEventListener("DOMContentLoaded", function () {
+    $(document).ready(function () {
         cargarPersonas();
 
-        // Botón nueva persona
-        if (btnNuevo) {
-            btnNuevo.addEventListener("click", abrirModalCrear);
+        if ($btnNuevo.length) {
+            $btnNuevo.on("click", abrirModalCrear);
         }
 
-        // Búsqueda con debounce
-        if (searchInput) {
-            searchInput.addEventListener("input", () => {
+        if ($searchInput.length) {
+            $searchInput.on("input", function () {
                 clearTimeout(searchTimeout);
                 searchTimeout = setTimeout(() => cargarPersonas(1), 400);
             });
         }
 
-        // Filtro por género
-        if (filtroGenero) {
-            filtroGenero.addEventListener("change", () => cargarPersonas(1));
+        if ($filtroGenero.length) {
+            $filtroGenero.on("change", function () {
+                cargarPersonas(1);
+            });
         }
 
-        // Filtro por estado civil
-        if (filtroEstadoCivil) {
-            filtroEstadoCivil.addEventListener("change", () => cargarPersonas(1));
+        if ($filtroEstadoCivil.length) {
+            $filtroEstadoCivil.on("change", function () {
+                cargarPersonas(1);
+            });
         }
 
-        // Confirmar eliminación
-        const btnConfirmarEliminar = document.getElementById("btnConfirmarEliminar");
-        if (btnConfirmarEliminar) {
-            btnConfirmarEliminar.addEventListener("click", eliminarPersona);
+        const $btnConfirmarEliminar = $("#btnConfirmarEliminar");
+        if ($btnConfirmarEliminar.length) {
+            $btnConfirmarEliminar.on("click", eliminarPersona);
         }
     });
 })();

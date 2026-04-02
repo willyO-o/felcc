@@ -109,34 +109,17 @@
     </div>
 
     {{-- Modal Crear/Editar Persona --}}
-    <div class="modal fade" id="modalPersona" tabindex="-1" aria-labelledby="modalPersonaLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" style="max-height: 90vh; display: flex; align-items: flex-start; padding-top: 2rem;">
-            <div class="modal-content" id="modalPersonaContent" style="max-height: calc(90vh - 2rem); overflow-y: auto;">
+    <div class="modal fade" id="modalPersona" tabindex="-1" aria-labelledby="modalPersonaLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content" id="modalPersonaContent" >
                 {{-- Se carga dinámicamente --}}
             </div>
         </div>
     </div>
 
-    {{-- Modal Confirmar Eliminación --}}
-    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-body text-center p-5">
-                    <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop"
-                        colors="primary:#405189,secondary:#f06548" style="width:90px;height:90px">
-                    </lord-icon>
-                    <div class="mt-4">
-                        <h4>¿Está seguro?</h4>
-                        <p class="text-muted mb-4">Está a punto de eliminar esta persona. Esta acción no se puede deshacer.</p>
-                        <div class="hstack gap-2 justify-content-center">
-                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">Sí, Eliminar</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+
+
+
 
     {{-- Modal Ver Detalles --}}
     <div class="modal fade" id="modalDetalles" tabindex="-1" aria-labelledby="modalDetallesLabel" aria-hidden="true">
@@ -159,5 +142,5 @@
 @endsection
 
 @section('js')
-    <script src="{{ url('/assets/js/personas/index.js') }}"></script>
+    <script src="{{ url('/assets/js/personas/index.js?v=' . config('app.aplicacion.version')) }}"></script>
 @endsection
