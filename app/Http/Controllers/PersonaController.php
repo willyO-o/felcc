@@ -85,21 +85,7 @@ class PersonaController extends Controller
         try {
             DB::beginTransaction();
 
-            $data = $request->only([
-                'nombres',
-                'apellidos',
-                'ci',
-                'fecha_nacimiento',
-                'domicilio',
-                'telefono',
-                'lugar_nacimiento',
-                'complemento',
-                'genero',
-                'estado_civil',
-                'nombre_conyuge',
-                'ocupacion',
-                'id_pais',
-            ]);
+            $data = $request->all();
 
             $persona = Persona::create($data);
 
@@ -184,21 +170,7 @@ class PersonaController extends Controller
         try {
             DB::beginTransaction();
 
-            $data = $request->only([
-                'nombres',
-                'apellidos',
-                'ci',
-                'fecha_nacimiento',
-                'domicilio',
-                'telefono',
-                'lugar_nacimiento',
-                'complemento',
-                'genero',
-                'estado_civil',
-                'nombre_conyuge',
-                'ocupacion',
-                'id_pais',
-            ]);
+            $data = $request->all();
 
             $persona->update($data);
 

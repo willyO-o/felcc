@@ -24,7 +24,6 @@ class Persona extends Model
         'nombre_conyuge',
         'ocupacion',
         'id_pais',
-        'url_documento',
         'responsable',
         'datos_segip',
         'estado_investigacion',

@@ -172,6 +172,13 @@
                     placeholder="Nombre completo del responsable">
                 <div class="invalid-feedback" id="error-responsable"></div>
             </div>
+            <div class="col-md-6">
+                <label for="url_documento" class="form-label">URL del Documento</label>
+                <input type="text" class="form-control " id="url_documento" name="url_documento" maxlength="250"
+                    value="{{ old('url_documento', $persona->url_documento ?? '') }}"
+                    placeholder="URL del documento en drive, nube, etc.">
+                <div class="invalid-feedback" id="error-url_documento"></div>
+            </div>
 
 
 
