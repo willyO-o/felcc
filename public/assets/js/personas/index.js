@@ -138,34 +138,29 @@
                             <button class="btn btn-sm btn-soft-warning btn-editar" value="${persona.id}" title="Editar">
                                 <i class="ri-pencil-fill align-bottom"></i>
                             </button>
-                            ${ ['superadmin', 'administrador'].includes(window.role) ?
-                            `<button class="btn btn-sm btn-soft-danger btn-eliminar" value="${persona.id}" title="Eliminar">
+                            ${['superadmin', 'administrador'].includes(window.role) ?
+                    `<button class="btn btn-sm btn-soft-danger btn-eliminar" value="${persona.id}" title="Eliminar">
                                 <i class="ri-delete-bin-fill align-bottom"></i>
                             </button>` : ""
-                            }
+                }
                         </div>
                     </td>
                 </tr>
             `;
         });
         $listado.html(html);
-
-        $listado.on("click", ".btn-ver", function () {
-            mostrarDetalles($(this).val());
-        });
-
-        $listado.on("click", ".btn-editar", function () {
-            abrirModalEditar($(this).val());
-        });
-
-
-
-        $listado.on("click", ".d-flex.cursor-pointer", function () {
-            const personaId = $(this).data("persona-id");
-            mostrarDetalles(personaId);
-        });
     }
+    $(document).on("click", ".d-flex.cursor-pointer", function () {
+        const personaId = $(this).data("persona-id");
+        mostrarDetalles(personaId);
+    });
+    $(document).on("click", ".btn-ver", function () {
+        mostrarDetalles($(this).val());
+    });
 
+    $(document).on("click", ".btn-editar", function () {
+        abrirModalEditar($(this).val());
+    });
 
     $(document).on("click", ".btn-eliminar", async function (e) {
         e.preventDefault();
@@ -491,8 +486,7 @@
                 $btnGuardar.prop("disabled", false);
                 $btnGuardar.html('<i class="ri-save-3-line align-middle me-1"></i> Guardar');
 
-                const modal = bootstrap.Modal.getInstance(document.getElementById("modalPersona"));
-                if (modal) modal.hide();
+
 
                 Swal.fire({
                     icon: "success",
@@ -501,7 +495,8 @@
                     timer: 2000,
                     showConfirmButton: false,
                 });
-
+                const modal = bootstrap.Modal.getInstance(document.getElementById("modalPersona"));
+                if (modal) modal.hide();
                 cargarPersonas(currentPage);
             })
             .fail(function (xhr) {
