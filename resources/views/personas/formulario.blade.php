@@ -65,13 +65,13 @@
             </div>
 
             <div class="col-md-6">
-                <label for="id_pais" class="form-label">País</label>
+                <label for="id_pais" class="form-label">Nacionalidad</label>
                 <select class="form-select" id="id_pais" name="id_pais">
-                    <option value="">Seleccione un país</option>
+                    <option value="">Seleccione una nacionalidad</option>
                     @foreach ($paises as $pais)
                         <option value="{{ $pais->id }}"
                             {{ old('id_pais', $persona->id_pais ?? '') == $pais->id ? 'selected' : '' }}>
-                            {{ $pais->pais }}
+                            {{ $pais->gentilicio }}
                         </option>
                     @endforeach
                 </select>

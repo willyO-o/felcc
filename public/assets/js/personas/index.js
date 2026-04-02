@@ -276,6 +276,23 @@
                 const modal = new bootstrap.Modal(document.getElementById("modalPersona"));
                 modal.show();
                 bindFormulario();
+                $("#id_pais").select2({
+                    dropdownParent: $("#modalPersonaContent"),
+                    width: "100%",
+                    theme: "bootstrap-5",
+                    placeholder: "Selecciona un país",
+                    allowClear: true,
+                });
+
+                //seleccionar pais bolivia por defecto utilizando su nombre
+                const $paisSelect = $("#id_pais");
+                const paisBolivia = $paisSelect.find("option").filter(function () {
+                    return $(this).text().trim() === "boliviano/a";
+                }).first();
+                if (paisBolivia.length) {
+                    $paisSelect.val(paisBolivia.val()).trigger("change");
+                }
+
             })
             .fail(function (err) {
                 console.error("Error:", err);
@@ -294,6 +311,16 @@
                 const modal = new bootstrap.Modal(document.getElementById("modalPersona"));
                 modal.show();
                 bindFormulario();
+
+
+                console.log($("#id_pais"))
+                $("#id_pais").select2({
+                    dropdownParent: $("#modalPersonaContent"),
+                    width: "100%",
+                    theme: "bootstrap-5",
+                    placeholder: "Selecciona un país",
+                    allowClear: true,
+                });
             })
             .fail(function (err) {
                 console.error("Error:", err);

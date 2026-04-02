@@ -109,9 +109,10 @@
     </div>
 
     {{-- Modal Crear/Editar Persona --}}
-    <div class="modal fade" id="modalPersona" tabindex="-1" aria-labelledby="modalPersonaLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal fade" id="modalPersona" tabindex="-1" aria-labelledby="modalPersonaLabel" aria-hidden="true"
+        data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-xl">
-            <div class="modal-content" id="modalPersonaContent" >
+            <div class="modal-content" id="modalPersonaContent">
                 {{-- Se carga dinámicamente --}}
             </div>
         </div>
@@ -139,8 +140,14 @@
 
 @section('css')
     <link href="/assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css" />
+    <link href="{{ url('/assets/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="{{ url('assets/css/select2-bootstrap-5-theme.min.css') }}" type="text/css" />
+
 @endsection
 
 @section('js')
+
     <script src="{{ url('/assets/js/personas/index.js?v=' . config('app.aplicacion.version')) }}"></script>
+    <script src="{{ url('/assets/js/select2.min.js') }}"></script>
+
 @endsection
