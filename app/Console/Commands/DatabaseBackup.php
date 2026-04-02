@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Carbon\Carbon;
 use Exception;
+use Symfony\Component\Process\Process;
 
 class DatabaseBackup extends Command
 {
@@ -46,19 +47,35 @@ class DatabaseBackup extends Command
             $backupFile = "{$backupDir}/backup_{$database}_{$timestamp}.sql";
 
             // Construir comando mysqldump
-            $command = sprintf(
-                'mysqldump --host=%s --port=%s --user=%s --password=%s %s > %s',
-                escapeshellarg($host),
-                escapeshellarg($port),
-                escapeshellarg($username),
-                escapeshellarg($password),
-                escapeshellarg($database),
-                escapeshellarg($backupFile)
-            );
+            $command = [
+                'mysqldump',
+                "--host={$host}",
+                "--port={$port}",
+                "--user={$username}",
+                "--password={$password}",
+                $database
+            ];
 
-            // Ejecutar el comando
+            // Ejecutar el comando usando Symfony Process
             $this->info('⏳ Iniciando copia de seguridad...');
-            exec($command, $output, $returnCode);
+            
+            try {
+                $process = new Process($command);
+                $process->setTimeout(300); // 5 minutos timeout
+                $process->run();
+
+                // Guardar output en archivo
+                if ($process->isSuccessful()) {
+                    file_put_contents($backupFile, $process->getOutput());
+                    $returnCode = 0;
+                } else {
+                    $this->error('Error en mysqldump: ' . $process->getErrorOutput());
+                    $returnCode = 1;
+                }
+            } catch (Exception $e) {
+                $this->error('Error ejecutando mysqldump: ' . $e->getMessage());
+                $returnCode = 1;
+            }
 
             // Verificar si fue exitoso
             if ($returnCode === 0 && file_exists($backupFile)) {
