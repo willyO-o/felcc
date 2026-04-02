@@ -14,6 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->validateCsrfTokens(except: [
             'mandamientos',
             'mandamientos/*',
+            'personas',
+            'personas/*',
+            'registro-criminal',
+            'registro-criminal/*',
         ]);
 
         // Agregar middleware para verificar si el usuario está activo

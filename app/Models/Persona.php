@@ -3,9 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Persona extends Model
 {
+    use SoftDeletes;
     protected $table = 'persona';
 
     protected $fillable = [
@@ -26,6 +28,11 @@ class Persona extends Model
         'responsable',
         'datos_segip',
         'estado_investigacion',
+        'url_documento',
+        'user_id',
+        'padre',
+        'madre',
+        'grupo_sanguineo',
 
     ];
 
@@ -89,5 +96,19 @@ class Persona extends Model
         }
 
         return $persona->id;
+    }
+
+    static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($persona) {
+            $persona->user_id = auth()->id();
+        });
+    }
+
+    public function usuario()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 }
