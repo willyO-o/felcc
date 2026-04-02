@@ -10,6 +10,7 @@
     let currentPage = 1;
     let pageSize = 10;
     let searchTimeout = null;
+    let filePondInstance = null;
 
     const $listado = $("#listadoPersonas");
     const $loading = $("#loadingPersonas");
@@ -20,6 +21,14 @@
     const $filtroGenero = $("#filtroGenero");
     const $filtroEstadoCivil = $("#filtroEstadoCivil");
     const $btnNuevo = $("#btnNuevaPersona");
+
+    FilePond.registerPlugin(
+        FilePondPluginFileEncode,
+        FilePondPluginFileValidateSize,
+        FilePondPluginImageExifOrientation,
+        FilePondPluginImagePreview,
+        FilePondPluginFileValidateType,
+    );
 
     function cargarPersonas(page = 1) {
         currentPage = page;
@@ -95,7 +104,7 @@
 
             const iniciales = nombreCompleto.split(" ").map(word => word.charAt(0).toUpperCase()).join("").substring(0, 2);
 
-            html += `
+            html += /*html */`
                 <tr>
                     <td>${(currentPage - 1) * pageSize + index + 1}</td>
                     <td>
@@ -129,9 +138,11 @@
                             <button class="btn btn-sm btn-soft-warning btn-editar" value="${persona.id}" title="Editar">
                                 <i class="ri-pencil-fill align-bottom"></i>
                             </button>
-                            <button class="btn btn-sm btn-soft-danger btn-eliminar" value="${persona.id}" title="Eliminar">
+                            ${ ['superadmin', 'administrador'].includes(window.role) ?
+                            `<button class="btn btn-sm btn-soft-danger btn-eliminar" value="${persona.id}" title="Eliminar">
                                 <i class="ri-delete-bin-fill align-bottom"></i>
-                            </button>
+                            </button>` : ""
+                            }
                         </div>
                     </td>
                 </tr>
@@ -275,24 +286,28 @@
                 $("#modalPersonaContent").html(html);
                 const modal = new bootstrap.Modal(document.getElementById("modalPersona"));
                 modal.show();
-                bindFormulario();
-                $("#id_pais").select2({
-                    dropdownParent: $("#modalPersonaContent"),
-                    width: "100%",
-                    theme: "bootstrap-5",
-                    placeholder: "Selecciona un país",
-                    allowClear: true,
-                });
 
-                //seleccionar pais bolivia por defecto utilizando su nombre
-                const $paisSelect = $("#id_pais");
-                const paisBolivia = $paisSelect.find("option").filter(function () {
-                    return $(this).text().trim() === "boliviano/a";
-                }).first();
-                if (paisBolivia.length) {
-                    $paisSelect.val(paisBolivia.val()).trigger("change");
-                }
+                setTimeout(() => {
+                    inicializarFilePond();
+                    bindFormulario();
+                    $("#id_pais").select2({
+                        dropdownParent: $("#modalPersona"),
+                        width: "100%",
+                        theme: "bootstrap-5",
+                        placeholder: "Selecciona un país",
+                        allowClear: true,
+                    });
 
+                    const $paisSelect = $("#id_pais");
+                    const paisBolivia = $paisSelect.find("option").filter(function () {
+                        return $(this).text().trim() === "boliviano/a";
+                    }).first();
+                    if (paisBolivia.length) {
+                        $paisSelect.val(paisBolivia.val()).trigger("change");
+                    }
+                }, 100);
+
+                $("#modalPersona").on("hidden.bs.modal", limpiarFilePond);
             })
             .fail(function (err) {
                 console.error("Error:", err);
@@ -310,17 +325,20 @@
                 $("#modalPersonaContent").html(html);
                 const modal = new bootstrap.Modal(document.getElementById("modalPersona"));
                 modal.show();
-                bindFormulario();
 
+                setTimeout(() => {
+                    inicializarFilePond();
+                    bindFormulario();
+                    $("#id_pais").select2({
+                        dropdownParent: $("#modalPersona"),
+                        width: "100%",
+                        theme: "bootstrap-5",
+                        placeholder: "Selecciona un país",
+                        allowClear: true,
+                    });
+                }, 100);
 
-                console.log($("#id_pais"))
-                $("#id_pais").select2({
-                    dropdownParent: $("#modalPersonaContent"),
-                    width: "100%",
-                    theme: "bootstrap-5",
-                    placeholder: "Selecciona un país",
-                    allowClear: true,
-                });
+                $("#modalPersona").on("hidden.bs.modal", limpiarFilePond);
             })
             .fail(function (err) {
                 console.error("Error:", err);
@@ -451,6 +469,11 @@
         $btnGuardar.prop("disabled", true);
         $btnGuardar.html('<i class="ri-loader-4-line align-middle me-1"></i> Guardando...');
 
+        if (filePondInstance) {
+            const files = filePondInstance.getFiles().map(fileItem => fileItem.file);
+            files.forEach((file) => formData.append('fotos[]', file));
+        }
+
         $.ajax({
             url: url,
             type: "POST",
@@ -542,6 +565,47 @@
     function escapeHtml(text) {
         if (!text) return "";
         return $("<div>").text(text).html();
+    }
+
+    function inicializarFilePond() {
+        const inputElement = document.querySelector('#fotos');
+        if (!inputElement) return;
+
+        if (filePondInstance) {
+            FilePond.destroy(inputElement);
+        }
+
+        filePondInstance = FilePond.create(inputElement, {
+            storeAsFile: false,
+            allowMultiple: true,
+            labelIdle: 'Arrastra o sube fotos <br><span class="filepond--label-action">Seleccionar</span>',
+            imagePreviewHeight: 140,
+            acceptedFileTypes: ['image/*'],
+            labelFileTypeNotAllowed: 'Archivo no válido',
+            labelIdle: 'Arrastra o sube hasta 4 fotos (opcional)<br><span class="filepond--label-action">Seleccionar</span>',
+            allowFileSizeValidation: true,
+            maxFiles: 4,
+            maxFileSize: '2MB',
+            labelMaxFileSize: 'Tamaño máximo de archivo es {filesize}',
+            labelMaxFileSizeExceeded: 'Archivo demasiado grande',
+            imageResizeTargetWidth: 200,
+            imageResizeTargetHeight: 200,
+            stylePanelLayout: 'compact stacked',
+            styleLoadIndicatorPosition: 'center bottom',
+            styleProgressIndicatorPosition: 'right bottom',
+            styleButtonRemoveItemPosition: 'left bottom',
+            styleButtonProcessItemPosition: 'right bottom',
+            acceptedFileTypes: ['image/*'],
+            labelFileTypeNotAllowed: 'Archivo no válido. Solo se permiten imágenes.',
+        });
+    }
+
+    function limpiarFilePond() {
+        if (filePondInstance) {
+            FilePond.destroy(document.querySelector('#fotos'));
+            filePondInstance = null;
+        }
+        $("#modalPersona").off("hidden.bs.modal", limpiarFilePond);
     }
 
     $(document).ready(function () {
