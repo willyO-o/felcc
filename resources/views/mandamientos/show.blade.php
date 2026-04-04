@@ -217,60 +217,9 @@
                                     style, featuring preppy with a twist designs.</p>
                             </div>
 
-                            <div class="row">
-                                <div class="col-12">
-                                    <div class="mt-3">
-                                        <h5 class="fs-14">
-                                            <i class="ri-user-line me-1 align-middle"></i>
-                                            Datos del imputado :
-                                        </h5>
-                                        <div class="table-responsive">
-                                            <table class="table mb-0">
-                                                <tbody>
 
-                                                    <tr>
-                                                        <th scope="row">Nro C.I.</th>
-                                                        <td>{{ $mandamiento->ci }}</td>
-                                                    </tr>
-                                                    <tr>
 
-                                                        <th scope="row" style="width: 200px;">
-                                                            Nombre</th>
-                                                        <td>{{ $mandamiento->persona->nombre }}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">Apellidos</th>
-                                                        <td>{{ $mandamiento->persona->paterno }}
-                                                            {{ $mandamiento->persona->materno }}
-                                                        </td>
-                                                    </tr>
-
-                                                    <tr>
-                                                        <th scope="row">Nro Celular</th>
-                                                        <td>{{ $mandamiento->telefono }}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">Edad</th>
-                                                        <td>{{ $mandamiento->persona?->fecha_nacimiento?->age }} años
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">Domicilio</th>
-                                                        <td>{{ $mandamiento->domicilio }}</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <th scope="row">Vehiculos</th>
-                                                        <td>{{ $mandamiento->vehiculos }}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-
-                                    </div>
-                                </div>
-
-                            </div>
-
+                            @include('personas.partials._datos', ['persona' => $mandamiento->persona])
 
                             <div class="product-content mt-5">
                                 <h5 class="fs-14 mb-3">

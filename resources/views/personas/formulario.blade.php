@@ -48,6 +48,12 @@
                     value="{{ old('telefono', $persona->telefono ?? '') }}" placeholder="Ej: +591 1234567">
                 <div class="invalid-feedback" id="error-telefono"></div>
             </div>
+            <div class="col-md-6">
+                <label for="alias" class="form-label">Alias</label>
+                <input type="text" class="form-control txtMayuscula" id="alias" name="alias" maxlength="25"
+                    value="{{ old('alias', $persona->alias ?? '') }}" placeholder="Ej: El Lobo, La Rata, etc.">
+                <div class="invalid-feedback" id="error-alias"></div>
+            </div>
             {{-- Información de Nacimiento --}}
             <div class="col-md-6">
                 <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>

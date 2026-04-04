@@ -48,12 +48,7 @@
                     </a>
                 </li>
 
-                <!-- Registro Criminal -->
-                <li class="nav-item">
-                    <a class="nav-link menu-link" href="{{ route('registro-criminal.index') }}">
-                        <i class="mdi mdi-file-document-outline"></i> <span>Registro Criminal</span>
-                    </a>
-                </li>
+
 
 
 
@@ -68,9 +63,8 @@
                                 <a  href="{{ route('personas.index') }}" class="nav-link">Personas</a>
                             </li>
 
-                            <li class="nav-item d-none">
-                                <a href="{{ route('importar.mandamientos.index') }}" class="nav-link">Importar
-                                    Mandamientos</a>
+                            <li class="nav-item ">
+                                <a href="{{ route('registro-criminal.index') }}" class="nav-link">Registro Criminal</a>
                             </li>
 
                             <li class="nav-item d-none">
