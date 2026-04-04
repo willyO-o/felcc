@@ -94,12 +94,15 @@
                                 <button type="button" value="${item.id}" class="btn btn-soft-secondary btn-sm shadow-none verDetalles" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Detalles">
                                     <i class="ri-eye-line"></i>
                                 </button>
-                                <a  href="/registro-criminal/${item.id}/edit"  class="btn btn-soft-secondary btn-sm shadow-none " data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Mandamiento">
+                                ${['superadmin', 'administrador'].includes(window.role) ? `<a  href="/registro-criminal/${item.id}/edit"  class="btn btn-soft-secondary btn-sm shadow-none " data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Mandamiento">
                                     <i class="ri-pencil-line"></i>
                                 </a>
                                 <button type="button" class="btn btn-soft-secondary btn-sm shadow-none btnDelete" value="${item.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Mandamiento">
                                     <i class="ri-delete-bin-2-line"></i>
                                 </button>
+                                ` : ''}
+
+
 
                             </div>
                         </div>

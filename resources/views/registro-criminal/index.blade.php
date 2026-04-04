@@ -366,5 +366,5 @@
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
 
-    <script src="{{url('assets/js/registro-criminal/index.js')}}"></script>
+    <script src="{{url('assets/js/registro-criminal/index.js?v='.config('app.aplicacion.version'))}}"></script>
 @endsection
