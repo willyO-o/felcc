@@ -16,13 +16,17 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+        if (!$request->user()->hasPermission('users_all')) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
         if ($request->ajax()) {
             $query = User::with('role')
                 ->when($request->filled('search'), function ($q) use ($request) {
                     $search = $request->search;
                     $q->where(function ($q2) use ($search) {
                         $q2->where('name', 'like', "%{$search}%")
-                           ->orWhere('email', 'like', "%{$search}%");
+                            ->orWhere('email', 'like', "%{$search}%");
                     });
                 })
                 ->when($request->filled('role_id'), function ($q) use ($request) {
@@ -61,6 +65,10 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        if (!$request->user()->hasPermission('users_all')) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|email|max:255|unique:users,email',
@@ -127,6 +135,11 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        if (!$request->user()->hasPermission('users_all')) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
+
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => ['required', 'email', 'max:255', Rule::unique('users')->ignore($id)],
@@ -181,6 +194,10 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
+        if (!request()->user()->hasPermission('users_all')) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
         try {
             $user = User::findOrFail($id);
 
@@ -208,6 +225,10 @@ class UserController extends Controller
      */
     public function toggleStatus(string $id)
     {
+
+        if (!request()->user()->hasPermission('users_all')) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
         try {
             $user = User::findOrFail($id);
 

@@ -5,12 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Mandamiento;
 use App\Models\Multimedia;
-use App\Models\Persona;
-use App\Models\Delito;
-use App\Models\Juzgado;
 use App\Models\TipoMandamiento;
 use Illuminate\Support\Facades\DB;
-use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Storage;
 
 class MandamientoController extends Controller
@@ -20,6 +16,9 @@ class MandamientoController extends Controller
      */
     public function index(Request $request)
     {
+        if (!$request->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_listar'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
         // Si es una petición AJAX, devolver los datos para DataTables
         if ($request->ajax()) {
             $mandamientos = Mandamiento::getMandamientos($request->all())
@@ -45,6 +44,9 @@ class MandamientoController extends Controller
      */
     public function create()
     {
+        if (!request()->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_crear'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
         $mandamientos = new Mandamiento();
         $tipoMandamientos = TipoMandamiento::all();
         return view('mandamientos.formulario', compact('mandamientos', 'tipoMandamientos'));
@@ -55,6 +57,10 @@ class MandamientoController extends Controller
      */
     public function store(Request $request)
     {
+
+        if (!request()->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_crear'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
 
         $request->validate(Mandamiento::$rules);
 
@@ -102,7 +108,6 @@ class MandamientoController extends Controller
                     'id_mandamiento' => $mandamiento->id,
                     'tipo_archivo' => $extensionActa,
                 ]);
-
             }
 
 
@@ -124,6 +129,9 @@ class MandamientoController extends Controller
      */
     public function show(string $id)
     {
+        if (!request()->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_listar', 'consulta_mandamientos'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
         $mandamiento = Mandamiento::getMandamientos([], $id)->first();
 
         if (!$mandamiento) {
@@ -138,6 +146,10 @@ class MandamientoController extends Controller
      */
     public function edit(string $id)
     {
+        if (!request()->user()->hasAnyPermission(['mandamientos_all'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
         $mandamiento = Mandamiento::getMandamientos([], $id)->first();
 
         if (!$mandamiento) {
@@ -153,6 +165,9 @@ class MandamientoController extends Controller
     public function update(Request $request, string $id)
     {
 
+        if (!request()->user()->hasAnyPermission(['mandamientos_all'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
 
         try {
             DB::beginTransaction();
@@ -238,6 +253,10 @@ class MandamientoController extends Controller
      */
     public function destroy(string $id)
     {
+
+        if (!request()->user()->hasAnyPermission(['mandamientos_all'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
         $mandamiento = Mandamiento::findOrFail($id);
         $mandamiento->delete();
 
