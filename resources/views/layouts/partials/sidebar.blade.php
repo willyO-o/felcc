@@ -59,13 +59,17 @@
                     </a>
                     <div class="collapse menu-dropdown" id="sidebarInteligencia">
                         <ul class="nav nav-sm flex-column">
-                            <li class="nav-item ">
-                                <a  href="{{ route('personas.index') }}" class="nav-link">Personas</a>
-                            </li>
 
                             <li class="nav-item ">
                                 <a href="{{ route('registro-criminal.index') }}" class="nav-link">Registro Criminal</a>
                             </li>
+
+
+                            <li class="nav-item ">
+                                <a href="{{ route('personas.index') }}" class="nav-link">Personas</a>
+                            </li>
+
+
 
                             <li class="nav-item d-none">
                                 <a href="{{ route('usuarios.index') }}" class="nav-link">Importar Registro</a>

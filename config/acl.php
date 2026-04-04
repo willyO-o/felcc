@@ -1,0 +1,50 @@
+<?php
+
+return [
+    'permissions' => [
+        'superadmin' => [
+            'users_all',
+            'mandamientos_all',
+            'personas_all',
+            'vehiculos_all',
+            'telefonos_all',
+            'importar_all',
+            'consulta_all',
+        ],
+        'administrador' => [
+            'users_all',
+            'mandamientos_all',
+            'personas_all',
+            'vehiculos_all',
+            'telefonos_all',
+            'importar_all',
+            'consulta_all',
+        ],
+        'tecnico_felcc' => [
+            'consulta_mandamientos',
+            'personas_crear',
+            'mandamientos_crear',
+        ],
+        'tecnico_daci' => [
+            'registro-criminal_crear',
+            'registro-criminal_listar',
+            'personas_crear',
+            'personas_listar',
+            'mandamientos_listar',
+            'vehiculos_listar',
+            'vehiculos_crear',
+            'telefonos_listar',
+            'telefonos_crear',
+        ],
+        'consultor_felcc' => [
+            'consulta_mandamientos',
+        ],
+        'consultor_daci' => [
+            'consulta_mandamientos',
+            'consulta_personas',
+            'consulta_registro-criminal',
+            'consulta_vehiculos',
+            'consulta_telefonos',
+        ],
+    ],
+];
