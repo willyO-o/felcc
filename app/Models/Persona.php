@@ -32,6 +32,7 @@ class Persona extends Model
         'padre',
         'madre',
         'grupo_sanguineo',
+        'alias',
 
     ];
 
@@ -63,6 +64,11 @@ class Persona extends Model
     public function registroCriminal()
     {
         return $this->hasMany(RegistroCriminal::class, 'id_persona');
+    }
+
+    public function pais()
+    {
+        return $this->belongsTo(Pais::class, 'id_pais');
     }
 
 

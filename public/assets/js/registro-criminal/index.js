@@ -429,7 +429,7 @@
             $("#modalDetalles").modal('show');
             $("#modalDetalles .modal-body").html('<div class="text-center"><span class="loaderHttp"></span><span class="text-muted">Cargando detalles...</span></div>');
 
-            $.get(`/mandamientos/${id}`)
+            $.get(`/registro-criminal/${id}`)
                 .done(function (response) {
                     $("#modalDetalles .modal-body").html(response);
                 })

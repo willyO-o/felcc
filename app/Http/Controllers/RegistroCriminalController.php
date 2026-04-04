@@ -57,9 +57,10 @@ class RegistroCriminalController extends Controller
 
             $criterio = $request->id_persona ? ['id' => $request->id_persona] : ['ci' => $request->ci];
 
-            $persona = Persona::updateOrCreate(
-                $criterio,
-                $request->only([
+            $persona = Persona::where($criterio)->first();
+
+            if (!$persona) {
+                $persona = Persona::create($request->only([
                     'nombres',
                     'apellidos',
                     'ci',
@@ -72,9 +73,10 @@ class RegistroCriminalController extends Controller
                     'estado_civil',
                     'nombre_conyuge',
                     'ocupacion',
-                    'id_pais'
-                ])
-            );
+                    'id_pais',
+                    'alias',
+                ]));
+            }
 
             $request->merge(['id_persona' => $persona->id]);
             $registro = RegistroCriminal::create($request->all());
@@ -116,7 +118,8 @@ class RegistroCriminalController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $datos = RegistroCriminal::with(['persona', 'fotos'])->findOrFail($id);
+        return view('registro-criminal.show', compact('datos'));
     }
 
     /**
@@ -139,25 +142,6 @@ class RegistroCriminalController extends Controller
             DB::beginTransaction();
 
             $registro = RegistroCriminal::findOrFail($id);
-            $persona = Persona::findOrFail($registro->persona->id);
-
-            $persona->update($request->only([
-                'nombres',
-                'apellidos',
-                'ci',
-                'domicilio',
-                'telefono',
-                'fecha_nacimiento',
-                'lugar_nacimiento',
-                'complemento',
-                'genero',
-                'estado_civil',
-                'nombre_conyuge',
-                'ocupacion',
-                'id_pais'
-            ]));
-
-
 
             $registro->update($request->only([
                 'fecha_registro',
@@ -172,6 +156,13 @@ class RegistroCriminalController extends Controller
                 'zonas_opera',
                 'observaciones',
                 'id_division',
+                'telefono',
+                'estatura',
+                'peso',
+                'cud',
+                'caracteristicas_particulares',
+                'hijos',
+
             ]));
 
             if ($request->hasFile('foto_frente')) {
