@@ -262,4 +262,34 @@ class MandamientoController extends Controller
 
         return response()->json(['success' => 'Mandamiento eliminado correctamente.'], 200);
     }
+
+
+
+    public function consultarMandamientos(Request $request)
+    {
+        if (!request()->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_listar', 'consulta_mandamientos'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
+        if($request->ajax()) {
+
+            if(empty($request->input('tipo_filtro')) || strlen($request->input('search')) < 4) {
+                return response()->json(['datos' => []]);
+            }
+
+
+            $mandamientos = Mandamiento::getMandamientos($request->all())
+                ->paginate($request->get('size', 10), ['*'], 'page', $request->get('page', 1));
+
+            return response()->json([
+                'datos' => $mandamientos->items(),
+                'total' => $mandamientos->total(),
+                'page' => $mandamientos->currentPage(),
+            ]);
+        }
+
+
+        return view('mandamientos.consultas');
+
+    }
 }

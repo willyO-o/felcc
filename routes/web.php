@@ -33,6 +33,11 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('tipos-mandamientos', App\Http\Controllers\TipoMandamientoController::class);
     Route::delete('/multimedia/{id}', [App\Http\Controllers\MultimediaController::class, 'destroy'])->name('multimedia.destroy');
 
+
+    Route::get('consultas/mandamientos', [App\Http\Controllers\MandamientoController::class, 'consultarMandamientos'])->name('consultas.mandamientos');
+    // Route::get('consultas/registro-criminal', [App\Http\Controllers\RegistroCriminalController::class, 'consultarRegistroCriminal'])->name('consultas.registro-criminal');
+
+
     // Rutas de importación de personas
     Route::get('/personas/importar', [App\Http\Controllers\ImportarPersonasController::class, 'index'])->name('personas.importar.index');
     Route::post('/personas/importar', [App\Http\Controllers\ImportarPersonasController::class, 'store'])->name('personas.importar.store');

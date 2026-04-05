@@ -48,8 +48,19 @@
                     </a>
                 </li>
 
-
-
+                <li class="menu-title"><span data-key="t-menu">Consultas</span></li>
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('consultas.mandamientos') }}">
+                            <i class="mdi mdi-magnify"></i> <span>Consultar Mandamientos</span>
+                        </a>
+                    </li>
+                @canany(['superadmin', 'administrador', 'tecnico_daci'])
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('consultas.mandamientos') }}">
+                            <i class="mdi mdi-magnify"></i> <span>Consultar Registro Criminal</span>
+                        </a>
+                    </li>
+                @endcanany
 
                 @canany(['superadmin', 'administrador', 'tecnico_daci'])
                     <li class="menu-title"><span data-key="t-menu">EREBOR</span></li>
