@@ -224,6 +224,11 @@
 
     <div class="modal-footer border-top" >
         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+        @if(!$persona->exists)
+            <button type="button" class="btn btn-info" id="btnGuardarReset">
+                <i class="ri-save-3-line align-middle me-1"></i> Guardar y Registrar Nuevo
+            </button>
+        @endif
         <button type="button" class="btn btn-primary" id="btnGuardarPersona">
             <i class="ri-save-3-line align-middle me-1"></i> Guardar
         </button>

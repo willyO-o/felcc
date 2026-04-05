@@ -19,21 +19,48 @@ class PersonaController extends Controller
     {
         if ($request->ajax()) {
             $query = Persona::with('multimedia')
-                ->when($request->filled('search'), function ($q) use ($request) {
-                    $search = $request->search;
-                    $q->where(function ($q2) use ($search) {
-                        $q2->where('nombres', 'like', "%{$search}%")
-                           ->orWhere('apellidos', 'like', "%{$search}%")
-                           ->orWhere('ci', 'like', "%{$search}%");
-                    });
-                })
                 ->when($request->filled('genero'), function ($q) use ($request) {
-                    $q->where('genero', $request->genero);
+                    $q->whereRaw('genero = ?', [$request->genero]);
                 })
                 ->when($request->filled('estado_civil'), function ($q) use ($request) {
-                    $q->where('estado_civil', $request->estado_civil);
+                    $q->whereRaw('estado_civil = ?', [$request->estado_civil]);
                 })
                 ->orderBy('id', 'desc');
+
+            if (!$request->filled('filtro') && $request->filled('search')) {
+                $query->when($request->filled('search'), function ($q) use ($request) {
+                    $search = $request->search;
+                    $search = str_replace('%', ' ', $search);
+                    $q->where(function ($q2) use ($search) {
+                        $q2->whereRaw('nombres LIKE ?', ["%{$search}%"])
+                            ->orWhereRaw('apellidos LIKE ?', ["%{$search}%"])
+                            ->orWhereRaw('ci LIKE ?', ["%{$search}%"])
+                            ->orWhereRaw('CONCAT(ci, "-", complemento) LIKE ?', ["%{$search}%"])
+                            ->orWhereRaw("CONCAT(COALESCE(nombres, ''), ' ', COALESCE(apellidos, '')) LIKE ?", ["%{$search}%"]);
+                    });
+                });
+            } else if ($request->filled('search') && $request->filled('filtro')) {
+                $search = $request->search;
+                $search = str_replace('%', ' ', $search);
+                switch ($request->filtro) {
+                    case 'nombre':
+                        $query->whereRaw('nombres  LIKE ?', ["%{$search}%"]);
+                        break;
+                    case 'apellidos':
+                        $query->whereRaw('apellidos  LIKE ?', ["%{$search}%"]);
+                        break;
+                    case 'ci':
+                        $query->whereRaw('ci  LIKE ?', ["%{$search}%"])
+                            ->orWhereRaw('CONCAT(ci, "-", complemento)  LIKE ?', ["%{$search}%"]);
+                        break;
+                    case 'nombre_padre':
+                        $query->whereRaw('padre  LIKE ?', ["%{$search}%"]);
+                        break;
+                    case 'nombre_madre':
+                        $query->whereRaw('madre  LIKE ?', ["%{$search}%"]);
+                        break;
+                }
+            }
 
             $personas = $query->paginate($request->get('size', 10), ['*'], 'page', $request->get('page', 1));
 
@@ -126,8 +153,8 @@ class PersonaController extends Controller
      */
     public function show(string $id)
     {
-        $persona = Persona::with('multimedia')->findOrFail($id);
-        return response()->json(['datos' => $persona], 200);
+        $datos = Persona::with('multimedia')->findOrFail($id);
+        return view('personas.show', compact('datos'));
     }
 
     /**

@@ -5,7 +5,7 @@
 @section('content')
     <div class="row">
         <div class="col-12 d-flex justify-content-end mb-2">
-            @canany(['superadmin', 'administrador'])
+            @canany(['superadmin', 'administrador','tecnico_daci'])
                 <div class="flex-shrink-0">
                     <button value="" class="btn btn-primary openModal" id="mandamientosBtn">
                         <i class="ri-add-line align-middle me-1"></i> Nuevo Mandamiento

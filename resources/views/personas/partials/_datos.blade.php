@@ -52,6 +52,10 @@
                             <td>{{ $persona->genero }}</td>
                         </tr>
                         <tr>
+                            <th scope="row">Lugar de nacimiento</th>
+                            <td>{{ $persona->lugar_nacimiento }}</td>
+                        </tr>
+                        <tr>
                             <th scope="row">Grupo sanguíneo</th>
                             <td>{{ $persona->grupo_sanguineo }}</td>
                         </tr>

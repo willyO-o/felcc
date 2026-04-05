@@ -40,6 +40,16 @@
                             </div>
                         </div>
                         <div class="col-md-2">
+                            <select name="filtros" id="filtros" class="form-select">
+                                <option value="">Filtrar Por</option>
+                                <option value="nombre">Nombre</option>
+                                <option value="apellidos">Apellidos</option>
+                                <option value="ci">C.I.</option>
+                                <option value="nombre_padre">Nombre del Padre</option>
+                                <option value="nombre_madre">Nombre de la Madre</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
                             <select name="filtroGenero" id="filtroGenero" class="form-select">
                                 <option value="">Todos los Géneros</option>
                                 <option value="MASCULINO">Masculino</option>
@@ -69,7 +79,8 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Nombre Completo</th>
-                                    <th scope="col">Cédula de Identidad</th>
+                                    <th scope="col">C.I.</th>
+                                    <th scope="col">Alias</th>
                                     <th scope="col">Género</th>
                                     <th scope="col">Estado Civil</th>
                                     <th scope="col">Teléfono</th>
@@ -124,15 +135,9 @@
 
     {{-- Modal Ver Detalles --}}
     <div class="modal fade" id="modalDetalles" tabindex="-1" aria-labelledby="modalDetallesLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalDetallesLabel">Detalles de la Persona</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="modalDetallesContent">
-                    {{-- Se carga dinámicamente --}}
-                </div>
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content" id="modalDetallesContent">
+
             </div>
         </div>
     </div>

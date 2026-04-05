@@ -52,6 +52,9 @@
         if ($filtroEstadoCivil.val()) {
             params.estado_civil = $filtroEstadoCivil.val();
         }
+        if ($('#filtros').val()) {
+            params.filtro = $('#filtros').val();
+        }
 
         $.ajax({
             url: "/personas",
@@ -103,15 +106,19 @@
                 : "—";
 
             const iniciales = nombreCompleto.split(" ").map(word => word.charAt(0).toUpperCase()).join("").substring(0, 2);
+            const primeraImagen = persona.multimedia && persona.multimedia.length > 0 ? persona.multimedia[0].ruta : null;
 
             html += /*html */`
                 <tr>
                     <td>${(currentPage - 1) * pageSize + index + 1}</td>
                     <td>
                         <div class="d-flex align-items-center gap-2 cursor-pointer" data-persona-id="${persona.id}">
-                            <div class="avatar-xs flex-shrink-0">
+                            <div class="avatar-sm flex-shrink-0">
                                 <div class="avatar-title bg-soft-primary text-primary rounded-circle fs-13">
-                                    ${iniciales}
+                                    ${primeraImagen ?
+                    `<img src="/storage/${primeraImagen}" alt="Foto de ${escapeHtml(nombreCompleto)}" class="avatar-sm rounded-circle">` :
+                    escapeHtml(iniciales)
+                }
                                 </div>
                             </div>
                             <div class="flex-grow-1">
@@ -121,12 +128,17 @@
                         </div>
                     </td>
                     <td>
-                        <span class="badge bg-light text-dark">
-                            ${persona.ci ? escapeHtml(persona.ci) : "—"}
+                        <span class="">
+                            ${persona.ci ? escapeHtml(persona.ci + (persona.complemento ? `-${persona.complemento}` : "")) : "—"}
                         </span>
                     </td>
-                    <td><span class="badge bg-info">${genero}</span></td>
-                    <td><span class="badge bg-warning">${estadoCivil}</span></td>
+                    <td>
+                        <span class="">
+                            ${persona.alias ? escapeHtml(persona.alias) : "—"}
+                        </span>
+                    </td>
+                    <td><span class="">${genero}</span></td>
+                    <td><span class=" ">${estadoCivil}</span></td>
                     <td>${escapeHtml(telefono)}</td>
                     <td>${fecha}</td>
                     <td class="text-center">
@@ -135,11 +147,13 @@
                                 title="Ver detalles">
                                 <i class="ri-eye-fill align-bottom"></i>
                             </button>
+
+                            ${['superadmin', 'administrador'].includes(window.role) ?
+                    /*html*/`
                             <button class="btn btn-sm btn-soft-warning btn-editar" value="${persona.id}" title="Editar">
                                 <i class="ri-pencil-fill align-bottom"></i>
                             </button>
-                            ${['superadmin', 'administrador'].includes(window.role) ?
-                    `<button class="btn btn-sm btn-soft-danger btn-eliminar" value="${persona.id}" title="Eliminar">
+                            <button class="btn btn-sm btn-soft-danger btn-eliminar" value="${persona.id}" title="Eliminar">
                                 <i class="ri-delete-bin-fill align-bottom"></i>
                             </button>` : ""
                 }
@@ -345,97 +359,13 @@
         $.ajax({
             url: `/personas/${id}`,
             type: "GET",
-            dataType: "json",
-            headers: {
-                "X-Requested-With": "XMLHttpRequest",
-                "Accept": "application/json"
-            }
-        })
-            .done(function (data) {
-                if (data.datos) {
-                    const persona = data.datos;
-                    let html = `
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <h6 class="text-muted mb-3">Información Personal</h6>
-                                <table class="table table-sm">
-                                    <tr>
-                                        <td class="fw-bold">Nombre:</td>
-                                        <td>${getNombreCompleto(persona)}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold">CI:</td>
-                                        <td>${persona.ci || "—"}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold">Ocupación:</td>
-                                        <td>${persona.ocupacion || "—"}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <div class="col-md-6">
-                                <h6 class="text-muted mb-3">Datos Demográficos</h6>
-                                <table class="table table-sm">
-                                    <tr>
-                                        <td class="fw-bold">Género:</td>
-                                        <td>${formatGenero(persona.genero) || "—"}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold">Estado Civil:</td>
-                                        <td>${formatEstadoCivil(persona.estado_civil) || "—"}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold">Fecha Nac.:</td>
-                                        <td>${persona.fecha_nacimiento ? new Date(persona.fecha_nacimiento).toLocaleDateString("es-BO") : "—"}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <div class="col-md-6">
-                                <h6 class="text-muted mb-3">Contacto</h6>
-                                <table class="table table-sm">
-                                    <tr>
-                                        <td class="fw-bold">Teléfono:</td>
-                                        <td>${persona.telefono || "—"}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold">Domicilio:</td>
-                                        <td>${persona.domicilio || "—"}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                            <div class="col-md-6">
-                                <h6 class="text-muted mb-3">Otra Información</h6>
-                                <table class="table table-sm">
-                                    <tr>
-                                        <td class="fw-bold">Lugar Nac.:</td>
-                                        <td>${persona.lugar_nacimiento || "—"}</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="fw-bold">País:</td>
-                                        <td>${persona.pais ? persona.pais.pais : "—"}</td>
-                                    </tr>
-                                </table>
-                            </div>
-                            ${persona.multimedia && persona.multimedia.length > 0 ? `
-                                <div class="col-12">
-                                    <h6 class="text-muted mb-3">Fotos</h6>
-                                    <div class="row g-2">
-                                        ${persona.multimedia.map(foto => `
-                                            <div class="col-md-3">
-                                                <img src="/storage/${foto.ruta}" class="img-fluid rounded" alt="Foto">
-                                            </div>
-                                        `).join("")}
-                                    </div>
-                                </div>
-                            ` : ""}
-                        </div>
-                    `;
-                    $("#modalDetallesContent").html(html);
-                    const modal = new bootstrap.Modal(document.getElementById("modalDetalles"));
-                    modal.show();
-                }
-            })
-            .fail(function (err) {
+
+        }).done(function (data) {
+
+            $("#modalDetallesContent").html(data);
+            const modal = new bootstrap.Modal(document.getElementById("modalDetalles"));
+            modal.show();
+        }).fail(function (err) {
                 console.error("Error:", err);
                 Swal.fire("Error", "No se pudieron cargar los detalles", "error");
             });
@@ -446,21 +376,42 @@
     function bindFormulario() {
         const $form = $("#personaForm");
         const $btnGuardar = $("#btnGuardarPersona");
+        const $btnGuardarReset = $("#btnGuardarReset");
 
         if ($form.length === 0 || $btnGuardar.length === 0) return;
 
         $btnGuardar.on("click", function () {
             guardarPersona($form);
         });
+        $btnGuardarReset.on("click", function () {
+            guardarPersona($form, true);
+        });
     }
 
-    function guardarPersona($form) {
+    function resetearFormulario() {
+        const $form = $("#personaForm");
+        if ($form.length === 0) return;
+
+        $form[0].reset();
+        $form.find(".is-invalid").removeClass("is-invalid");
+
+        if (filePondInstance) {
+            filePondInstance.removeFiles();
+        }
+    }
+
+    function guardarPersona($form, resetForm = false) {
         $form.find(".is-invalid").removeClass("is-invalid");
 
         const formData = new FormData($form[0]);
         const url = $form.attr("action");
         const $btnGuardar = $("#btnGuardarPersona");
+        const $btnGuardarReset = $("#btnGuardarReset");
 
+        if (resetForm) {
+            $btnGuardarReset.prop("disabled", true);
+            $btnGuardarReset.html('<i class="ri-loader-4-line align-middle me-1"></i> Guardando...');
+        }
         $btnGuardar.prop("disabled", true);
         $btnGuardar.html('<i class="ri-loader-4-line align-middle me-1"></i> Guardando...');
 
@@ -488,6 +439,7 @@
 
 
 
+
                 Swal.fire({
                     icon: "success",
                     title: "¡Éxito!",
@@ -495,9 +447,16 @@
                     timer: 2000,
                     showConfirmButton: false,
                 });
+                cargarPersonas(currentPage);
+
+                if (resetForm) {
+                    $btnGuardarReset.prop("disabled", false);
+                    $btnGuardarReset.html('<i class="ri-save-3-line align-middle me-1"></i> Guardar y Registrar Nuevo');
+                    resetearFormulario();
+                    return;
+                }
                 const modal = bootstrap.Modal.getInstance(document.getElementById("modalPersona"));
                 if (modal) modal.hide();
-                cargarPersonas(currentPage);
             })
             .fail(function (xhr) {
                 $btnGuardar.prop("disabled", false);

@@ -51,37 +51,25 @@
 
 
 
-
-                <li class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebarInteligencia" data-bs-toggle="collapse" role="button"
-                        aria-expanded="false" aria-controls="sidebarInteligencia">
-                        <i class="mdi mdi-head-lightbulb-outline"></i> <span>EREBOR</span>
-                    </a>
-                    <div class="collapse menu-dropdown" id="sidebarInteligencia">
-                        <ul class="nav nav-sm flex-column">
-
-                            <li class="nav-item ">
-                                <a href="{{ route('registro-criminal.index') }}" class="nav-link">Registro Criminal</a>
-                            </li>
-
-
-                            <li class="nav-item ">
-                                <a href="{{ route('personas.index') }}" class="nav-link">Personas</a>
-                            </li>
+                @canany(['superadmin', 'administrador', 'tecnico_daci'])
+                    <li class="menu-title"><span data-key="t-menu">EREBOR</span></li>
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('registro-criminal.index') }}">
+                            <i class="mdi mdi-gavel"></i> <span>Registro Criminal</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('personas.index') }}">
+                            <i class="mdi mdi-account-outline"></i> <span>Personas</span>
+                        </a>
+                    </li>
+                @endcanany
 
 
-
-                            <li class="nav-item d-none">
-                                <a href="{{ route('usuarios.index') }}" class="nav-link">Importar Registro</a>
-                            </li>
-
-                        </ul>
-                    </div>
-                </li>
-
-
-                @canany(['superadmin', 'administrador', 'tecnico'])
+                @canany(['superadmin', 'administrador', 'tecnico_daci'])
                     <!-- Usuarios -->
+                    <li class="menu-title"><span data-key="t-menu">Importar</span></li>
+
                     <li class="nav-item">
                         <a class="nav-link menu-link" href="#sidebarImportar" data-bs-toggle="collapse" role="button"
                             aria-expanded="false" aria-controls="sidebarImportar">
