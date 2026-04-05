@@ -125,11 +125,11 @@
                                     <i class="ri-eye-line"></i>
                                 </button>
 
-                                ${archivoMandamiento && archivoMandamiento.tipo_archivo !=='pdf' ? /*html */`
+                                ${archivoMandamiento && archivoMandamiento.tipo_archivo !== 'pdf' ? /*html */`
                                     <button type="button" class="btn btn-soft-secondary btn-sm shadow-none btn-ver-img" data-img='${archivoMandamiento.ruta}' data-bs-toggle="tooltip" data-bs-placement="top" title="Ver imagen mandamiento">
                                         <i class="ri-image-line"></i>
                                     </button>` : ''}
-                                ${archivoMandamiento && archivoMandamiento.tipo_archivo =='pdf' ? /*html */`
+                                ${archivoMandamiento && archivoMandamiento.tipo_archivo == 'pdf' ? /*html */`
                                     <a href="${window.location.origin}/storage/${archivoMandamiento.ruta}" target="_blank" class="btn btn-soft-secondary btn-sm shadow-none" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver imagen mandamiento">
                                         <i class="ri-image-line"></i>
                                     </a>` : ''}
@@ -219,34 +219,29 @@
 
     let timerSearch;
 
-    $("#searchMandamientos").on('input', function (e) {
+    $("#btnBuscar").on('click', function (e) {
         e.preventDefault();
-        clearTimeout(timerSearch);
-        if ($(this).val().trim() != '' && $(this).val().trim().length < 2) return;
-        timerSearch = setTimeout(function () {
+        if ($("#tipo_filtro").val().trim() == '' || $("#searchMandamientos").val().trim().length < 4) return;
 
-            scrollPersonal.resetScrollPagination(getDataFilter());
-        }, 500);
+        scrollPersonal.resetScrollPagination(getDataFilter());
 
     });
 
-    $("#filtroFechas").on('apply.daterangepicker', function(ev, picker) {
+    $("#filtroFechas").on('apply.daterangepicker', function (ev, picker) {
         // Capturar las fechas seleccionadas
         dataScroll.fecha_inicio = picker.startDate.format('YYYY-MM-DD');
         dataScroll.fecha_fin = picker.endDate.format('YYYY-MM-DD');
-        scrollPersonal.resetScrollPagination(getDataFilter());
     });
 
-    $("#filtroFechas").on('cancel.daterangepicker', function(ev, picker) {
+    $("#filtroFechas").on('cancel.daterangepicker', function (ev, picker) {
         // Limpiar los filtros de fecha cuando se cancela
         dataScroll.fecha_inicio = null;
         dataScroll.fecha_fin = null;
         $(this).val('');
-        scrollPersonal.resetScrollPagination(getDataFilter());
     });
 
     // Evento para el botón de limpiar filtro de fechas
-    $("#btnLimpiarFechas").on('click', function(e) {
+    $("#btnLimpiarFechas").on('click', function (e) {
         e.preventDefault();
         dataScroll.fecha_inicio = null;
         dataScroll.fecha_fin = null;
@@ -447,7 +442,7 @@
                         Object.entries(datos).forEach(function ([key, value]) {
 
 
-                            if(key == 'acta_ejecucion'){
+                            if (key == 'acta_ejecucion') {
                                 //saltar campo
 
                                 return;
@@ -476,7 +471,7 @@
 
                         }
 
-                        if(datos.acta_ejecucion){
+                        if (datos.acta_ejecucion) {
                             $(".requerido_ejecutado").show().find('input[type="file"]').attr('required', false);
                         }
 

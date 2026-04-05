@@ -5,6 +5,9 @@
 @section('content')
 
     <div class="row">
+        <p class="mb-1">Para realizar una búsqueda, seleccione un filtro y escriba al menos 4 caracteres en el campo de búsqueda, luego haga clic en el botón de búsqueda.</p>
+    </div>
+    <div class="row">
         <div class="col-lg-12">
             <div class="card">
 
@@ -12,7 +15,8 @@
                     <div class="d-flex flex-column-reverse flex-md-row justify-content-between align-items-center gap-2">
                         <div class="col-md-4 mt-2 mt-md-0 ">
                             <div class="input-group">
-                                <span class="input-group-text btn btn-primary"><i class="ri-search-line"></i></span>
+                                <span class="input-group-text btn btn-primary" id="btnBuscar"><i class="ri-search-line"></i>
+                                    Buscar</span>
 
                                 <input type="search" id="searchMandamientos" class="form-control "
                                     placeholder="Buscar mandamiento...">
