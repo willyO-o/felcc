@@ -129,5 +129,5 @@
 @endsection
 
 @section('js')
-    <script src="{{ url('/assets/js/usuarios/index.js') }}"></script>
+    <script src="{{ url('/assets/js/usuarios/index.js?v='.config('app.aplicacion.version')) }}"></script>
 @endsection
