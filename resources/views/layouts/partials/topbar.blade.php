@@ -339,12 +339,12 @@
                         <span class="d-flex align-items-center">
                             <div class="avatar-xs">
                                 <div class="avatar-title bg-soft-primary text-primary rounded-circle fs-14">
-                                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                                    {{ strtoupper(substr(Auth::user()->descripcion, 0, 1)) }}
                                 </div>
                             </div>
                             <span class="text-start ms-xl-2">
                                 <span class="d-none d-xl-inline-block ms-1 fw-medium user-name-text">{{ Auth::user()->name }}</span>
-                                <span class="d-none d-xl-block ms-1 fs-12 text-muted user-name-sub-text">{{ Auth::user()->role ? ucfirst(Auth::user()->role->nombre) : 'Usuario' }}</span>
+                                <span class="d-none d-xl-block ms-1 fs-12 text-muted user-name-sub-text">{{ Auth::user()->role ? ucfirst(Auth::user()->role->descripcion) : 'Usuario' }}</span>
                             </span>
                         </span>
                     </button>

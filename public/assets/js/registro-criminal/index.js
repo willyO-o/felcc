@@ -146,7 +146,7 @@
                                     </div>
                                     <div class="flex-grow-1 ms-md-3 mt-3 mt-md-0 d-md-flex align-items-center">
                                         <div class="ms-lg-3 my-3 my-lg-0">
-                                            <a href="pages-profile">
+                                            <a href="javascript:void(0);">
                                                 <h5 class="fs-16 mb-1">${item.nombres} ${item.apellidos}</h5>
                                                 <h6 class="text-muted mb-1">Genero: <strong>${item.genero || "-"}</strong></h6>
                                                 <h6 class="text-muted mb-1">C.I.: <strong>${item.ci || "-"}</strong></h6>
