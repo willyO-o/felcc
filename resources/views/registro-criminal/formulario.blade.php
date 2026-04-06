@@ -320,7 +320,7 @@
                             <div class="col-md-9">
                                 <input type="text" class="form-control txtMayuscula" id="especialidad"
                                     value="{{ $registroCriminal->especialidad ?? '' }}" placeholder="(opcional)"
-                                    name="especialidad" required>
+                                    name="especialidad" >
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
                         </div>
@@ -416,7 +416,7 @@
                                 for="caracteristicas_particulares">Características particulares</label>
                             <div class="col-md-9">
                                 <textarea name="caracteristicas_particulares" class="form-control txtMayuscula" id="caracteristicas_particulares"
-                                    rows="3" required>{{ $registroCriminal->caracteristicas_particulares ?? '' }}</textarea>
+                                    rows="3" >{{ $registroCriminal->caracteristicas_particulares ?? '' }}</textarea>
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
                         </div>
@@ -461,7 +461,7 @@
                         <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="hijos">Hijos</label>
                             <div class="col-md-9">
-                                <textarea name="hijos" class="form-control txtMayuscula" id="hijos" rows="3" required>{{ $registroCriminal->hijos ?? '' }}</textarea>
+                                <textarea name="hijos" class="form-control txtMayuscula" id="hijos" rows="3" >{{ $registroCriminal->hijos ?? '' }}</textarea>
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
                         </div>
@@ -503,14 +503,14 @@
                         <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="modus_operandi">Modus Operandi</label>
                             <div class="col-md-9">
-                                <textarea name="modus_operandi" class="form-control txtMayuscula" id="modus_operandi" rows="3" required>{{ $registroCriminal->modus_operandi ?? '' }}</textarea>
+                                <textarea name="modus_operandi" class="form-control txtMayuscula" id="modus_operandi" rows="3" >{{ $registroCriminal->modus_operandi ?? '' }}</textarea>
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
                         </div>
                         <div class="row mb-3">
                             <label class="form-label col-md-3 col-form-label" for="zonas_opera">Zonas que Operan</label>
                             <div class="col-md-9">
-                                <textarea name="zonas_opera" class="form-control txtMayuscula" id="zonas_opera" rows="3" required>{{ $registroCriminal->zonas_opera ?? '' }}</textarea>
+                                <textarea name="zonas_opera" class="form-control txtMayuscula" id="zonas_opera" rows="3" >{{ $registroCriminal->zonas_opera ?? '' }}</textarea>
                                 <div class="invalid-feedback">Este campo es obligatorio.</div>
                             </div>
                         </div>

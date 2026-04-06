@@ -199,6 +199,12 @@ class Mandamiento extends Model
                 case 'apellidos':
                     $query->where('persona.apellidos', 'like', "%$search%");
                     break;
+                case 'nombre_persona':
+                    $query->where('persona.nombres', 'like', "%$search%");
+                    break;
+                case 'nombre_completo':
+                    $query->whereRaw("CONCAT(COALESCE(persona.nombres, ''), ' ', COALESCE(persona.apellidos, '')) like ?", ["%$search%"]);
+                    break;
                 case 'encargado':
                     $query->where('mandamiento.asignado', 'like', "%$search%");
                     break;

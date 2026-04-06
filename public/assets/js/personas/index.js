@@ -320,7 +320,8 @@
             })
             .fail(function (err) {
                 console.error("Error:", err);
-                Swal.fire("Error", "No se pudo cargar el formulario", "error");
+
+                processError(err);
             });
     }
 

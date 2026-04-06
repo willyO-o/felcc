@@ -10,6 +10,7 @@ return [
             'telefonos_all',
             'importar_all',
             'consulta_all',
+            'registro-criminal_all',
         ],
         'administrador' => [
             'users_all',
@@ -19,6 +20,7 @@ return [
             'telefonos_all',
             'importar_all',
             'consulta_all',
+            'registro-criminal_all',
         ],
         'tecnico_felcc' => [
             'consulta_mandamientos',
@@ -31,10 +33,12 @@ return [
             'personas_crear',
             'personas_listar',
             'mandamientos_listar',
+            'mandamientos_crear',
             'vehiculos_listar',
             'vehiculos_crear',
             'telefonos_listar',
             'telefonos_crear',
+            'consulta_mandamientos',
         ],
         'consultor_felcc' => [
             'consulta_mandamientos',

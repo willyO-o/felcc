@@ -41,23 +41,34 @@
                     </a>
                 </li>
 
-                <!-- Mandamientos -->
-                <li class="nav-item">
-                    <a class="nav-link menu-link" href="{{ route('mandamientos.index') }}">
-                        <i class="mdi mdi-gavel"></i> <span>Mandamientos</span>
-                    </a>
-                </li>
-
-                <li class="menu-title"><span data-key="t-menu">Consultas</span></li>
+                @canany(['superadmin', 'administrador', 'tecnico_daci'])
+                    <!-- Mandamientos -->
                     <li class="nav-item">
-                        <a class="nav-link menu-link" href="{{ route('consultas.mandamientos') }}">
-                            <i class="mdi mdi-magnify"></i> <span>Consultar Mandamientos</span>
+                        <a class="nav-link menu-link" href="{{ route('mandamientos.index') }}">
+                            <i class="mdi mdi-gavel"></i> <span>Mandamientos</span>
                         </a>
                     </li>
-                @canany(['superadmin', 'administrador', 'tecnico_daci'])
+                @endcanany
+
+
+                @canany([ 'tecnico_felcc'])
+                    <!-- Mandamientos -->
                     <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('mandamientos.create') }}">
+                            <i class="mdi mdi-plus"></i> <span>Registrar Mandamiento</span>
+                        </a>
+                    </li>
+                @endcanany
+                <li class="menu-title"><span data-key="t-menu">Consultas</span></li>
+                <li class="nav-item">
+                    <a class="nav-link menu-link" href="{{ route('consultas.mandamientos') }}">
+                        <i class="mdi mdi-magnify"></i> <span>Consultar Mandamientos</span>
+                    </a>
+                </li>
+                @canany(['superadmin', 'administrador', 'tecnico_daci'])
+                    <li class="nav-item d-none">
                         <a class="nav-link menu-link" href="{{ route('consultas.mandamientos') }}">
-                            <i class="mdi mdi-magnify"></i> <span>Consultar Registro Criminal</span>
+                            <i class="mdi mdi-criminal"></i> <span>Consultar Registro Criminal</span>
                         </a>
                     </li>
                 @endcanany
@@ -66,7 +77,7 @@
                     <li class="menu-title"><span data-key="t-menu">EREBOR</span></li>
                     <li class="nav-item">
                         <a class="nav-link menu-link" href="{{ route('registro-criminal.index') }}">
-                            <i class="mdi mdi-gavel"></i> <span>Registro Criminal</span>
+                            <i class="mdi mdi-head"></i> <span>Registro Criminal</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -77,7 +88,7 @@
                 @endcanany
 
 
-                @canany(['superadmin', 'administrador', 'tecnico_daci'])
+                @canany(['superadmin', 'administrador', ])
                     <!-- Usuarios -->
                     <li class="menu-title"><span data-key="t-menu">Importar</span></li>
 

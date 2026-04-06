@@ -1,114 +1,53 @@
- <div class="modal-header">
-     <h5 class="modal-title" id="miModalLabel">Registrar Mandamiento</h5>
-     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
- </div>
- <form
-     action="{{ isset($mandamientos->id) ? route('mandamientos.update', $mandamientos->id) : route('mandamientos.store') }}"
-     method="POST" id="mandamientoForm">
-     @csrf
-     @if (isset($mandamientos->id))
-         @method('PUT')
-     @endif
+@extends('layouts.app')
 
 
+@section('page-title', 'Registrar Mandamiento')
 
-     <div class="modal-body">
-         <div class="row g-3">
-             <div class="col-md-6">
-                 <div>
-                     <label for="hoja_ruta" class="form-label">Hoja de Ruta</label>
-                     <input type="text" class="form-control" id="hoja_ruta"
-                         placeholder="Ingrese Nro. de  hoja de ruta" name="hoja_ruta"
-                         value="{{ old('hoja_ruta', $mandamientos->hoja_ruta ?? '') }}">
-                 </div>
-             </div><!--end col-->
-             <div class="col-md-6">
-                 <div>
-                     <label for="tipo_documento" class="form-label">Tipo Documento</label>
-                     <input type="text" class="form-control" id="tipo_documento" placeholder="Ingrese Tipo Documento"
-                         name="tipo_documento" value="{{ old('tipo_documento', $mandamientos->tipo_documento ?? '') }}">
-                 </div>
-             </div><!--end col-->
-             <div class="col-xxl-6">
-                 <div>
-                     <label for="id_persona" class="form-label">Nombre</label>
+@section('content')
+    <div class="row">
 
-                     <select name="id_persona" id="id_persona" class="form-select"></select>
+        <div class="col-10">
+            <div class="card">
+                <div class="card-header ">
+                    <h4 class="">Registrar Mandamiento</h4>
+                </div>
 
-                 </div>
-             </div><!--end col-->
+                <div class="card-body">
+
+                    @include('mandamientos.partials._form', ['estados' => $estados])
+
+                </div>
+            </div>
+        </div>
+    </div>
+@endsection
 
 
-             <div class="col-xxl-6">
-                 <div>
-                     <label for="id_juzgado" class="form-label">Juzgado</label>
-                     <select name="id_juzgado" id="id_juzgado" class="form-select"></select>
-                 </div>
-             </div><!--end col-->
+@section('css')
+    <link href="{{ url('/assets/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="/assets/libs/filepond/filepond.min.css" type="text/css" />
+    <link rel="stylesheet" href="/assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.css">
+    <link rel="stylesheet" href="{{ url('assets/css/select2-bootstrap-5-theme.min.css') }}" type="text/css" />
+@endsection
+@section('js')
 
-             <div class="col-xxl-6">
-                 <div>
-                     <label for="id_delito" class="form-label">Delito</label>
-                     <select name="id_delito" id="id_delito" class="form-select"></select>
-                 </div>
-             </div><!--end col-->
-             <div class="col-xxl-6">
-                 <label for="id_tipo_mandamiento" class="form-label">Tipo Mandamiento</label>
+    <script src="{{ url('/assets/js/select2.min.js') }}"></script>
 
-                 <div class="input-group">
+    <!-- Custom DataTable Script -->
 
-                     <select name="id_tipo_mandamiento" id="id_tipo_mandamiento" class="form-select">
-                         @foreach ($tipoMandamientos as $tipo)
-                             <option value="{{ $tipo->id }}"
-                                 {{ old('id_tipo_mandamiento', $mandamientos->id_tipo_mandamiento ?? '') == $tipo->id ? 'selected' : '' }}>
-                                 {{ $tipo->tipo_mandamiento }}
-                             </option>
-                         @endforeach
-                     </select>
-                     <span class="input-group-text btn btn-info"><i class="ri-add-line"></i> </span>
-                 </div>
-             </div><!--end col-->
+    <script src="{{ url('/assets/libs/filepond/filepond.min.js') }}"></script>
+    <script src="{{ url('/assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js') }}"></script>
+    <script src="{{ url('/assets/libs/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js') }}">
+    </script>
+    <script
+        src="{{ url('/assets/libs/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js') }}">
+    </script>
+    {{-- <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script> --}}
 
-             <div class="col-lg-12">
-                 <label for="estado" class="form-label">Estado</label>
-                 <div>
-                     <div class="form-check form-check-inline">
-                         <input class="form-check-input" type="radio" name="estado" id="inlineRadio2"
-                             value="PENDIENTE"
-                             {{ old('estado', $mandamientos->estado ?? 'PENDIENTE') == 'PENDIENTE' ? 'checked' : '' }}>
-                         <label class="form-check-label" for="inlineRadio2">PENDIENTE</label>
-                     </div>
-                     <div class="form-check form-check-inline">
-                         <input class="form-check-input" type="radio" name="estado" id="inlineRadio1"
-                             value="EJECUTADO"
-                             {{ old('estado', $mandamientos->estado ?? '') == 'EJECUTADO' ? 'checked' : '' }}>
-                         <label class="form-check-label" for="inlineRadio1">EJECUTADO</label>
-                     </div>
+    <script src="{{ url('assets/libs/filepond/filepond-plugin-file-validate-type.js') }}"></script>
+    <script src="{{ url('/assets/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js') }}"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/moment@2.29.4/locale/es.js"></script>
+    <script src="{{ url('/assets/js/mandamientos/formulario.js?v=' . config('app.aplicacion.version')) }}"></script>
 
-                     <div class="form-check form-check-inline">
-                         <input class="form-check-input" type="radio" name="estado" id="inlineRadio3"
-                             value="CANCELADO"
-                             {{ old('estado', $mandamientos->estado ?? '') == 'CANCELADO' ? 'checked' : '' }}>
-                         <label class="form-check-label" for="inlineRadio3">CANCELADO</label>
-                     </div>
-                 </div>
-             </div><!--end col-->
-             <div class="col-md-12">
-                 <div>
-                     <label for="asignado" class="form-label">Asignado</label>
-                     <input type="text" class="form-control" id="asignado" placeholder="Ingrese asignado"
-                         name="asignado" value="{{ old('asignado', $mandamientos->asignado ?? '') }}">
-                 </div>
-             </div><!--end col-->
-
-
-         </div><!--end row-->
-     </div>
-     <div class="modal-footer">
-         <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-         <button type="button" class="btn btn-primary" id="confirmSave">
-             <i class="ri-save-3-line align-middle me-1"></i>
-             Guardar
-         </button>
-     </div>
- </form>
+@endsection

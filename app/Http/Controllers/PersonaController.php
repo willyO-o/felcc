@@ -17,6 +17,11 @@ class PersonaController extends Controller
      */
     public function index(Request $request)
     {
+
+        if (!request()->user()->hasAnyPermission(['personas_all', 'personas_listar'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
         if ($request->ajax()) {
             $query = Persona::with('multimedia')
                 ->when($request->filled('genero'), function ($q) use ($request) {
@@ -79,6 +84,9 @@ class PersonaController extends Controller
      */
     public function create()
     {
+        if (!request()->user()->hasAnyPermission(['personas_all', 'personas_crear'])) {
+            abort(403, 'No tienes permiso para realizar esta acción.');
+        }
         $persona = new Persona();
         $paises = Pais::all();
         return view('personas.formulario', compact('persona', 'paises'));
@@ -89,6 +97,12 @@ class PersonaController extends Controller
      */
     public function store(Request $request)
     {
+
+        if (!request()->user()->hasAnyPermission(['personas_all', 'personas_crear'])) {
+            abort(403, 'No tienes permiso para realizar esta acción.');
+        }
+
+
         $reglas = [
             'nombres' => 'required|string|max:255',
             'apellidos' => 'nullable|string|max:255',

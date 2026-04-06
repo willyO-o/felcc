@@ -5,7 +5,8 @@
 @section('content')
 
     <div class="row">
-        <p class="mb-1">Para realizar una búsqueda, seleccione un filtro y escriba al menos 4 caracteres en el campo de búsqueda, luego haga clic en el botón de búsqueda.</p>
+        <p class="mb-1">Para realizar una búsqueda, seleccione un filtro y escriba al menos 4 caracteres en el campo de
+            búsqueda, luego haga clic en el botón de búsqueda.</p>
     </div>
     <div class="row">
         <div class="col-lg-12">
@@ -15,11 +16,12 @@
                     <div class="d-flex flex-column-reverse flex-md-row justify-content-between align-items-center gap-2">
                         <div class="col-md-4 mt-2 mt-md-0 ">
                             <div class="input-group">
-                                <span class="input-group-text btn btn-primary" id="btnBuscar"><i class="ri-search-line"></i>
-                                    Buscar</span>
+
 
                                 <input type="search" id="searchMandamientos" class="form-control "
                                     placeholder="Buscar mandamiento...">
+                                <span class="input-group-text btn btn-primary" id="btnBuscar"><i class="ri-search-line"></i>
+                                    Buscar</span>
                             </div>
 
                         </div>
@@ -27,6 +29,7 @@
                             <select name="tipo_filtro" id="tipo_filtro" class="form-select">
                                 <option value="">Filtrar por</option>
                                 <option value="hoja_ruta">Hoja de Ruta</option>
+                                <option value="nombre_completo">Nombre completo</option>
                                 <option value="nombre_persona">Nombre</option>
                                 <option value="apellidos">Apellidos</option>
                                 <option value="ci">C.I.</option>
@@ -213,34 +216,15 @@
 
 @section('js')
     <!-- DataTables JS -->
-    <script src="{{ url('/assets/libs/datatables/dataTables.js') }}"></script>
-    <script src="{{ url('/assets/libs/datatables/dataTables.bootstrap5.js') }}"></script>
-    <script src="{{ url('/assets/libs/datatables/dataTables.responsive.js') }}"></script>
-    <script src="{{ url('/assets/libs/datatables/responsive.bootstrap5.js') }}"></script>
-    <script src="{{ url('/assets/libs/datatables/dataTables.buttons.js') }}"></script>
-    <script src="{{ url('/assets/libs/datatables/buttons.bootstrap5.js') }}"></script>
-    <script src="{{ url('/assets/libs/datatables/buttons.html5.js') }}"></script>
-    <script src="{{ url('/assets/libs/datatables/buttons.print.js') }}"></script>
     <script src="{{ url('/assets/js/select2.min.js') }}"></script>
 
     <!-- Custom DataTable Script -->
 
-    <script src="{{ url('/assets/libs/filepond/filepond.min.js') }}"></script>
-    <script src="{{ url('/assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js') }}"></script>
-    <script src="{{ url('/assets/libs/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js') }}">
-    </script>
-    <script
-        src="{{ url('/assets/libs/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js') }}">
-    </script>
-    {{-- <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script> --}}
-
-    <script src="{{ url('assets/libs/filepond/filepond-plugin-file-validate-type.js') }}"></script>
-    <script src="{{ url('/assets/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js') }}"></script>
     <script src="{{ url('assets/libs/ligthbox/index.js') }}"></script>
-    {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/fslightbox/3.4.0-2/index.js"
-        integrity="sha512-Vdge+4gAuFr0U/JCfFdR24aOl9R0c/3pCYgi5bt/nU+Hl6REetTWmOr6FYjOW/7JdyQt27U8x7XJcE+IS8vKMA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script> --}}
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"
+        integrity="sha512-a+SUDuwNzXDvz4XrIcXHuCf089/iJAoN4lmrXJg18XnduKK6YlDHNRalv4yd1N40OKI80tFidF+rqTFKGPoWFQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <!-- DateRangePicker Scripts -->
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/moment@2.29.4/locale/es.js"></script>

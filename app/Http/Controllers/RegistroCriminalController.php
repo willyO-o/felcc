@@ -21,6 +21,10 @@ class RegistroCriminalController extends Controller
     public function index(Request $request)
     {
 
+        if (!request()->user()->hasAnyPermission(['registro-criminal_all', 'registro-criminal_listar'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
         if ($request->ajax()) {
             $registros = RegistroCriminal::getRegistros($request->all())
                 ->paginate($request->get('size', 10), ['*'], 'page', $request->get('page', 1));
@@ -40,7 +44,12 @@ class RegistroCriminalController extends Controller
      */
     public function create()
     {
-        $this->authorize('acceso-total');
+        // $this->authorize('acceso-total');
+
+        if (!request()->user()->hasAnyPermission(['registro-criminal_all', 'registro-criminal_crear'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
         $registroCriminal = new RegistroCriminal();
         return view('registro-criminal.formulario', compact('registroCriminal'));
     }
@@ -51,6 +60,9 @@ class RegistroCriminalController extends Controller
     public function store(GuardarRegistroCriminalRequest $request)
     {
         // return $request->file('foto_frente');
+        if (!request()->user()->hasAnyPermission(['registro-criminal_all', 'registro-criminal_crear'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
 
         try {
             DB::beginTransaction();
@@ -127,6 +139,10 @@ class RegistroCriminalController extends Controller
      */
     public function edit(string $id)
     {
+        if (!request()->user()->hasAnyPermission(['registro-criminal_all', 'registro-criminal_editar'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
         $registroCriminal = RegistroCriminal::findOrFail($id);
 
 
@@ -138,6 +154,10 @@ class RegistroCriminalController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        if (!request()->user()->hasAnyPermission(['registro-criminal_all', 'registro-criminal_editar'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
         try {
             DB::beginTransaction();
 

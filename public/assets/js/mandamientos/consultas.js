@@ -14,6 +14,11 @@
 
     }
 
+    let criteriosConsulta = {
+        'tipo_filtro': '',
+        'search': '',
+    };
+
 
     $(document).on('click', '.image-popup-zoom', function (e) {
         e.preventDefault();
@@ -217,13 +222,23 @@
         return html;
     }
 
-    let timerSearch;
 
     $("#btnBuscar").on('click', function (e) {
         e.preventDefault();
         if ($("#tipo_filtro").val().trim() == '' || $("#searchMandamientos").val().trim().length < 4) return;
 
+        if (criteriosConsulta.tipo_filtro != $("#tipo_filtro").val() || criteriosConsulta.search !== $("#searchMandamientos").val()) {
+            criteriosConsulta.tipo_filtro = $("#tipo_filtro").val();
+            criteriosConsulta.search = $("#searchMandamientos").val();
+            dataScroll.identificador = crypto.randomUUID();
+
+            dataScroll.nuevo_filtro = 1;
+
+        }
+
+
         scrollPersonal.resetScrollPagination(getDataFilter());
+        dataScroll.nuevo_filtro = 0;
 
     });
 
@@ -496,7 +511,7 @@
             $("#modalDetalles").modal('show');
             $("#modalDetalles .modal-body").html('<div class="text-center"><span class="loaderHttp"></span><span class="text-muted">Cargando detalles...</span></div>');
 
-            $.get(`/mandamientos/${id}`)
+            $.get(`/mandamientos/${id}?identificador=${dataScroll.identificador}`)
                 .done(function (response) {
                     $("#modalDetalles .modal-body").html(response);
                 })

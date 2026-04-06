@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Mandamiento;
 use App\Models\Multimedia;
 use App\Models\TipoMandamiento;
+use App\Models\AuditarConsultas;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
@@ -47,9 +48,8 @@ class MandamientoController extends Controller
         if (!request()->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_crear'])) {
             abort(403, 'No tienes permiso para acceder a esta sección.');
         }
-        $mandamientos = new Mandamiento();
-        $tipoMandamientos = TipoMandamiento::all();
-        return view('mandamientos.formulario', compact('mandamientos', 'tipoMandamientos'));
+        $estados = Mandamiento::select('estado')->groupBy('estado')->get()->pluck('estado');
+        return view('mandamientos.formulario', compact('estados'));
     }
 
     /**
@@ -131,6 +131,10 @@ class MandamientoController extends Controller
     {
         if (!request()->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_listar', 'consulta_mandamientos'])) {
             abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
+        if (in_array(request()->user()->role->nombre, ['tecnico_daci', 'tecnico_felcc', 'consultor_daci', 'consultor_felcc'])) {
+            AuditarConsultas::agregarIdsAccedidos(request()->get('identificador'), $id, 'mandamiento');
         }
         $mandamiento = Mandamiento::getMandamientos([], $id)->first();
 
@@ -271,15 +275,25 @@ class MandamientoController extends Controller
             abort(403, 'No tienes permiso para acceder a esta sección.');
         }
 
-        if($request->ajax()) {
+        if ($request->ajax()) {
 
-            if(empty($request->input('tipo_filtro')) || strlen($request->input('search')) < 4) {
+            if (empty($request->input('tipo_filtro')) || strlen($request->input('search')) < 4) {
                 return response()->json(['datos' => []]);
             }
 
 
             $mandamientos = Mandamiento::getMandamientos($request->all())
                 ->paginate($request->get('size', 10), ['*'], 'page', $request->get('page', 1));
+
+            $user = auth()->user();
+            if (in_array($user->role->nombre, ['tecnico_daci', 'tecnico_felcc', 'consultor_daci', 'consultor_felcc'])) {
+                if ($request->get('nuevo_filtro', false)) {
+                    $request->merge([
+                        'cantidad_resultados' => $mandamientos->total(),
+                    ]);
+                    AuditarConsultas::registrar($user, 'consulta_mandamientos', $request);
+                }
+            }
 
             return response()->json([
                 'datos' => $mandamientos->items(),
@@ -290,6 +304,5 @@ class MandamientoController extends Controller
 
 
         return view('mandamientos.consultas');
-
     }
 }
