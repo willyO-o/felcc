@@ -66,6 +66,11 @@ class Persona extends Model
         return $this->hasMany(RegistroCriminal::class, 'id_persona');
     }
 
+    public function telefonos()
+    {
+        return $this->hasMany(Telefono::class, 'persona_id');
+    }
+
     public function pais()
     {
         return $this->belongsTo(Pais::class, 'id_pais');

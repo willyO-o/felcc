@@ -85,6 +85,11 @@
                             <i class="mdi mdi-account-outline"></i> <span>Personas</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('telefonos.index') }}">
+                            <i class="mdi mdi-phone"></i> <span>Teléfonos</span>
+                        </a>
+                    </li>
                 @endcanany
 
 

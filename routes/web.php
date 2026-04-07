@@ -48,6 +48,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::resource('delitos', App\Http\Controllers\DelitoController::class);
     Route::resource('paises', App\Http\Controllers\PaisController::class);
     Route::resource('divisiones', App\Http\Controllers\DivisionController::class);
+    Route::resource('telefonos', App\Http\Controllers\TelefonoController::class);
     Route::get('/personas-search', [PersonaController::class, 'search'])->name('personas.search');
 
 

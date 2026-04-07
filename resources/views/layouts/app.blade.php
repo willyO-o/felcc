@@ -18,7 +18,7 @@
 
     {{-- @vite('resources/css/app.css') --}}
 
-    <link rel="stylesheet" href="{{url('assets/css/app-B_c9eOtX.css')}}">
+    {{-- <link rel="stylesheet" href="{{url('assets/css/app-B_c9eOtX.css')}}"> --}}
 
     <script>
         window.role = '{{ auth()->check() ? auth()->user()->role->nombre : 'guest' }}';
