@@ -34,7 +34,7 @@
                                     placeholder="Buscar (Placa, descripción, responsable)...">
                             </div>
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-auto">
                             <select name="filtros" id="filtros" class="form-select">
                                 <option value="">Filtrar Por</option>
                                 <option value="placa">Placa</option>
