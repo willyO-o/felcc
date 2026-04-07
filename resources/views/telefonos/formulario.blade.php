@@ -91,18 +91,18 @@
                     <div class="input-group mb-2">
                         <input type="text" class="form-control txtNumero" id="nuevoIMEI"
                             placeholder="Ingresa el IMEI">
-                        <button class="btn btn-outline-primary" type="button" id="btnAgregarIMEI">
+                        <button class="btn btn-outline-secondary" type="button" id="btnAgregarIMEI">
                             <i class="ri-add-line align-middle"></i> Agregar
                         </button>
                     </div>
                     <div id="listaIMEIs" class="d-flex flex-wrap gap-2">
                         @if ($telefono->imeis_asociados && is_array($telefono->imeis_asociados))
                             @foreach ($telefono->imeis_asociados as $imei)
-                                <span class="badge badge-outline-primary d-flex align-items-center gap-2"
+                                <span class="badge badge-outline-secondary d-flex align-items-center gap-2"
                                     data-imei="{{ $imei }}">
                                     {{ $imei }}
                                     <button type="button" value="{{ $imei }}"
-                                        class="btn-remove-imei btn btn-primary py-0 px-1 border-0 text-white cursor-pointer"
+                                        class="btn-remove-imei btn btn-secondary py-0 px-1 border-0 text-white cursor-pointer"
                                         title="Eliminar">
                                         <i class="ri-close-line"></i>
                                     </button>

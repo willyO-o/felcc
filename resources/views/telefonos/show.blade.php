@@ -68,7 +68,7 @@
                     <h6 class="text-muted">IMEI Asociados</h6>
                     <div>
                         @foreach ($datos->imeis_asociados as $imei)
-                            <span class="badge bg-info me-2">{{ $imei }}</span>
+                            <span class="badge badge-outline-secondary me-2">{{ $imei }}</span>
                         @endforeach
                     </div>
                 </div>
@@ -103,13 +103,13 @@
         <div class="col-12 mt-3 pt-3 border-top">
             <small class="text-muted">
                 <i class="ri-calendar-line"></i>
-                Registrado: {{ \Carbon\Carbon::parse($datos->created_at)->format('d/m/Y H:i') }}
+                Registrado: {{ $datos->created_at?->format('d/m/Y H:i') }}
             </small>
             @if ($datos->updated_at)
                 <br>
                 <small class="text-muted">
                     <i class="ri-refresh-line"></i>
-                    Último cambio: {{ \Carbon\Carbon::parse($datos->updated_at)->format('d/m/Y H:i') }}
+                    Último cambio: {{ $datos->updated_at?->format('d/m/Y H:i') }}
                 </small>
             @endif
         </div>
@@ -117,11 +117,7 @@
 </div>
 
 <div class="modal-footer">
-    @if (auth()->user()->hasAnyPermission(['telefonos_all', 'telefonos_editar']))
-        <button type="button" class="btn btn-warning" onclick="editarTelefono({{ $datos->id }})">
-            <i class="ri-pencil-line align-middle me-1"></i> Editar
-        </button>
-    @endif
+
     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
         <i class="ri-close-line align-middle me-1"></i> Cerrar
     </button>

@@ -22,16 +22,22 @@ class TelefonoController extends Controller
             $query = Telefono::with('persona')
                 ->orderBy('id', 'desc');
 
-            if ($request->filled('search')) {
+            if ($request->filled('search') && !$request->filled('filtro')) {
                 $search = $request->search;
                 $search = str_replace('%', ' ', $search);
                 $query->where(function ($q) use ($search) {
                     $q->whereRaw('numero_celular LIKE ?', ["%{$search}%"])
-                        ->orWhereRaw('empresa LIKE ?', ["%{$search}%"])
                         ->orWhereRaw('caso LIKE ?', ["%{$search}%"])
-                        ->orWhereRaw('persona_caso LIKE ?', ["%{$search}%"]);
+                        ->orWhereRaw('persona_caso LIKE ?', ["%{$search}%"])
+                        ->orWhereHas('persona', function ($q2) use ($search) {
+                            $q2->whereRaw('ci LIKE ?', ["%{$search}%"])
+                                ->orWhereRaw('CONCAT(COALESCE(nombres, ""), " ", COALESCE(apellidos, "")) LIKE ?', ["%{$search}%"]);
+                        });
+
                 });
             }
+
+
 
             if ($request->filled('filtro') && $request->filled('search')) {
                 $search = $request->search;
@@ -40,15 +46,28 @@ class TelefonoController extends Controller
                     case 'numero':
                         $query->whereRaw('numero_celular LIKE ?', ["%{$search}%"]);
                         break;
-                    case 'empresa':
-                        $query->whereRaw('empresa LIKE ?', ["%{$search}%"]);
+                    case 'imei':
+                        $query->whereJSONContains('imeis_asociados', $search);
                         break;
-                    case 'caso':
-                        $query->whereRaw('caso LIKE ?', ["%{$search}%"]);
+                    case 'ci_persona':
+                        $query->whereRaw('ci LIKE ?', ["%{$search}%"]);
                         break;
-                    case 'persona_caso':
-                        $query->whereRaw('persona_caso LIKE ?', ["%{$search}%"]);
+                    case 'nombre_persona':
+                        $query->whereRaw('CONCAT(COALESCE(nombres, ""), " ", COALESCE(apellidos, "")) LIKE ?', ["%{$search}%"]);
                         break;
+                    case 'callap':
+                        $query->whereRaw('callapp LIKE ?', ["%{$search}%"]);
+                        break;
+                    case 'truecall':
+                        $query->whereRaw('truecall LIKE ?', ["%{$search}%"]);
+                        break;
+                    case 'uninet':
+                        $query->whereRaw('uninet LIKE ?', ["%{$search}%"]);
+                        break;
+                    case 'respuesta_requerimiento':
+                        $query->whereRaw('respuesta_requerimiento LIKE ?', ["%{$search}%"]);
+                        break;
+
                 }
             }
 
@@ -233,6 +252,70 @@ class TelefonoController extends Controller
             DB::rollBack();
             return response()->json([
                 'error' => 'Error al eliminar el teléfono: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Vincular una persona a un teléfono
+     */
+    public function vincularPersona(Request $request, string $id)
+    {
+        $request->validate([
+            'persona_id' => 'required|exists:persona,id'
+        ]);
+
+        try {
+            $telefono = Telefono::findOrFail($id);
+            $telefono->update(['persona_id' => $request->persona_id]);
+
+            return response()->json([
+                'success' => 'Persona vinculada correctamente.',
+                'datos' => $telefono->load('persona'),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al vincular persona: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Agregar un IMEI a un teléfono
+     */
+    public function agregarIMEI(Request $request, string $id)
+    {
+        $request->validate([
+            'imei' => 'required|string|min:10|max:50'
+        ]);
+
+        try {
+            $telefono = Telefono::findOrFail($id);
+            $imeis = $telefono->imeis_asociados ?? [];
+
+            if (!is_array($imeis)) {
+                $imeis = [];
+            }
+
+            $nuevoIMEI = trim($request->imei);
+
+            // Validar que no exista duplicado
+            if (in_array($nuevoIMEI, $imeis)) {
+                return response()->json([
+                    'error' => 'Este IMEI ya existe en el teléfono',
+                ], 400);
+            }
+
+            $imeis[] = $nuevoIMEI;
+            $telefono->update(['imeis_asociados' => $imeis]);
+
+            return response()->json([
+                'success' => 'IMEI agregado correctamente.',
+                'datos' => $telefono,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Error al agregar IMEI: ' . $e->getMessage(),
             ], 500);
         }
     }

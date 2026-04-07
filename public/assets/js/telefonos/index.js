@@ -82,10 +82,8 @@
         let html = "";
         telefonos.forEach((telefono, index) => {
             const numero = telefono.numero_celular || "—";
-            const personaCaso = telefono.persona_caso || "—";
-            const empresa = telefono.empresa || "—";
             const caso = telefono.caso || "—";
-            const respuesta = telefono.respuesta_requerimiento || "—";
+            const persona_caso = telefono.persona_caso || "—";
             const fecha = telefono.created_at
                 ? new Date(telefono.created_at).toLocaleDateString("es-BO", {
                     year: "numeric",
@@ -94,6 +92,26 @@
                 })
                 : "—";
 
+            // Procesar IMEIs
+            let imeis = [];
+            if (typeof telefono.imeis_asociados === 'string' && telefono.imeis_asociados) {
+                imeis = telefono.imeis_asociados.split(',').map(i => i.trim()).filter(i => i);
+            } else if (Array.isArray(telefono.imeis_asociados)) {
+                imeis = telefono.imeis_asociados;
+            }
+
+            const imeisHtml = imeis.length > 0
+                ? `<div class="d-flex flex-wrap gap-1">${imeis.map(imei => `<span class="badge badge-outline-secondary">${escapeHtml(imei)}</span>`).join('')}</div>`
+                : '<small class="text-muted">Sin IMEIs</small>';
+
+            // Procesar persona
+            const tienePersona = telefono.persona_id && telefono.persona;
+            const ci = tienePersona ? (telefono.persona.ci || "—") : "";
+            const nombrePersona = tienePersona
+                ? escapeHtml(telefono.persona.nombres + ' ' + telefono.persona.apellidos)
+                : "No vinculado";
+            const clasesPersona = tienePersona ? "" : "text-danger";
+
             html += /*html */`
                 <tr>
                     <td>${(currentPage - 1) * pageSize + index + 1}</td>
@@ -101,29 +119,44 @@
                         <span class="fw-bold">${escapeHtml(numero)}</span>
                         ${telefono.empresa ? `<br><small class="text-muted">${escapeHtml(telefono.empresa)}</small>` : ''}
                     </td>
-                    <td>${escapeHtml(personaCaso)}</td>
-                    <td>${escapeHtml(empresa)}</td>
+                    <td>
+                        <div class=" gap-2">
+                            <div>
+                                <div class="fw-bold">${escapeHtml(ci)}</div>
+                                <small class="${clasesPersona}">${nombrePersona}</small>
+                            </div>
+                            ${!tienePersona ? `<button class="btn btn-sm btn-soft-secondary btn-vincular-persona" value="${telefono.id}" title="Vincular persona"><i class="ri-user-add-line align-bottom"></i></button>` : ''}
+                        </div>
+                    </td>
                     <td>${escapeHtml(caso)}</td>
                     <td>
-                        ${respuesta !== "—" ? `<span class="badge bg-info">${escapeHtml(respuesta)}</span>` : '—'}
+                        ${persona_caso !== "—" ? `<span class="">${escapeHtml(persona_caso)}</span>` : '—'}
+                    </td>
+                    <td>
+                        <div class=" gap-2">
+                            <div>${imeisHtml}</div>
+                            <button class="btn btn-sm btn-outline-secondary  p-1 py-0 btn-agregar-imei" value="${telefono.id}" title="Agregar IMEI">
+                                <i class="ri-add-line align-bottom"></i>
+                            </button>
+                        </div>
                     </td>
                     <td>${fecha}</td>
                     <td class="text-center">
-                        <div class="d-flex gap-2 justify-content-center">
-                            <button class="btn btn-sm btn-soft-info btn-ver" value="${telefono.id}"
+                        <div class="d-flex gap-2 justify-content-center flex-wrap">
+                            <button class="btn btn-sm btn-soft-secondary btn-ver" value="${telefono.id}"
                                 title="Ver detalles">
                                 <i class="ri-eye-fill align-bottom"></i>
                             </button>
 
                             ${['superadmin', 'administrador'].includes(window.role) ?
                     /*html*/`
-                            <button class="btn btn-sm btn-soft-warning btn-editar" value="${telefono.id}" title="Editar">
+                            <button class="btn btn-sm btn-soft-secondary btn-editar" value="${telefono.id}" title="Editar">
                                 <i class="ri-pencil-fill align-bottom"></i>
                             </button>
-                            <button class="btn btn-sm btn-soft-danger btn-eliminar" value="${telefono.id}" title="Eliminar">
+                            <button class="btn btn-sm btn-soft-secondary btn-eliminar" value="${telefono.id}" title="Eliminar">
                                 <i class="ri-delete-bin-fill align-bottom"></i>
                             </button>` : ""
-                }
+                            }
                         </div>
                     </td>
                 </tr>
@@ -251,6 +284,160 @@
     };
 
     /**
+     * Abrir modal para vincular persona
+     */
+    function abrirModalVincularPersona(telefonoId) {
+        const $modal = $("#modalVincularPersona");
+        const $select = $("#personaVincular");
+
+        // Limpiar y destroyear select2 anterior
+        if ($select.data('select2')) {
+            $select.select2('destroy');
+        }
+
+        $select.val(null).html('<option value="">Seleccionar persona...</option>');
+
+        // Inicializar Select2
+        $select.select2({
+            placeholder: "Buscar persona (3+ caracteres)",
+            allowClear: true,
+            minimumInputLength: 3,
+            ajax: {
+                url: "/personas-search",
+                type: "GET",
+                dataType: "json",
+                delay: 300,
+                data: function (params) {
+                    return { q: params.term };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(function (persona) {
+                            return {
+                                id: persona.id,
+                                text: persona.nombres + ' ' + persona.apellidos +
+                                      (persona.ci ? ' (' + persona.ci + ')' : '')
+                            };
+                        })
+                    };
+                },
+                cache: true
+            },
+            dropdownParent: $modal,
+            width: "100%",
+            theme: "bootstrap-5",
+            language: {
+                inputTooShort: () => "Escribe al menos 3 caracteres",
+                noResults: () => "No se encontraron personas",
+                searching: () => "Buscando..."
+            }
+        });
+
+        $("#btnVincularPersona").data("telef-id", telefonoId);
+        $modal.modal("show");
+    }
+
+    /**
+     * Vincular persona al teléfono
+     */
+    $(document).on("click", "#btnVincularPersona", function () {
+        const telefonoId = $(this).data("telef-id");
+        const personaId = $("#personaVincular").val();
+
+        if (!personaId) {
+            notification("Selecciona una persona", "Validación", 2000, "warning", "top");
+            return;
+        }
+
+        const $btn = $(this);
+        $btn.prop("disabled", true);
+        $btn.html('<i class="ri-loader-4-line align-middle me-1"></i> Vinculando...');
+
+        $.ajax({
+            url: `/telefonos/${telefonoId}/vincular-persona`,
+            type: "POST",
+            dataType: "json",
+            data: { persona_id: personaId },
+            headers: {
+                "X-CSRF-TOKEN": csrfToken,
+                "X-Requested-With": "XMLHttpRequest",
+                "Accept": "application/json",
+            }
+        })
+            .done(function (data) {
+                $btn.prop("disabled", false);
+                $btn.html('<i class="ri-user-add-line align-middle me-1"></i> Vincular');
+
+                notification(data.success, "Éxito", 2000, "success", "top");
+                cargarTelefonos(currentPage);
+                bootstrap.Modal.getInstance(document.getElementById("modalVincularPersona")).hide();
+            })
+            .fail(function (xhr) {
+                $btn.prop("disabled", false);
+                $btn.html('<i class="ri-user-add-line align-middle me-1"></i> Vincular');
+                processError(xhr);
+            });
+    });
+
+    /**
+     * Abrir modal para agregar IMEI
+     */
+    function abrirModalAgregarIMEI(telefonoId) {
+        $("#nuevoIMEIForm").val("");
+        $("#btnAgregarIMEIForm").data("telef-id", telefonoId);
+        $("#modalAgregarIMEI").modal("show");
+        $("#nuevoIMEIForm").focus();
+    }
+
+    /**
+     * Agregar IMEI al teléfono
+     */
+    $(document).on("click", "#btnAgregarIMEIForm", function () {
+        const telefonoId = $(this).data("telef-id");
+        const nuevoIMEI = $("#nuevoIMEIForm").val().trim();
+
+        if (!nuevoIMEI) {
+            notification("Ingresa un IMEI válido", "Validación", 2000, "warning", "top");
+            return;
+        }
+
+        const $btn = $(this);
+        $btn.prop("disabled", true);
+        $btn.html('<i class="ri-loader-4-line align-middle me-1"></i> Agregando...');
+
+        $.ajax({
+            url: `/telefonos/${telefonoId}/agregar-imei`,
+            type: "POST",
+            dataType: "json",
+            data: { imei: nuevoIMEI },
+            headers: {
+                "X-CSRF-TOKEN": csrfToken,
+                "X-Requested-With": "XMLHttpRequest",
+                "Accept": "application/json",
+            }
+        })
+            .done(function (data) {
+                $btn.prop("disabled", false);
+                $btn.html('<i class="ri-add-circle-line align-middle me-1"></i> Agregar IMEI');
+
+                notification(data.success, "Éxito", 2000, "success", "top");
+                cargarTelefonos(currentPage);
+                bootstrap.Modal.getInstance(document.getElementById("modalAgregarIMEI")).hide();
+            })
+            .fail(function (xhr) {
+                $btn.prop("disabled", false);
+                $btn.html('<i class="ri-add-circle-line align-middle me-1"></i> Agregar IMEI');
+
+                const body = xhr.responseJSON;
+                if (xhr.status === 400 && body.error) {
+                    notification(body.error, "Error", 2000, "warning", "top");
+                } else {
+                    processError(xhr);
+                }
+            });
+    });
+
+    /**
      * Bindear eventos del formulario
      */
     function bindFormulario() {
@@ -366,9 +553,9 @@
         }
 
         const badge = `
-            <span class="badge badge-outline-primary d-flex align-items-center gap-2" data-imei="${escapeHtml(nuevoIMEI)}">
+            <span class="badge badge-outline-secondary d-flex align-items-center gap-2" data-imei="${escapeHtml(nuevoIMEI)}">
                 ${escapeHtml(nuevoIMEI)}
-                <button type="button" value="${escapeHtml(nuevoIMEI)}" class="btn-remove-imei btn btn-primary py-0 px-1 border-0 text-white cursor-pointer" title="Eliminar">
+                <button type="button" value="${escapeHtml(nuevoIMEI)}" class="btn-remove-imei btn btn-secondary py-0 px-1 border-0 text-white cursor-pointer" title="Eliminar">
                     <i class="ri-close-line"></i>
                 </button>
             </span>
@@ -518,6 +705,20 @@
      */
     $(document).on("click", ".btn-editar", function () {
         editarTelefono($(this).val());
+    });
+
+    /**
+     * Vincular persona (click en botón vincular-persona)
+     */
+    $(document).on("click", ".btn-vincular-persona", function () {
+        abrirModalVincularPersona($(this).val());
+    });
+
+    /**
+     * Agregar IMEI (click en botón agregar-imei)
+     */
+    $(document).on("click", ".btn-agregar-imei", function () {
+        abrirModalAgregarIMEI($(this).val());
     });
 
     /**
