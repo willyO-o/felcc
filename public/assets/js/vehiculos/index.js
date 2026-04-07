@@ -99,16 +99,11 @@
                 personasHtml = vehiculo.personas.map(persona => {
                     const pivot = persona.pivot;
                     return `
-                        <div class="d-flex align-items-center justify-content-between gap-2 mb-2">
-                            <div>
-                                <div class="fw-bold">${escapeHtml(persona.ci || "—")}</div>
-                                <small>${escapeHtml(persona.nombres + ' ' + persona.apellidos)}</small><br>
-                                <small><span class="badge bg-secondary">${escapeHtml(pivot.tipo)}</span></small>
-                                ${pivot.caso ? `<small><span class="badge bg-info">${escapeHtml(pivot.caso)}</span></small>` : ''}
-                            </div>
-                            <button class="btn btn-sm btn-soft-danger btn-desvincular-persona" data-Vehicle-id="${vehiculo.id}" data-case-id="${pivot.id}" title="Desvincular">
-                                <i class="ri-close-line align-bottom"></i>
-                            </button>
+                        <div class="mb-2">
+                            <div class="fw-bold">${escapeHtml(persona.ci || "—")}</div>
+                            <small>${escapeHtml(persona.nombres + ' ' + persona.apellidos)}</small><br>
+                            <small><span class="badge badge-outline-secondary">${escapeHtml(pivot.tipo)}</span></small>
+                            ${pivot.caso ? `<small><span class="badge badge-outline-info">${escapeHtml(pivot.caso)}</span></small>` : ''}
                         </div>
                     `;
                 }).join('');
@@ -127,9 +122,6 @@
                         <div style="max-height: 150px; overflow-y: auto;">
                             ${personasHtml}
                         </div>
-                        <button class="btn btn-sm btn-soft-primary btn-vincular-persona mt-2" value="${vehiculo.id}" title="Vincular persona">
-                            <i class="ri-user-add-line align-bottom"></i> Vincular
-                        </button>
                     </td>
                     <td>${escapeHtml(responsable)}</td>
                     <td>${escapeHtml(casoRelacionado)}</td>
@@ -253,19 +245,115 @@
     };
 
     /**
-     * Abrir modal para vincular persona
+     * Agregar persona a la lista
      */
-    function abrirModalVincularPersona(vehiculoId) {
-        const $modal = $("#modalVincularPersona");
-        const $select = $("#personaVincular");
+    function agregarPersonaFormulario() {
+        const personaId = $("#personaBuscar").val();
+        const tipo = $("#tipoPersona").val();
+        const caso = $("#casoPersona").val().trim();
 
-        if ($select.data('select2')) {
-            $select.select2('destroy');
+        if (!personaId) {
+            notification("Selecciona una persona", "Validación", 2000, "warning", "top");
+            return;
         }
 
-        $select.val(null).html('<option value="">Seleccionar persona...</option>');
+        if (!tipo) {
+            notification("Selecciona un tipo", "Validación", 2000, "warning", "top");
+            return;
+        }
 
-        $select.select2({
+        // Evitar duplicados
+        const $listaPersonas = $("#listaPersonasVehiculo");
+        const existe = $listaPersonas.find(`[data-persona-id="${personaId}"][data-tipo="${tipo}"]`).length > 0;
+
+        if (existe) {
+            notification("Esta persona ya está agregada con este tipo", "Validación", 2000, "warning", "top");
+            return;
+        }
+
+        // Obtener nombre de la persona desde Select2
+        const $select = $("#personaBuscar");
+        const personaNombre = $select.find('option:selected').text() || "Persona";
+
+        const card = `
+            <div class="card mb-2" data-persona-id="${personaId}" data-tipo="${tipo}" data-caso="${caso}">
+                <div class="card-body p-2 d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="fw-bold d-block">${escapeHtml(personaNombre)}</small>
+                        <small class="badge badge-outline-secondary">${escapeHtml(tipo)}</small>
+                        ${caso ? `<small class="badge badge-outline-info">Caso: ${escapeHtml(caso)}</small>` : ''}
+                    </div>
+                    <button type="button" class="btn btn-sm btn-soft-danger btn-remove-persona" title="Eliminar">
+                        <i class="ri-close-line align-bottom"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        $listaPersonas.append(card);
+        $("#personaBuscar").val(null).trigger('change');
+        $("#tipoPersona").val("");
+        $("#casoPersona").val("");
+        actualizarCampoPersonas();
+    }
+
+    /**
+     * Actualizar campo oculto con todas las personas
+     */
+    function actualizarCampoPersonas() {
+        const personas = [];
+        $("#listaPersonasVehiculo [data-persona-id]").each(function () {
+            const casoVal = $(this).data("caso");
+            personas.push({
+                persona_id: $(this).data("persona-id"),
+                tipo: $(this).data("tipo"),
+                caso: casoVal && casoVal.trim() ? casoVal : null
+            });
+        });
+        $("#personas_asociadas").val(JSON.stringify(personas));
+    }
+
+
+    /**
+     * Bindear eventos del formulario
+     */
+    function bindFormulario() {
+        const $form = $("#vehiculoForm");
+        const $btnGuardar = $("#btnGuardarVehiculo");
+
+        if ($form.length === 0 || $btnGuardar.length === 0) return;
+
+        inicializarSelect2Personas();
+        actualizarCampoPersonas();
+
+        $("#btnAgregarPersona").off("click").on("click", function () {
+            agregarPersonaFormulario();
+        });
+
+        $(document).on("click", "#listaPersonasVehiculo .btn-remove-persona", function (e) {
+            e.preventDefault();
+            $(this).closest(".card").remove();
+            actualizarCampoPersonas();
+        });
+
+        $btnGuardar.off("click").on("click", function () {
+            guardarVehiculo($form);
+        });
+    }
+
+    /**
+     * Inicializar Select2 para búsqueda de personas
+     */
+    function inicializarSelect2Personas() {
+        const $personaSelect = $("#personaBuscar");
+
+        if ($personaSelect.length === 0) return;
+
+        if ($personaSelect.data('select2')) {
+            $personaSelect.select2('destroy');
+        }
+
+        $personaSelect.select2({
             placeholder: "Buscar persona (3+ caracteres)",
             allowClear: true,
             minimumInputLength: 3,
@@ -290,7 +378,7 @@
                 },
                 cache: true
             },
-            dropdownParent: $modal,
+            dropdownParent: $("#modalVehiculo"),
             width: "100%",
             theme: "bootstrap-5",
             language: {
@@ -299,110 +387,6 @@
                 searching: () => "Buscando..."
             }
         });
-
-        $("#btnVincularPersona").data("vehiculo-id", vehiculoId);
-        $("#tipoVinculacion").val("");
-        $("#casoVinculacion").val("");
-        $modal.modal("show");
-    }
-
-    /**
-     * Vincular persona al vehículo
-     */
-    $(document).on("click", "#btnVincularPersona", function () {
-        const vehiculoId = $(this).data("vehiculo-id");
-        const personaId = $("#personaVincular").val();
-        const tipo = $("#tipoVinculacion").val();
-
-        if (!personaId) {
-            notification("Selecciona una persona", "Validación", 2000, "warning", "top");
-            return;
-        }
-
-        if (!tipo) {
-            notification("Selecciona un tipo de información", "Validación", 2000, "warning", "top");
-            return;
-        }
-
-        const $btn = $(this);
-        $btn.prop("disabled", true);
-        $btn.html('<i class="ri-loader-4-line align-middle me-1"></i> Vinculando...');
-
-        $.ajax({
-            url: `/vehiculos/${vehiculoId}/vincular-persona`,
-            type: "POST",
-            dataType: "json",
-            data: {
-                persona_id: personaId,
-                tipo: tipo,
-                caso: $("#casoVinculacion").val(),
-            },
-            headers: {
-                "X-CSRF-TOKEN": csrfToken,
-                "X-Requested-With": "XMLHttpRequest",
-                "Accept": "application/json",
-            }
-        })
-            .done(function (data) {
-                $btn.prop("disabled", false);
-                $btn.html('<i class="ri-user-add-line align-middle me-1"></i> Vincular');
-
-                notification(data.success, "Éxito", 2000, "success", "top");
-                cargarVehiculos(currentPage);
-                bootstrap.Modal.getInstance(document.getElementById("modalVincularPersona")).hide();
-            })
-            .fail(function (xhr) {
-                $btn.prop("disabled", false);
-                $btn.html('<i class="ri-user-add-line align-middle me-1"></i> Vincular');
-                processError(xhr);
-            });
-    });
-
-    /**
-     * Desvincular persona
-     */
-    $(document).on("click", ".btn-desvincular-persona", async function (e) {
-        e.preventDefault();
-        const vehiculoId = $(this).data("vehicle-id");
-        const caseId = $(this).data("case-id");
-
-        const confirmacion = await confirmarEnvio("Sí, Desvincular", "¿Desvinculár esta persona del vehículo?");
-
-        if (!confirmacion) {
-            return;
-        }
-
-        $.ajax({
-            url: `/vehiculos/${vehiculoId}/desvincular-persona/${caseId}`,
-            type: "DELETE",
-            dataType: "json",
-            headers: {
-                "X-CSRF-TOKEN": csrfToken,
-                "X-Requested-With": "XMLHttpRequest",
-                "Accept": "application/json",
-            }
-        })
-            .done(function (data) {
-                notification(data.success, "Éxito", 2000, "success", "top");
-                cargarVehiculos(currentPage);
-            })
-            .fail(function (xhr) {
-                processError(xhr);
-            });
-    });
-
-    /**
-     * Bindear eventos del formulario
-     */
-    function bindFormulario() {
-        const $form = $("#vehiculoForm");
-        const $btnGuardar = $("#btnGuardarVehiculo");
-
-        if ($form.length === 0 || $btnGuardar.length === 0) return;
-
-        $btnGuardar.off("click").on("click", function () {
-            guardarVehiculo($form);
-        });
     }
 
     /**
@@ -410,6 +394,8 @@
      */
     function guardarVehiculo($form) {
         $form.find(".is-invalid").removeClass("is-invalid");
+
+        actualizarCampoPersonas();
 
         const formData = new FormData($form[0]);
         const url = $form.attr("action");
@@ -507,13 +493,6 @@
      */
     $(document).on("click", ".btn-editar", function () {
         editarVehiculo($(this).val());
-    });
-
-    /**
-     * Vincular persona (click en botón vincular-persona)
-     */
-    $(document).on("click", ".btn-vincular-persona", function () {
-        abrirModalVincularPersona($(this).val());
     });
 
     /**

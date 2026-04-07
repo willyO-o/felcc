@@ -112,48 +112,6 @@
             </div>
         </div>
     </div>
-
-    {{-- Modal Vincular Persona --}}
-    <div class="modal fade" id="modalVincularPersona" tabindex="-1" aria-labelledby="modalVincularPersonaLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Vincular Persona</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="personaVincular" class="form-label">Buscar Persona</label>
-                        <select id="personaVincular" class="form-select" style="width: 100%;"></select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="tipoVinculacion" class="form-label">Tipo de Información</label>
-                        <select id="tipoVinculacion" class="form-select">
-                            <option value="">Seleccionar tipo</option>
-                            <option value="bsisa">BSISA</option>
-                            <option value="ruat">RUAT</option>
-                            <option value="soat">SOAT</option>
-                            <option value="anh">ANH</option>
-                            <option value="itb">ITB</option>
-                            <option value="otro">Otro</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="casoVinculacion" class="form-label">Caso (Opcional)</label>
-                        <input type="text" class="form-control" id="casoVinculacion" placeholder="Ingresa el caso si aplica">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        <i class="ri-close-line align-middle me-1"></i> Cancelar
-                    </button>
-                    <button type="button" class="btn btn-primary" id="btnVincularPersona">
-                        <i class="ri-user-add-line align-middle me-1"></i> Vincular
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
 @endsection
 
 @section('css')

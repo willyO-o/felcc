@@ -88,8 +88,8 @@ class VehiculoController extends Controller
         }
 
         $validated = $request->validate([
-            'placa' => 'required|string|unique:vehiculo,placa|max:20',
-            'descripcion' => 'nullable|string|max:500',
+            'placa' => 'required|string|unique:vehiculo,placa|max:20|min:3',
+            'descripcion' => 'nullable|string|max:2500',
             'responsable' => 'nullable|string|max:255',
             'caso_relacionado' => 'nullable|string|max:255',
             'bsisa' => 'nullable|string|max:255',
@@ -98,14 +98,40 @@ class VehiculoController extends Controller
             'anh' => 'nullable|string|max:255',
             'itb' => 'nullable|string|max:255',
             'soat' => 'nullable|string|max:255',
+            'personas_asociadas' => 'nullable|json',
         ]);
 
-        $vehiculo = Vehiculo::create($validated);
+        try {
+            DB::beginTransaction();
 
-        return response()->json([
-            'success' => 'Vehículo creado correctamente',
-            'data' => $vehiculo,
-        ]);
+            $vehiculo = Vehiculo::create($validated);
+
+            // Procesar personas asociadas si existen
+            if ($request->filled('personas_asociadas')) {
+                $personas = json_decode($request->input('personas_asociadas'), true);
+
+                if (is_array($personas) && count($personas) > 0) {
+                    foreach ($personas as $persona) {
+                        VehiculoCaso::create([
+                            'vehiculo_id' => $vehiculo->id,
+                            'persona_id' => $persona['persona_id'],
+                            'tipo' => $persona['tipo'],
+                            'caso' => $persona['caso'] ?? null,
+                        ]);
+                    }
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => 'Vehículo creado correctamente',
+                'data' => $vehiculo->load('personas'),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Error al crear vehículo'], 500);
+        }
     }
 
     /**
@@ -156,14 +182,55 @@ class VehiculoController extends Controller
             'anh' => 'nullable|string|max:255',
             'itb' => 'nullable|string|max:255',
             'soat' => 'nullable|string|max:255',
+            'personas_asociadas' => 'nullable|json',
         ]);
 
-        $vehiculo->update($validated);
+        try {
+            DB::beginTransaction();
 
-        return response()->json([
-            'success' => 'Vehículo actualizado correctamente',
-            'data' => $vehiculo,
-        ]);
+            $vehiculo->update($validated);
+
+            // Procesar personas asociadas si existen
+            if ($request->filled('personas_asociadas')) {
+                // Obtener los IDs de personas en el nuevo array
+                $personas = json_decode($request->input('personas_asociadas'), true);
+                $nuevasPersonasIds = [];
+
+                if (is_array($personas) && count($personas) > 0) {
+                    foreach ($personas as $persona) {
+                        $caso = VehiculoCaso::updateOrCreate(
+                            [
+                                'vehiculo_id' => $vehiculo->id,
+                                'persona_id' => $persona['persona_id'],
+                                'tipo' => $persona['tipo'],
+                            ],
+                            [
+                                'caso' => $persona['caso'] ?? null,
+                            ]
+                        );
+                        $nuevasPersonasIds[] = $caso->id;
+                    }
+                }
+
+                // Eliminar personas que no están en el nuevo array
+                VehiculoCaso::where('vehiculo_id', $vehiculo->id)
+                    ->whereNotIn('id', $nuevasPersonasIds)
+                    ->delete();
+            } else {
+                // Si no hay personas, eliminar todas
+                VehiculoCaso::where('vehiculo_id', $vehiculo->id)->delete();
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => 'Vehículo actualizado correctamente',
+                'data' => $vehiculo->load('personas'),
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Error al actualizar vehículo'], 500);
+        }
     }
 
     /**
@@ -180,70 +247,6 @@ class VehiculoController extends Controller
 
         return response()->json([
             'success' => 'Vehículo eliminado correctamente',
-        ]);
-    }
-
-    /**
-     * Vincular una persona al vehículo
-     */
-    public function vincularPersona(Request $request, string $id)
-    {
-        if (!request()->user()->hasAnyPermission(['vehiculos_all', 'vehiculos_vincular'])) {
-            abort(403, 'No tienes permiso para vincular personas a vehículos.');
-        }
-
-        $validated = $request->validate([
-            'persona_id' => 'required|exists:persona,id',
-            'tipo' => 'required|string|max:50',
-            'caso' => 'nullable|string|max:255',
-        ]);
-
-        $vehiculo = Vehiculo::findOrFail($id);
-
-        // Verificar si ya existe esa relación
-        $existe = VehiculoCaso::where('vehiculo_id', $vehiculo->id)
-            ->where('persona_id', $validated['persona_id'])
-            ->where('tipo', $validated['tipo'])
-            ->exists();
-
-        if ($existe) {
-            return response()->json([
-                'error' => 'Esta persona ya está vinculada con este tipo',
-            ], 400);
-        }
-
-        VehiculoCaso::create([
-            'vehiculo_id' => $vehiculo->id,
-            'persona_id' => $validated['persona_id'],
-            'tipo' => $validated['tipo'],
-            'caso' => $validated['caso'] ?? null,
-        ]);
-
-        $vehiculo->load('personas');
-
-        return response()->json([
-            'success' => 'Persona vinculada correctamente',
-            'data' => $vehiculo,
-        ]);
-    }
-
-    /**
-     * Desvincular una persona del vehículo
-     */
-    public function desvincularPersona(Request $request, string $id, string $caseId)
-    {
-        if (!request()->user()->hasAnyPermission(['vehiculos_all', 'vehiculos_vincular'])) {
-            abort(403, 'No tienes permiso para desvincular personas.');
-        }
-
-        $vehiculo = Vehiculo::findOrFail($id);
-        VehiculoCaso::where('vehiculo_id', $vehiculo->id)->where('id', $caseId)->delete();
-
-        $vehiculo->load('personas');
-
-        return response()->json([
-            'success' => 'Persona desvinculada correctamente',
-            'data' => $vehiculo,
         ]);
     }
 }
