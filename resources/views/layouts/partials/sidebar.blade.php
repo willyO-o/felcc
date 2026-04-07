@@ -90,6 +90,11 @@
                             <i class="mdi mdi-phone"></i> <span>Teléfonos</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('vehiculos.index') }}">
+                            <i class="mdi mdi-car"></i> <span>Vehículos</span>
+                        </a>
+                    </li>
                 @endcanany
 
 
