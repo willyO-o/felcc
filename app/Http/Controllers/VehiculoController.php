@@ -268,7 +268,7 @@ class VehiculoController extends Controller
      */
     public function vincularPersona(Request $request, string $id)
     {
-        if (!request()->user()->hasAnyPermission(['vehiculos_all', 'vehiculos_crear'])) {
+        if (!request()->user()->hasAnyPermission(['vehiculos_all', 'vehiculos_vincular'])) {
             abort(403, 'No tienes permiso para vincular personas a vehículos.');
         }
 
@@ -314,7 +314,7 @@ class VehiculoController extends Controller
      */
     public function desvincularPersona(string $vehiculoId, string $personaId)
     {
-        if (!request()->user()->hasAnyPermission(['vehiculos_all', 'vehiculos_crear'])) {
+        if (!request()->user()->hasAnyPermission(['vehiculos_all', 'vehiculos_vincular'])) {
             abort(403, 'No tienes permiso para desvincular personas.');
         }
 

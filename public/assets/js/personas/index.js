@@ -108,6 +108,26 @@
             const iniciales = nombreCompleto.split(" ").map(word => word.charAt(0).toUpperCase()).join("").substring(0, 2);
             const primeraImagen = persona.multimedia && persona.multimedia.length > 0 ? persona.multimedia[0].ruta : null;
 
+            // Lógica para el botón de documento
+            let documentoHtml = "";
+            if (persona.url_documento && persona.url_documento.trim()) {
+                documentoHtml = `
+                    <button class="btn btn-sm btn-soft-success btn-abrir-documento"
+                        data-url="${escapeHtml(persona.url_documento)}"
+                        title="Abrir documento">
+                        <i class="ri-download-cloud-fill align-bottom"></i>
+                    </button>
+                `;
+            } else {
+                documentoHtml = `
+                    <button class="btn btn-sm btn-soft-secondary btn-vincular-documento"
+                        value="${persona.id}"
+                        title="Vincular documento">
+                        <i class="ri-link align-bottom"></i>
+                    </button>
+                `;
+            }
+
             html += /*html */`
                 <tr>
                     <td>${(currentPage - 1) * pageSize + index + 1}</td>
@@ -141,6 +161,9 @@
                     <td><span class=" ">${estadoCivil}</span></td>
                     <td>${escapeHtml(telefono)}</td>
                     <td>${fecha}</td>
+                    <td class="text-center">
+                        ${documentoHtml}
+                    </td>
                     <td class="text-center">
                         <div class="d-flex gap-2 justify-content-center">
                             <button class="btn btn-sm btn-soft-info btn-ver" value="${persona.id}"
@@ -209,6 +232,135 @@
 
             });
     });
+
+    /**
+     * Abrir documento en nueva ventana
+     */
+    $(document).on("click", ".btn-abrir-documento", function (e) {
+        e.preventDefault();
+        const url = $(this).data("url");
+        if (url && url.trim()) {
+            window.open(url, '_blank');
+        } else {
+            Swal.fire("Error", "No hay URL válida para el documento", "error");
+        }
+    });
+
+    /**
+     * Vincular documento
+     */
+    $(document).on("click", ".btn-vincular-documento", function (e) {
+        e.preventDefault();
+        const personaId = $(this).val();
+        abrirModalVincularDocumento(personaId);
+    });
+
+    /**
+     * Abrir modal para vincular documento
+     */
+    function abrirModalVincularDocumento(personaId) {
+        const $modal = $("#modalVincularDocumento");
+        const $form = $("#formVincularDocumento");
+
+        if ($modal.length === 0) {
+            Swal.fire("Error", "Modal no encontrado", "error");
+            return;
+        }
+
+        // Limpiar formulario
+        $form[0].reset();
+        $form.find(".is-invalid").removeClass("is-invalid");
+        $form.find(".invalid-feedback").text("");
+
+        // Guardar ID de la persona en el formulario
+        $form.data("persona-id", personaId);
+
+        // Mostrar modal
+        const modal = new bootstrap.Modal($modal[0]);
+        modal.show();
+    }
+
+    /**
+     * Enviar formulario de vincular documento
+     */
+    $(document).on("submit", "#formVincularDocumento", function (e) {
+        e.preventDefault();
+
+        const $form = $(this);
+        const personaId = $form.data("persona-id");
+        const urlDocumento = $("#urlDocumento").val().trim();
+
+        // Limpiar errores previos
+        $form.find(".is-invalid").removeClass("is-invalid");
+        $form.find(".invalid-feedback").text("");
+
+        // Validar
+        if (!urlDocumento) {
+            $("#urlDocumento").addClass("is-invalid");
+            $("#error-url_documento").text("Ingresa una URL válida");
+            return;
+        }
+
+        // Validar que sea una URL válida
+        try {
+            new URL(urlDocumento);
+        } catch (_) {
+            $("#urlDocumento").addClass("is-invalid");
+            $("#error-url_documento").text("Ingresa una URL válida (ej: https://drive.google.com/...)");
+            return;
+        }
+
+        const $btnVincular = $("#btnVincularDocumento");
+        $btnVincular.prop("disabled", true);
+        $btnVincular.html('<i class="ri-loader-4-line align-middle me-1"></i> Guardando...');
+
+        const data = {
+            url_documento: urlDocumento,
+            _token: csrfToken
+        };
+
+        $.ajax({
+            url: `/personas/${personaId}`,
+            type: "PATCH",
+            data: data,
+            dataType: "json",
+            headers: {
+                "X-CSRF-TOKEN": csrfToken,
+                "X-Requested-With": "XMLHttpRequest",
+                "Accept": "application/json",
+            }
+        })
+            .done(function (body) {
+                $btnVincular.prop("disabled", false);
+                $btnVincular.html('<i class="ri-link align-middle me-1"></i> Vincular');
+
+                Swal.fire({
+                    icon: "success",
+                    title: "¡Éxito!",
+                    text: body.success || "Documento vinculado correctamente",
+                    timer: 2000,
+                    showConfirmButton: false,
+                });
+
+                cargarPersonas(currentPage);
+
+                const modal = bootstrap.Modal.getInstance(document.getElementById("modalVincularDocumento"));
+                if (modal) modal.hide();
+            })
+            .fail(function (xhr) {
+                $btnVincular.prop("disabled", false);
+                $btnVincular.html('<i class="ri-link align-middle me-1"></i> Vincular');
+
+                const body = xhr.responseJSON;
+
+                if (body.error) {
+                    Swal.fire("Error", body.error, "error");
+                } else {
+                    processError(xhr);
+                }
+            });
+    });
+
     /**
      * Obtener nombre completo de la persona
      */

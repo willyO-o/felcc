@@ -36,6 +36,7 @@ return [
             'mandamientos_crear',
             'vehiculos_listar',
             'vehiculos_crear',
+            'vehiculos_vincular',
             'telefonos_listar',
             'telefonos_crear',
             'consulta_mandamientos',

@@ -188,6 +188,26 @@ class PersonaController extends Controller
     {
         $persona = Persona::findOrFail($id);
 
+        // Si solo se está vinculando un documento, hacer validación simplificada
+        if ($request->filled('url_documento') && $request->only('url_documento', '_token')) {
+            $request->validate([
+                'url_documento' => 'required|url|max:500',
+            ]);
+
+            try {
+                $persona->update(['url_documento' => $request->url_documento]);
+                return response()->json([
+                    'success' => 'Documento vinculado correctamente.',
+                    'datos' => $persona,
+                ], 200);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'error' => 'Error al vincular el documento: ' . $e->getMessage(),
+                ], 500);
+            }
+        }
+
+        // Validación completa para edición de persona
         $reglas = [
             'nombres' => 'required|string|max:255',
             'apellidos' => 'nullable|string|max:255',
@@ -202,6 +222,7 @@ class PersonaController extends Controller
             'nombre_conyuge' => 'nullable|string|max:250',
             'ocupacion' => 'nullable|string|max:150',
             'id_pais' => 'nullable|exists:pais,id',
+            'url_documento' => 'nullable|url|max:500',
             'fotos' => 'nullable|array',
             'fotos.*' => 'file|mimes:jpeg,png,jpg,webp|max:2048',
         ];

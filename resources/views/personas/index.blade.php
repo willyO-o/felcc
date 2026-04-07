@@ -85,6 +85,7 @@
                                     <th scope="col">Estado Civil</th>
                                     <th scope="col">Teléfono</th>
                                     <th scope="col">Fecha Registro</th>
+                                    <th scope="col" class="text-center">Documento</th>
                                     <th scope="col" class="text-center">Acciones</th>
                                 </tr>
                             </thead>
@@ -138,6 +139,40 @@
         <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content" id="modalDetallesContent">
 
+            </div>
+        </div>
+    </div>
+
+    {{-- Modal Vincular Documento --}}
+    <div class="modal fade" id="modalVincularDocumento" tabindex="-1" aria-labelledby="modalVincularDocumentoLabel" aria-hidden="true"
+        data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalVincularDocumentoLabel">Vincular Documento</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formVincularDocumento">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="urlDocumento" class="form-label">URL del Documento *</label>
+                            <input type="text" class="form-control" id="urlDocumento" placeholder="https://drive.google.com/..." required>
+                            <small class="text-muted d-block mt-2">
+                                Puedes vincular documentos desde Google Drive, OneDrive, Dropbox o cualquier otra fuente.
+                            </small>
+                            <div id="error-url_documento" class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line align-middle me-1"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="btnVincularDocumento">
+                            <i class="ri-link align-middle me-1"></i> Vincular
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
