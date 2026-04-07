@@ -734,7 +734,12 @@
         if ($searchInput.length) {
             $searchInput.on("input", function () {
                 clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => cargarTelefonos(1), 400);
+                const searchValue = $(this).val().trim();
+
+                // Solo buscar si tiene al menos 3 caracteres o está vacío
+                if (searchValue.length >= 3 || searchValue.length === 0) {
+                    searchTimeout = setTimeout(() => cargarTelefonos(1), 400);
+                }
             });
         }
     });
