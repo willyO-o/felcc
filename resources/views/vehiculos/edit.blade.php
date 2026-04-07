@@ -1,2 +1,0 @@
-@include('vehiculos.partials.form')
-

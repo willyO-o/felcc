@@ -128,17 +128,17 @@
                     <td>${fecha}</td>
                     <td class="text-center">
                         <div class="d-flex gap-2 justify-content-center flex-wrap">
-                            <button class="btn btn-sm btn-soft-info btn-ver" value="${vehiculo.id}"
+                            <button class="btn btn-sm btn-soft-secondary btn-ver" value="${vehiculo.id}"
                                 title="Ver detalles">
                                 <i class="ri-eye-fill align-bottom"></i>
                             </button>
 
                             ${['superadmin', 'administrador'].includes(window.role) ?
                     /*html*/`
-                            <button class="btn btn-sm btn-soft-warning btn-editar" value="${vehiculo.id}" title="Editar">
+                            <button class="btn btn-sm btn-soft-secondary btn-editar" value="${vehiculo.id}" title="Editar">
                                 <i class="ri-pencil-fill align-bottom"></i>
                             </button>
-                            <button class="btn btn-sm btn-soft-danger btn-eliminar" value="${vehiculo.id}" title="Eliminar">
+                            <button class="btn btn-sm btn-soft-secondary btn-eliminar" value="${vehiculo.id}" title="Eliminar">
                                 <i class="ri-delete-bin-fill align-bottom"></i>
                             </button>` : ""
                             }

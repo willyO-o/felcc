@@ -27,7 +27,7 @@
     </div>
 
     <hr>
-    <h6 class="mb-3 text-muted">Información Adicional</h6>
+    {{-- <h6 class="mb-3 text-muted">Información Adicional</h6>
 
     <div class="row">
         <div class="col-md-6">
@@ -60,7 +60,7 @@
             <small class="text-muted">SOAT</small>
             <p>{{ $vehiculo->soat ?? '—' }}</p>
         </div>
-    </div>
+    </div> --}}
 
     @if($vehiculo->casos->count() > 0)
         <hr>

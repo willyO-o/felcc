@@ -23,7 +23,7 @@ class VehiculoController extends Controller
             $query = Vehiculo::with('personas')
                 ->orderBy('id', 'desc');
 
-            if ($request->filled('search')) {
+            if ($request->filled('search') && !$request->filled('filtro')) {
                 $search = $request->search;
                 $search = str_replace('%', ' ', $search);
                 $query->where(function ($q) use ($search) {
@@ -50,6 +50,19 @@ class VehiculoController extends Controller
                     case 'caso_relacionado':
                         $query->whereRaw('caso_relacionado LIKE ?', ["%{$search}%"]);
                         break;
+                    case 'ci_persona':
+                        $query->whereHas('personas', function ($q) use ($search) {
+                            $q->whereRaw('ci LIKE ?', ["%{$search}%"]);
+                        });
+                        break;
+                    case 'nombres':
+                        $query->whereHas('personas', function ($q) use ($search) {
+                            $q->whereRaw(
+                                "CONCAT(COALESCE(nombres, ''), ' ', COALESCE(apellidos, '')) LIKE ?",
+                                ["%{$search}%"]
+                            );
+                        });
+                        break;
                 }
             }
 
@@ -75,7 +88,7 @@ class VehiculoController extends Controller
             abort(403, 'No tienes permiso para crear vehículos.');
         }
 
-        return view('vehiculos.create');
+        return view('vehiculos.form');
     }
 
     /**
@@ -157,7 +170,7 @@ class VehiculoController extends Controller
         }
 
         $vehiculo = Vehiculo::with('casos.persona')->findOrFail($id);
-        return view('vehiculos.edit', ['vehiculo' => $vehiculo]);
+        return view('vehiculos.form', ['vehiculo' => $vehiculo]);
     }
 
     /**

@@ -41,6 +41,8 @@
                                 <option value="descripcion">Descripción</option>
                                 <option value="responsable">Responsable</option>
                                 <option value="caso_relacionado">Caso Relacionado</option>
+                                <option value="ci_persona">CI de Persona</option>
+                                <option value="nombres">Nombre de Persona</option>
                             </select>
                         </div>
                     </div>
