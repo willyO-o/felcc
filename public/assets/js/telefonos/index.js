@@ -16,8 +16,6 @@
     const $sinResultados = $("#sinResultados");
     const $paginacion = $("#paginacionTelefonos");
     const $detallesPagina = $("#detalles-pagina");
-    const $searchInput = $("#searchTelefonos");
-    const $btnNuevo = $("#btnNuevoTelefono");
 
     /**
      * Cargar listado de teléfonos con paginación y filtros
@@ -33,8 +31,8 @@
             size: pageSize,
         };
 
-        if ($searchInput.val().trim()) {
-            params.search = $searchInput.val().trim();
+        if ($("#searchTelefonos").val().trim()) {
+            params.search = $("#searchTelefonos").val().trim();
         }
 
         if ($('#filtros').val()) {
@@ -156,7 +154,7 @@
                             <button class="btn btn-sm btn-soft-secondary btn-eliminar" value="${telefono.id}" title="Eliminar">
                                 <i class="ri-delete-bin-fill align-bottom"></i>
                             </button>` : ""
-                            }
+                }
                         </div>
                     </td>
                 </tr>
@@ -235,29 +233,7 @@
         });
     };
 
-    /**
-     * Abrir modal para crear teléfono
-     */
-    function abrirModalCrear() {
-        $.ajax({
-            url: "/telefonos/create",
-            type: "GET",
-            headers: { "X-Requested-With": "XMLHttpRequest" }
-        })
-            .done(function (html) {
-                $("#modalTelefonoContent").html(html);
-                const modal = new bootstrap.Modal(document.getElementById("modalTelefono"));
-                modal.show();
 
-                setTimeout(() => {
-                    bindFormulario();
-                }, 100);
-            })
-            .fail(function (err) {
-                console.error("Error:", err);
-                processError(err);
-            });
-    }
 
     /**
      * Editar teléfono
@@ -316,7 +292,7 @@
                             return {
                                 id: persona.id,
                                 text: persona.nombres + ' ' + persona.apellidos +
-                                      (persona.ci ? ' (' + persona.ci + ')' : '')
+                                    (persona.ci ? ' (' + persona.ci + ')' : '')
                             };
                         })
                     };
@@ -488,7 +464,7 @@
                             return {
                                 id: persona.id,
                                 text: persona.nombres + ' ' + persona.apellidos +
-                                      (persona.ci ? ' (' + persona.ci + ')' : '')
+                                    (persona.ci ? ' (' + persona.ci + ')' : '')
                             };
                         })
                     };
@@ -724,23 +700,39 @@
     /**
      * Inicialización cuando el documento está listo
      */
-    $(document).ready(function () {
-        cargarTelefonos();
 
-        if ($btnNuevo.length) {
-            $btnNuevo.on("click", abrirModalCrear);
-        }
+    $(document).on("click", "#btnNuevoTelefono", function () {
+        $.ajax({
+            url: "/telefonos/create",
+            type: "GET",
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+            .done(function (html) {
+                $("#modalTelefonoContent").html(html);
+                const modal = new bootstrap.Modal(document.getElementById("modalTelefono"));
+                modal.show();
 
-        if ($searchInput.length) {
-            $searchInput.on("input", function () {
-                clearTimeout(searchTimeout);
-                const searchValue = $(this).val().trim();
-
-                // Solo buscar si tiene al menos 3 caracteres o está vacío
-                if (searchValue.length >= 3 || searchValue.length === 0) {
-                    searchTimeout = setTimeout(() => cargarTelefonos(1), 400);
-                }
+                setTimeout(() => {
+                    bindFormulario();
+                }, 100);
+            })
+            .fail(function (err) {
+                console.error("Error:", err);
+                processError(err);
             });
+    });
+
+
+    cargarTelefonos();
+
+    $("#searchTelefonos").on("input", function () {
+        clearTimeout(searchTimeout);
+        const searchValue = $(this).val().trim();
+
+        // Solo buscar si tiene al menos 3 caracteres o está vacío
+        if (searchValue.length >= 3 || searchValue.length === 0) {
+            searchTimeout = setTimeout(() => cargarTelefonos(1), 400);
         }
     });
+
 })();

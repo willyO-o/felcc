@@ -172,13 +172,11 @@
 @endsection
 
 @section('css')
-    <link href="/assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css" />
     <link href="{{ url('/assets/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="{{ url('assets/css/select2-bootstrap-5-theme.min.css') }}" type="text/css" />
 @endsection
 
 @section('js')
     <script src="{{ url('/assets/js/select2.min.js') }}"></script>
-
     <script src="{{ url('/assets/js/telefonos/index.js?v=' . config('app.aplicacion.version')) }}"></script>
 @endsection
