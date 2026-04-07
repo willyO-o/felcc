@@ -262,4 +262,75 @@ class VehiculoController extends Controller
             'success' => 'Vehículo eliminado correctamente',
         ]);
     }
+
+    /**
+     * Vincular una persona al vehículo directamente
+     */
+    public function vincularPersona(Request $request, string $id)
+    {
+        if (!request()->user()->hasAnyPermission(['vehiculos_all', 'vehiculos_crear'])) {
+            abort(403, 'No tienes permiso para vincular personas a vehículos.');
+        }
+
+        try {
+            $vehiculo = Vehiculo::findOrFail($id);
+
+            $validated = $request->validate([
+                'persona_id' => 'required|exists:persona,id',
+                'tipo' => 'required|string|max:255',
+                'caso' => 'nullable|string|max:255',
+            ]);
+
+            // Verificar que no exista ya esta combinación
+            $existe = VehiculoCaso::where('vehiculo_id', $vehiculo->id)
+                ->where('persona_id', $validated['persona_id'])
+                ->where('tipo', $validated['tipo'])
+                ->exists();
+
+            if ($existe) {
+                return response()->json([
+                    'error' => 'Esta persona ya está vinculada con este tipo',
+                ], 422);
+            }
+
+            VehiculoCaso::create([
+                'vehiculo_id' => $vehiculo->id,
+                'persona_id' => $validated['persona_id'],
+                'tipo' => $validated['tipo'],
+                'caso' => $validated['caso'] ?? null,
+            ]);
+
+            return response()->json([
+                'success' => 'Persona vinculada correctamente',
+                'data' => $vehiculo->load('personas'),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al vincular persona: ' . $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Desvincular una persona del vehículo
+     */
+    public function desvincularPersona(string $vehiculoId, string $personaId)
+    {
+        if (!request()->user()->hasAnyPermission(['vehiculos_all', 'vehiculos_crear'])) {
+            abort(403, 'No tienes permiso para desvincular personas.');
+        }
+
+        try {
+            $vehiculo = Vehiculo::findOrFail($vehiculoId);
+
+            VehiculoCaso::where('vehiculo_id', $vehiculo->id)
+                ->where('persona_id', $personaId)
+                ->delete();
+
+            return response()->json([
+                'success' => 'Persona desvinculada correctamente',
+                'data' => $vehiculo->load('personas'),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Error al desvincular persona'], 500);
+        }
+    }
 }

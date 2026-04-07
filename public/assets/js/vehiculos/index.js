@@ -133,6 +133,11 @@
                                 <i class="ri-eye-fill align-bottom"></i>
                             </button>
 
+                            <button class="btn btn-sm btn-soft-success btn-vincular-persona" value="${vehiculo.id}"
+                                title="Vincular persona">
+                                <i class="ri-links-line align-bottom"></i>
+                            </button>
+
                             ${['superadmin', 'administrador'].includes(window.role) ?
                     /*html*/`
                             <button class="btn btn-sm btn-soft-secondary btn-editar" value="${vehiculo.id}" title="Editar">
@@ -307,7 +312,7 @@
             personas.push({
                 persona_id: $(this).data("persona-id"),
                 tipo: $(this).data("tipo"),
-                caso: casoVal && casoVal.trim() ? casoVal : null
+                caso: casoVal && typeof casoVal === 'string' && casoVal.trim() ? casoVal.trim() : null
             });
         });
         $("#personas_asociadas").val(JSON.stringify(personas));
@@ -493,6 +498,207 @@
      */
     $(document).on("click", ".btn-editar", function () {
         editarVehiculo($(this).val());
+    });
+
+    /**
+     * Vincular persona (mostrar modal)
+     */
+    $(document).on("click", ".btn-vincular-persona", function () {
+        const vehiculoId = $(this).val();
+        abrirModalVincularPersona(vehiculoId);
+    });
+
+    /**
+     * Abrir modal para vincular persona
+     */
+    function abrirModalVincularPersona(vehiculoId) {
+        const $modal = $("#modalVincularPersona");
+        const $form = $("#formVincularPersona");
+
+        // Limpiar formulario
+        $form[0].reset();
+        $form.find(".is-invalid").removeClass("is-invalid");
+        $form.find(".invalid-feedback").text("");
+
+        // Guardar ID del vehículo en el formulario
+        $form.data("vehiculo-id", vehiculoId);
+
+        // Inicializar Select2
+        inicializarSelect2VincularPersona();
+
+        // Mostrar modal
+        const modal = new bootstrap.Modal($modal[0]);
+        modal.show();
+    }
+
+    /**
+     * Inicializar Select2 para vincular persona
+     */
+    function inicializarSelect2VincularPersona() {
+        const $personaSelect = $("#vincularPersonaBuscar");
+
+        if ($personaSelect.data('select2')) {
+            $personaSelect.select2('destroy');
+        }
+
+        $personaSelect.select2({
+            placeholder: "Buscar persona (3+ caracteres)",
+            allowClear: true,
+            minimumInputLength: 3,
+            ajax: {
+                url: "/personas-search",
+                type: "GET",
+                dataType: "json",
+                delay: 300,
+                data: function (params) {
+                    return { q: params.term };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(function (persona) {
+                            return {
+                                id: persona.id,
+                                text: persona.nombres + ' ' + persona.apellidos +
+                                    (persona.ci ? ' (' + persona.ci + ')' : '')
+                            };
+                        })
+                    };
+                },
+                cache: true
+            },
+            dropdownParent: $("#modalVincularPersona"),
+            width: "100%",
+            theme: "bootstrap-5",
+            language: {
+                inputTooShort: () => "Escribe al menos 3 caracteres",
+                noResults: () => "No se encontraron personas",
+                searching: () => "Buscando..."
+            }
+        });
+    }
+
+    /**
+     * Enviar formulario de vincular persona
+     */
+    $(document).on("submit", "#formVincularPersona", function (e) {
+        e.preventDefault();
+
+        const $form = $(this);
+        const vehiculoId = $form.data("vehiculo-id");
+        const personaId = $("#vincularPersonaBuscar").val();
+        const tipo = $("#vincularTipo").val();
+        const caso = $("#vincularCaso").val().trim();
+
+        // Limpiar errores previos
+        $form.find(".is-invalid").removeClass("is-invalid");
+        $form.find(".invalid-feedback").text("");
+
+        // Validar
+        if (!personaId) {
+            $("#vincularPersonaBuscar").addClass("is-invalid");
+            $("#error-persona_id").text("Selecciona una persona");
+            return;
+        }
+
+        if (!tipo) {
+            $("#vincularTipo").addClass("is-invalid");
+            $("#error-tipo").text("Selecciona un tipo");
+            return;
+        }
+
+        const $btnVincular = $("#btnVincularPersona");
+        $btnVincular.prop("disabled", true);
+        $btnVincular.html('<i class="ri-loader-4-line align-middle me-1"></i> Vinculando...');
+
+        const data = {
+            persona_id: personaId,
+            tipo: tipo,
+            caso: caso || null,
+            _token: csrfToken
+        };
+
+        $.ajax({
+            url: `/vehiculos/${vehiculoId}/vincular-persona`,
+            type: "POST",
+            data: data,
+            dataType: "json",
+            headers: {
+                "X-CSRF-TOKEN": csrfToken,
+                "X-Requested-With": "XMLHttpRequest",
+                "Accept": "application/json",
+            }
+        })
+            .done(function (body) {
+                $btnVincular.prop("disabled", false);
+                $btnVincular.html('<i class="ri-link align-middle me-1"></i> Vincular');
+
+                notification(body.success, "Éxito", 2000, "success", "top");
+                cargarVehiculos(currentPage);
+
+                const modal = bootstrap.Modal.getInstance(document.getElementById("modalVincularPersona"));
+                if (modal) modal.hide();
+            })
+            .fail(function (xhr) {
+                $btnVincular.prop("disabled", false);
+                $btnVincular.html('<i class="ri-link align-middle me-1"></i> Vincular');
+
+                const body = xhr.responseJSON;
+
+                if (xhr.status === 422 && body.errors) {
+                    Object.keys(body.errors).forEach((field) => {
+                        const $input = $form.find(`[name="${field}"]`);
+                        const $errorDiv = $form.find(`#error-${field}`);
+                        if ($input.length) $input.addClass("is-invalid");
+                        if ($errorDiv.length) $errorDiv.text(body.errors[field]?.[0] || "Error");
+                    });
+
+                    // Si hay error de validación de campo, mostrar el mensaje
+                    if (body.error) {
+                        notification(body.error, "Error", 3000, "danger", "top");
+                    }
+                    return;
+                }
+
+                if (body.error) {
+                    notification(body.error, "Error", 3000, "danger", "top");
+                } else {
+                    processError(xhr);
+                }
+            });
+    });
+
+    /**
+     * Desvincular persona de la tabla de detalles
+     */
+    $(document).on("click", ".btn-desvincular-persona-tabla", function (e) {
+        e.preventDefault();
+
+        const $row = $(this).closest("tr");
+        const vehiculoId = $row.data("vehiculo-id");
+        const personaId = $(this).data("persona-id");
+        const personaNombre = $(this).data("persona-nombre");
+
+        confirmarEnvio("Sí, Desvincular", `¿Desvinculars a ${personaNombre}?`).then(confirmacion => {
+            if (confirmacion) {
+                $.ajax({
+                    url: `/vehiculos/${vehiculoId}/desvincular-persona/${personaId}`,
+                    type: "DELETE",
+                    dataType: "json",
+                    headers: {
+                        "X-CSRF-TOKEN": csrfToken,
+                        "X-Requested-With": "XMLHttpRequest",
+                        "Accept": "application/json",
+                    }
+                })
+                    .done(function (body) {
+                        notification(body.success, "Éxito", 2000, "success", "top");
+                        cargarVehiculos(currentPage);
+                    })
+                    .fail(function (xhr) {
+                        processError(xhr);
+                    });
+            }
+        });
     });
 
     /**

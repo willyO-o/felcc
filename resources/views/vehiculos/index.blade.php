@@ -114,6 +114,67 @@
             </div>
         </div>
     </div>
+
+    {{-- Modal Vincular Persona --}}
+    <div class="modal fade" id="modalVincularPersona" tabindex="-1" aria-labelledby="modalVincularPersonaLabel"
+        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalVincularPersonaLabel">Vincular Persona al Vehículo</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="formVincularPersona">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="vincularPersonaBuscar" class="form-label">Buscar Persona *</label>
+                            <select id="vincularPersonaBuscar" class="form-select" style="width: 100%;" required>
+                                <option value="">Seleccionar persona</option>
+                            </select>
+                            <div id="error-persona_id" class="invalid-feedback"></div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="vincularTipo" class="form-label">Tipo de Información *</label>
+                                    <input type="text" id="vincularTipo" class="form-control txtMayuscula" list="datalistTipo"
+                                        placeholder="Buscar tipo..." required>
+                                    <datalist id="datalistTipo">
+                                        <option value="BSISA">
+                                        <option value="RUAT">
+                                        <option value="SOAT">
+                                        <option value="ANH">
+                                        <option value="ITB">
+                                    </datalist>
+
+                                    <div id="error-tipo" class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="vincularCaso" class="form-label">Caso (Opcional)</label>
+                                    <input type="text" class="form-control txtMayuscula" id="vincularCaso"
+                                        placeholder="Ingresa el caso si aplica">
+                                    <div id="error-caso" class="invalid-feedback"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line align-middle me-1"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="btnVincularPersona">
+                            <i class="ri-link align-middle me-1"></i> Vincular
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
 @endsection
 
 @section('css')

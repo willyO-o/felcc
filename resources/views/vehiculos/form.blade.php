@@ -111,7 +111,7 @@
                 <div class="mb-3">
                     <label for="tipoPersona" class="form-label">Tipo de Información *</label>
 
-                    <input list="tiposPersona" class="form-control" id="tipoPersona"  placeholder="Seleccionar tipo" >
+                    <input list="tiposPersona" class="form-control txtMayuscula" id="tipoPersona"  placeholder="Seleccionar tipo" >
 
                     <datalist id="tiposPersona">
                         <option value="BSISA">
