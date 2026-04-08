@@ -16,7 +16,6 @@ class Telefono extends Model
         'persona_caso',
         'caso',
         'empresa',
-        'imeis_asociados',
         'respuesta_requerimiento',
         'persona_id',
         'informacion',
@@ -25,9 +24,6 @@ class Telefono extends Model
         'uninet',
     ];
 
-    protected $casts = [
-        'imeis_asociados' => 'array',
-    ];
 
     /**
      * Relación con Persona
@@ -35,5 +31,9 @@ class Telefono extends Model
     public function persona()
     {
         return $this->belongsTo(Persona::class, 'persona_id');
+    }
+    public function imei()
+    {
+        return $this->belongsTo(Imei::class, 'imei_id');
     }
 }
