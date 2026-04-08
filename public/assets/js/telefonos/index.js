@@ -92,8 +92,10 @@
 
             // Procesar IMEIs
             let imeis = [];
-            if (telefono.imeis && Array.isArray(telefono.imeis)) {
-                imeis = telefono.imeis.map(i => i.imei);
+            if (typeof telefono.imeis_asociados === 'string' && telefono.imeis_asociados) {
+                imeis = telefono.imeis_asociados.split(',').map(i => i.trim()).filter(i => i);
+            } else if (Array.isArray(telefono.imeis_asociados)) {
+                imeis = telefono.imeis_asociados;
             }
 
             const imeisHtml = imeis.length > 0
@@ -356,6 +358,61 @@
     /**
      * Abrir modal para agregar IMEI
      */
+    function abrirModalAgregarIMEI(telefonoId) {
+        $("#nuevoIMEIForm").val("");
+        $("#btnAgregarIMEIForm").data("telef-id", telefonoId);
+        $("#modalAgregarIMEI").modal("show");
+        $("#nuevoIMEIForm").focus();
+    }
+
+    /**
+     * Agregar IMEI al teléfono
+     */
+    $(document).on("click", "#btnAgregarIMEIForm", function () {
+        const telefonoId = $(this).data("telef-id");
+        const nuevoIMEI = $("#nuevoIMEIForm").val().trim();
+
+        if (!nuevoIMEI) {
+            notification("Ingresa un IMEI válido", "Validación", 2000, "warning", "top");
+            return;
+        }
+
+        const $btn = $(this);
+        $btn.prop("disabled", true);
+        $btn.html('<i class="ri-loader-4-line align-middle me-1"></i> Agregando...');
+
+        $.ajax({
+            url: `/telefonos/${telefonoId}/agregar-imei`,
+            type: "POST",
+            dataType: "json",
+            data: { imei: nuevoIMEI },
+            headers: {
+                "X-CSRF-TOKEN": csrfToken,
+                "X-Requested-With": "XMLHttpRequest",
+                "Accept": "application/json",
+            }
+        })
+            .done(function (data) {
+                $btn.prop("disabled", false);
+                $btn.html('<i class="ri-add-circle-line align-middle me-1"></i> Agregar IMEI');
+
+                notification(data.success, "Éxito", 2000, "success", "top");
+                cargarTelefonos(currentPage);
+                bootstrap.Modal.getInstance(document.getElementById("modalAgregarIMEI")).hide();
+            })
+            .fail(function (xhr) {
+                $btn.prop("disabled", false);
+                $btn.html('<i class="ri-add-circle-line align-middle me-1"></i> Agregar IMEI');
+
+                const body = xhr.responseJSON;
+                if (xhr.status === 400 && body.error) {
+                    notification(body.error, "Error", 2000, "warning", "top");
+                } else {
+                    processError(xhr);
+                }
+            });
+    });
+
     /**
      * Bindear eventos del formulario
      */
@@ -366,6 +423,8 @@
         if ($form.length === 0 || $btnGuardar.length === 0) return;
 
         inicializarSelect2Personas();
+        actualizarCampoIMEIs();
+        $("#nuevoIMEI").focus();
 
         $btnGuardar.off("click").on("click", function () {
             guardarTelefono($form);
@@ -453,11 +512,78 @@
     /**
      * Agregar IMEI a la lista
      */
+    function agregarIMEI() {
+        const nuevoIMEI = $("#nuevoIMEI").val().trim();
+
+        if (!nuevoIMEI) {
+            notification("Ingresa un IMEI válido", "Validación", 2000, "warning", "top");
+            return;
+        }
+
+        const $listaIMEIs = $("#listaIMEIs");
+        const imeiExiste = $listaIMEIs.find(`[data-imei="${nuevoIMEI}"]`).length > 0;
+
+        if (imeiExiste) {
+            notification("Este IMEI ya existe en la lista", "Validación", 2000, "warning", "top");
+            return;
+        }
+
+        const badge = `
+            <span class="badge badge-outline-secondary d-flex align-items-center gap-2" data-imei="${escapeHtml(nuevoIMEI)}">
+                ${escapeHtml(nuevoIMEI)}
+                <button type="button" value="${escapeHtml(nuevoIMEI)}" class="btn-remove-imei btn btn-secondary py-0 px-1 border-0 text-white cursor-pointer" title="Eliminar">
+                    <i class="ri-close-line"></i>
+                </button>
+            </span>
+        `;
+
+        $listaIMEIs.append(badge);
+        $("#nuevoIMEI").val("").focus();
+        actualizarCampoIMEIs();
+    }
+
+    /**
+     * Actualizar campo oculto con todos los IMEIs
+     */
+    function actualizarCampoIMEIs() {
+        const imeis = [];
+        $("#listaIMEIs [data-imei]").each(function () {
+            imeis.push($(this).data("imei"));
+        });
+        $("#imeis_asociados").val(imeis.join(","));
+    }
+
+    /**
+     * Delegación de eventos para agregar IMEI (botón y Enter)
+     */
+    $(document).on("click", "#btnAgregarIMEI", function () {
+        agregarIMEI();
+    });
+
+    $(document).on("keypress", "#nuevoIMEI", function (e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
+            agregarIMEI();
+        }
+    });
+
+    /**
+     * Delegación de eventos para eliminar IMEI
+     */
+    $(document).on("click", ".btn-remove-imei", function (e) {
+        e.preventDefault();
+        $(this).closest(".badge").remove();
+        actualizarCampoIMEIs();
+    });
+
     /**
      * Guardar teléfono
      */
     function guardarTelefono($form) {
         $form.find(".is-invalid").removeClass("is-invalid");
+
+        // Actualizar IMEIs antes de enviar
+        actualizarCampoIMEIs();
 
         const formData = new FormData($form[0]);
         const url = $form.attr("action");
@@ -565,19 +691,10 @@
     });
 
     /**
-     * Agregar IMEI (click en botón agregar-imei) - abre el módulo IMEI
+     * Agregar IMEI (click en botón agregar-imei)
      */
     $(document).on("click", ".btn-agregar-imei", function () {
-        const telefonoId = $(this).val();
-
-        console.log($(this).val());
-
-        // Requiere que el módulo IMEI esté carguado y tenga una función llamada abrirModalIMEI
-        if (typeof abrirModalIMEI === 'function') {
-            abrirModalIMEI(telefonoId);
-        } else {
-            notification("El módulo de IMEI no está cargado", "Error", 2000, "danger", "top");
-        }
+        abrirModalAgregarIMEI($(this).val());
     });
 
     /**

@@ -62,13 +62,13 @@
             </div>
         @endif
 
-        @if ($datos->imeis && $datos->imeis->count() > 0)
+        @if ($datos->imeis_asociados && count($datos->imeis_asociados) > 0)
             <div class="col-12">
                 <div class="mb-3">
                     <h6 class="text-muted">IMEI Asociados</h6>
                     <div>
-                        @foreach ($datos->imeis as $imei)
-                            <span class="badge badge-outline-secondary me-2">{{ $imei->imei }}</span>
+                        @foreach ($datos->imeis_asociados as $imei)
+                            <span class="badge badge-outline-secondary me-2">{{ $imei }}</span>
                         @endforeach
                     </div>
                 </div>

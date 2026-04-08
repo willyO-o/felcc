@@ -88,23 +88,32 @@
             <div class="col-md-6">
                 <div class="mb-3">
                     <label class="form-label">IMEI Asociados</label>
-                    @if ($telefono->id)
-                        <div class="d-flex flex-wrap gap-2 mb-2">
-                            @if ($telefono->imeis && $telefono->imeis->count() > 0)
-                                @foreach ($telefono->imeis as $imei)
-                                    <span class="badge badge-outline-secondary">{{ $imei->imei }}</span>
-                                @endforeach
-                            @else
-                                <small class="text-muted">Sin IMEIs asociados</small>
-                            @endif
-                        </div>
-                        <small class="text-muted d-block">
-                            <i class="ri-info-line"></i> Los IMEIs se gestionan desde el módulo IMEI
-                        </small>
-                    @else
-                        <small class="text-muted">Los IMEIs se agregan después de crear el teléfono</small>
-                    @endif
+                    <div class="input-group mb-2">
+                        <input type="text" class="form-control txtNumero" id="nuevoIMEI"
+                            placeholder="Ingresa el IMEI">
+                        <button class="btn btn-outline-secondary" type="button" id="btnAgregarIMEI">
+                            <i class="ri-add-line align-middle"></i> Agregar
+                        </button>
+                    </div>
+                    <div id="listaIMEIs" class="d-flex flex-wrap gap-2">
+                        @if ($telefono->imeis_asociados && is_array($telefono->imeis_asociados))
+                            @foreach ($telefono->imeis_asociados as $imei)
+                                <span class="badge badge-outline-secondary d-flex align-items-center gap-2"
+                                    data-imei="{{ $imei }}">
+                                    {{ $imei }}
+                                    <button type="button" value="{{ $imei }}"
+                                        class="btn-remove-imei btn btn-secondary py-0 px-1 border-0 text-white cursor-pointer"
+                                        title="Eliminar">
+                                        <i class="ri-close-line"></i>
+                                    </button>
+                                </span>
+                            @endforeach
+                        @endif
+                    </div>
+                    <input type="hidden" id="imeis_asociados" name="imeis_asociados" value="">
+                    <div id="error-imeis_asociados" class="invalid-feedback"></div>
                 </div>
+
             </div>
 
             <div class="col-md-6">
