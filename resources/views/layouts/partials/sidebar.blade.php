@@ -91,6 +91,11 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('imeis.index') }}">
+                            <i class="mdi mdi-numeric"></i> <span>IMEIs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link menu-link" href="{{ route('vehiculos.index') }}">
                             <i class="mdi mdi-car"></i> <span>Vehículos</span>
                         </a>

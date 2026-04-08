@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('imei', function (Blueprint $table) {
             $table->id();
-            $table->string('imei');
+            $table->string('imei')->unique();
+            $table->foreignId('telefono_id')->nullable()->constrained('telefono')->onDelete('restrict');
             $table->text('caracteristicas')->nullable();
             $table->timestamps();
             $table->softDeletes();
@@ -22,7 +23,6 @@ return new class extends Migration
         //eliminar la columna imeis_asociados de la tabla telefono
         Schema::table('telefono', function (Blueprint $table) {
             $table->dropColumn('imeis_asociados');
-            $table->foreignId('imei_id')->nullable()->constrained('imei')->onDelete('restrict');
         });
     }
 
@@ -32,5 +32,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('imei');
+        Schema::table('telefono', function (Blueprint $table) {
+            $table->json('imeis_asociados')->nullable();
+        });
     }
 };

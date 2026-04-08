@@ -8,19 +8,21 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Imei extends Model
 {
     use SoftDeletes;
-    //
+
     protected $table = 'imei';
     protected $fillable = [
         'imei',
         'caracteristicas',
+        'telefono_id',
     ];
 
-    public function telefonos()
+    /**
+     * Un IMEI pertenece a un Teléfono
+     */
+    public function telefono()
     {
-        return $this->hasMany(Telefono::class, 'imei_id');
-
+        return $this->belongsTo(Telefono::class, 'telefono_id');
     }
-
 }
 
 

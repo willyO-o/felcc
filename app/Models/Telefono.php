@@ -32,8 +32,12 @@ class Telefono extends Model
     {
         return $this->belongsTo(Persona::class, 'persona_id');
     }
-    public function imei()
+
+    /**
+     * Un Teléfono tiene muchos IMEIs
+     */
+    public function imeis()
     {
-        return $this->belongsTo(Imei::class, 'imei_id');
+        return $this->hasMany(Imei::class, 'telefono_id');
     }
 }

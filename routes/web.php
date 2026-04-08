@@ -52,6 +52,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/telefonos/{telefono}/vincular-persona', [App\Http\Controllers\TelefonoController::class, 'vincularPersona'])->name('telefonos.vincular-persona');
     Route::post('/telefonos/{telefono}/agregar-imei', [App\Http\Controllers\TelefonoController::class, 'agregarIMEI'])->name('telefonos.agregar-imei');
 
+    Route::resource('imeis', App\Http\Controllers\ImeiController::class);
+    Route::get('/telefonos-imeis-search', [App\Http\Controllers\ImeiController::class, 'searchTelefonos'])->name('imeis.telefonos-search');
+
     Route::resource('vehiculos', App\Http\Controllers\VehiculoController::class);
     Route::post('/vehiculos/{vehiculo}/vincular-persona', [App\Http\Controllers\VehiculoController::class, 'vincularPersona'])->name('vehiculos.vincular-persona');
     Route::delete('/vehiculos/{vehiculo}/desvincular-persona/{persona}', [App\Http\Controllers\VehiculoController::class, 'desvincularPersona'])->name('vehiculos.desvincular-persona');
