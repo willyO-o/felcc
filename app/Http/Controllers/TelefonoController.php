@@ -19,7 +19,7 @@ class TelefonoController extends Controller
         }
 
         if ($request->ajax()) {
-            $query = Telefono::with('persona')
+            $query = Telefono::with(['persona', 'imeis'])
                 ->orderBy('id', 'desc');
 
             if ($request->filled('search') && !$request->filled('filtro')) {
@@ -47,7 +47,9 @@ class TelefonoController extends Controller
                         $query->whereRaw('numero_celular LIKE ?', ["%{$search}%"]);
                         break;
                     case 'imei':
-                        $query->whereJSONContains('imeis_asociados', $search);
+                        $query->whereHas('imeis', function ($q) use ($search) {
+                            $q->where('imei', 'LIKE', "%{$search}%");
+                        });
                         break;
                     case 'ci_persona':
                         $query->whereRaw('ci LIKE ?', ["%{$search}%"]);
@@ -111,7 +113,6 @@ class TelefonoController extends Controller
             'persona_caso' => 'nullable|string|max:255',
             'caso' => 'nullable|string|max:255',
             'empresa' => 'nullable|string|max:150',
-            'imeis_asociados' => 'nullable|string',
             'respuesta_requerimiento' => 'nullable|string|max:255',
             'persona_id' => 'nullable|exists:persona,id',
             'informacion' => 'nullable|string|max:500',
@@ -125,21 +126,14 @@ class TelefonoController extends Controller
         try {
             DB::beginTransaction();
 
-            $data = $request->all();
-
-            // Si hay IMEIs, convertirlos a array (el cast los convierte a JSON)
-            if ($request->filled('imeis_asociados')) {
-                $imeis = array_filter(array_map('trim', explode(',', $request->imeis_asociados)));
-                $data['imeis_asociados'] = $imeis;
-            }
-
+            $data = $request->except('imeis_asociados');
             $telefono = Telefono::create($data);
 
             DB::commit();
 
             return response()->json([
                 'success' => 'Teléfono registrado correctamente.',
-                'datos' => $telefono->load('persona'),
+                'datos' => $telefono->load(['persona', 'imeis']),
             ], 201);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -154,7 +148,7 @@ class TelefonoController extends Controller
      */
     public function show(string $id)
     {
-        $datos = Telefono::with('persona')->findOrFail($id);
+        $datos = Telefono::with(['persona', 'imeis'])->findOrFail($id);
         return view('telefonos.show', compact('datos'));
     }
 
@@ -167,7 +161,7 @@ class TelefonoController extends Controller
             abort(403, 'No tienes permiso para realizar esta acción.');
         }
 
-        $telefono = Telefono::findOrFail($id);
+        $telefono = Telefono::with(['persona', 'imeis'])->findOrFail($id);
 
         return view('telefonos.formulario', compact('telefono'));
     }
@@ -188,7 +182,6 @@ class TelefonoController extends Controller
             'persona_caso' => 'nullable|string|max:255',
             'caso' => 'nullable|string|max:255',
             'empresa' => 'nullable|string|max:150',
-            'imeis_asociados' => 'nullable|string',
             'respuesta_requerimiento' => 'nullable|string|max:255',
             'persona_id' => 'nullable|exists:persona,id',
             'informacion' => 'nullable|string|max:500',
@@ -202,23 +195,14 @@ class TelefonoController extends Controller
         try {
             DB::beginTransaction();
 
-            $data = $request->all();
-
-            // Si hay IMEIs, convertirlos a array
-            if ($request->filled('imeis_asociados')) {
-                $imeis = array_filter(array_map('trim', explode(',', $request->imeis_asociados)));
-                $data['imeis_asociados'] = $imeis;
-            } else {
-                $data['imeis_asociados'] = null;
-            }
-
+            $data = $request->except('imeis_asociados');
             $telefono->update($data);
 
             DB::commit();
 
             return response()->json([
                 'success' => 'Teléfono actualizado correctamente.',
-                'datos' => $telefono->load('persona'),
+                'datos' => $telefono->load(['persona', 'imeis']),
             ], 200);
         } catch (\Exception $e) {
             DB::rollBack();
@@ -276,46 +260,6 @@ class TelefonoController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Error al vincular persona: ' . $e->getMessage(),
-            ], 500);
-        }
-    }
-
-    /**
-     * Agregar un IMEI a un teléfono
-     */
-    public function agregarIMEI(Request $request, string $id)
-    {
-        $request->validate([
-            'imei' => 'required|string|min:10|max:50'
-        ]);
-
-        try {
-            $telefono = Telefono::findOrFail($id);
-            $imeis = $telefono->imeis_asociados ?? [];
-
-            if (!is_array($imeis)) {
-                $imeis = [];
-            }
-
-            $nuevoIMEI = trim($request->imei);
-
-            // Validar que no exista duplicado
-            if (in_array($nuevoIMEI, $imeis)) {
-                return response()->json([
-                    'error' => 'Este IMEI ya existe en el teléfono',
-                ], 400);
-            }
-
-            $imeis[] = $nuevoIMEI;
-            $telefono->update(['imeis_asociados' => $imeis]);
-
-            return response()->json([
-                'success' => 'IMEI agregado correctamente.',
-                'datos' => $telefono,
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Error al agregar IMEI: ' . $e->getMessage(),
             ], 500);
         }
     }

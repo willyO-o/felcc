@@ -289,7 +289,42 @@
     };
 
     /**
-     * Bindear eventos del formulario
+     * Abrir modal para crear nuevo IMEI desde teléfonos
+     */
+    window.abrirModalIMEI = function (telefonoId) {
+        $.ajax({
+            url: "/imeis/create",
+            type: "GET",
+            headers: { "X-Requested-With": "XMLHttpRequest" }
+        })
+            .done(function (html) {
+                $("#modalImeiContent").html(html);
+                const modalEl = document.getElementById("modalImei");
+                const modal = new bootstrap.Modal(modalEl);
+
+                // Esperar a que el modal esté completamente visible antes de inicializar Select2
+                modalEl.addEventListener('shown.bs.modal', function onShown() {
+                    bindFormulario();
+                    // Pre-llenar el campo de teléfono si se proporciona telefonoId
+                    if (telefonoId) {
+                        const $telefonoSelect = $("#telefono_id");
+                        if ($telefonoSelect.length) {
+                            $telefonoSelect.val(telefonoId).trigger('change');
+                        }
+                    }
+                    modalEl.removeEventListener('shown.bs.modal', onShown);
+                }, { once: true });
+
+                modal.show();
+            })
+            .fail(function (err) {
+                console.error("Error:", err);
+                processError(err);
+            });
+    };
+
+    /**
+     * Bindear eventos del formulario - Soporta modo edición y creación múltiple
      */
     function bindFormulario() {
         const $form = $("#imeiForm");
@@ -297,15 +332,236 @@
 
         if ($form.length === 0 || $btnGuardar.length === 0) return;
 
-        inicializarSelect2Telefonos();
+        // Detectar si es modo edición o creación múltiple
+        const esModoPerfil = $("#imei").length > 0; // Campo "IMEI" sin sufijo = edición
 
-        $btnGuardar.off("click").on("click", function () {
-            guardarImei($form);
+        if (esModoPerfil) {
+            // MODO EDICIÓN: Formulario simple con un solo IMEI
+            inicializarSelect2TelefonosEdicion();
+            $btnGuardar.off("submit").on("click", function (e) {
+                e.preventDefault();
+                guardarImei($form);
+            });
+        } else {
+            // MODO CREACIÓN MÚLTIPLE: Formulario con tabla de IMEIs
+            inicializarSelect2TelefonosMultiple();
+            inicializarEventosMultiplesIMEIs();
+            $form.off("submit").on("submit", function (e) {
+                e.preventDefault();
+                guardarImeiMultiple($form);
+            });
+        }
+    }
+
+    /**
+     * Inicializar select2 para edición (teléfono único)
+     */
+    function inicializarSelect2TelefonosEdicion() {
+        const $telefonoSelect = $("#telefono_id");
+
+        if ($telefonoSelect.length === 0) return;
+
+        if ($telefonoSelect.data('select2')) {
+            $telefonoSelect.select2('destroy');
+            $telefonoSelect.closest('.select2-container').remove();
+        }
+
+        $telefonoSelect.select2({
+            placeholder: "Buscar teléfono (3+ caracteres)",
+            allowClear: true,
+            minimumInputLength: 3,
+            ajax: {
+                url: "/telefonos-imeis-search",
+                type: "GET",
+                dataType: "json",
+                delay: 300,
+                data: function (params) {
+                    return { q: params.term };
+                },
+                processResults: function (data) {
+                    return { results: data };
+                },
+                cache: true
+            },
+            templateResult: formatTelefonoResult,
+            templateSelection: formatTelefonoSelection,
+            dropdownParent: $("#modalImei"),
+            width: "100%",
+            theme: "bootstrap-5",
+            language: {
+                inputTooShort: () => "Escribe al menos 3 caracteres",
+                noResults: () => "No se encontraron teléfonos",
+                searching: () => "Buscando...",
+                errorLoading: () => "Error al cargar los teléfonos"
+            }
+        });
+
+        $telefonoSelect.on('select2:opening', function () {
+            $telefonoSelect.data('select2').$dropdown.css('width', '100%');
         });
     }
 
     /**
-     * Inicializar Select2 para búsqueda de teléfonos
+     * Inicializar select2 para creación múltiple (teléfono obligatorio)
+     */
+    function inicializarSelect2TelefonosMultiple() {
+        const $telefonoSelect = $("#telefono_id_multiple");
+
+        if ($telefonoSelect.length === 0) return;
+
+        if ($telefonoSelect.data('select2')) {
+            $telefonoSelect.select2('destroy');
+            $telefonoSelect.closest('.select2-container').remove();
+        }
+
+        $telefonoSelect.select2({
+            placeholder: "Buscar teléfono (3+ caracteres)",
+            allowClear: false,
+            minimumInputLength: 3,
+            ajax: {
+                url: "/telefonos-imeis-search",
+                type: "GET",
+                dataType: "json",
+                delay: 300,
+                data: function (params) {
+                    return { q: params.term };
+                },
+                processResults: function (data) {
+                    return { results: data };
+                },
+                cache: true
+            },
+            templateResult: formatTelefonoResult,
+            templateSelection: formatTelefonoSelection,
+            dropdownParent: $("#modalImei"),
+            width: "100%",
+            theme: "bootstrap-5",
+            language: {
+                inputTooShort: () => "Escribe al menos 3 caracteres",
+                noResults: () => "No se encontraron teléfonos",
+                searching: () => "Buscando...",
+                errorLoading: () => "Error al cargar los teléfonos"
+            }
+        });
+
+        $telefonoSelect.on('select2:opening', function () {
+            $telefonoSelect.data('select2').$dropdown.css('width', '100%');
+        });
+    }
+
+    /**
+     * Inicializar eventos para creación de múltiples IMEIs
+     */
+    function inicializarEventosMultiplesIMEIs() {
+        // Limpiar IMEIs previos
+        window.imeisList = [];
+        renderizarListadoIMEIs();
+
+        // Botón agregar IMEI
+        $(document).off("click", "#btnAgregarImei").on("click", "#btnAgregarImei", function () {
+            agregarImeiALista();
+        });
+
+        // Permitir agregar con Enter
+        $(document).off("keypress", "#imei_input").on("keypress", "#imei_input", function (e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                agregarImeiALista();
+            }
+        });
+
+        // Botón eliminar IMEI de la lista
+        $(document).off("click", ".btn-eliminar-imei-temporal").on("click", ".btn-eliminar-imei-temporal", function () {
+            const index = $(this).data("index");
+            window.imeisList.splice(index, 1);
+            renderizarListadoIMEIs();
+        });
+    }
+
+    /**
+     * Agregar IMEI a la lista temporal
+     */
+    function agregarImeiALista() {
+        const $imeiInput = $("#imei_input");
+        const $caracteristicasInput = $("#caracteristicas_input");
+        const imei = $imeiInput.val().trim();
+        const caracteristicas = $caracteristicasInput.val().trim();
+
+        // Validaciónes
+        if (!imei) {
+            notification("El IMEI no puede estar vacío", "Validación", 2000, "warning", "top");
+            $imeiInput.focus();
+            return;
+        }
+
+        if (imei.length > 50) {
+            notification("El IMEI no puede exceder 50 caracteres", "Validación", 2000, "warning", "top");
+            return;
+        }
+
+        if (caracteristicas.length > 1000) {
+            notification("Las características no pueden exceder 1000 caracteres", "Validación", 2000, "warning", "top");
+            return;
+        }
+
+        // Validar que no esté duplicado en la lista
+        if (window.imeisList.some(i => i.imei === imei)) {
+            notification("El IMEI ya está en la lista", "Validación", 2000, "warning", "top");
+            $imeiInput.focus();
+            return;
+        }
+
+        // Agregar a la lista
+        window.imeisList.push({
+            imei: imei,
+            caracteristicas: caracteristicas
+        });
+
+        // Limpiar inputs
+        $imeiInput.val("");
+        $caracteristicasInput.val("");
+        $imeiInput.focus();
+
+        // Actualizar listado
+        renderizarListadoIMEIs();
+    }
+
+    /**
+     * Renderizar tabla de IMEIs
+     */
+    function renderizarListadoIMEIs() {
+        const $tbody = $("#tbody-imeis");
+        const $sinImeis = $("#sinImeis");
+
+        if (window.imeisList.length === 0) {
+            $tbody.empty();
+            $sinImeis.show();
+            return;
+        }
+
+        $sinImeis.hide();
+
+        let html = "";
+        window.imeisList.forEach((imei, index) => {
+            html += `
+                <tr>
+                    <td class="text-monospace">${escapeHtml(imei.imei)}</td>
+                    <td><small>${escapeHtml(imei.caracteristicas || '—')}</small></td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-outline-danger btn-eliminar-imei-temporal" 
+                            data-index="${index}" title="Remover">
+                            <i class="ri-delete-bin-5-line align-bottom"></i>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        });
+
+        $tbody.html(html);
+    }
+
+    /**
+     * Inicializar Select2 para búsqueda de teléfonos (DEPRECATED - usar específicas)
      */
     function inicializarSelect2Telefonos() {
         const $telefonoSelect = $("#telefono_id");
@@ -384,7 +640,7 @@
     }
 
     /**
-     * Guardar IMEI
+     * Guardar un IMEI individual (Modo edición)
      */
     function guardarImei($form) {
         $form.find(".is-invalid").removeClass("is-invalid");
@@ -431,6 +687,88 @@
                         const $errorDiv = $form.find(`#error-${field}`);
                         if ($input.length) $input.addClass("is-invalid");
                         if ($errorDiv.length) $errorDiv.text(body.errors[field][0]);
+                    });
+                    return;
+                }
+
+                processError(xhr);
+            });
+    }
+
+    /**
+     * Guardar múltiples IMEIs en una transacción (Modo creación)
+     */
+    function guardarImeiMultiple($form) {
+        // Validar que haya al menos un IMEI
+        if (!window.imeisList || window.imeisList.length === 0) {
+            notification("Debe agregar al menos un IMEI", "Validación", 2000, "warning", "top");
+            $("#imei_input").focus();
+            return;
+        }
+
+        // Validar que haya teléfono seleccionado
+        const telefonoId = $("#telefono_id_multiple").val();
+        if (!telefonoId) {
+            notification("Debe seleccionar un teléfono", "Validación", 2000, "warning", "top");
+            $("#telefono_id_multiple").focus();
+            return;
+        }
+
+        $form.find(".is-invalid").removeClass("is-invalid");
+
+        const url = $form.attr("action");
+        const $btnGuardar = $("#btnGuardarImei");
+
+        $btnGuardar.prop("disabled", true);
+        $btnGuardar.html('<i class="ri-loader-4-line align-middle me-1"></i> Registrando IMEIs...');
+
+        const datos = {
+            telefono_id: telefonoId,
+            imeis: window.imeisList
+        };
+
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: JSON.stringify(datos),
+            dataType: "json",
+            contentType: "application/json",
+            headers: {
+                "X-CSRF-TOKEN": csrfToken,
+                "X-Requested-With": "XMLHttpRequest",
+                "Accept": "application/json",
+            }
+        })
+            .done(function (body) {
+                $btnGuardar.prop("disabled", false);
+                $btnGuardar.html('<i class="ri-save-3-line align-middle me-1"></i> Registrar IMEIs');
+
+                notification(body.success, "Éxito", 3000, "success", "top");
+                
+                // Limpiar lista
+                window.imeisList = [];
+                cargarImeis(currentPage);
+
+                const modal = bootstrap.Modal.getInstance(document.getElementById("modalImei"));
+                if (modal) modal.hide();
+            })
+            .fail(function (xhr) {
+                $btnGuardar.prop("disabled", false);
+                $btnGuardar.html('<i class="ri-save-3-line align-middle me-1"></i> Registrar IMEIs');
+
+                const body = xhr.responseJSON;
+
+                if (xhr.status === 422 && body.errors) {
+                    Object.keys(body.errors).forEach((field) => {
+                        const $errorDiv = $form.find(`#error-${field}`);
+                        if ($errorDiv.length) {
+                            $errorDiv.addClass("d-block");
+                            if (Array.isArray(body.errors[field])) {
+                                $errorDiv.text(body.errors[field][0]);
+                            } else {
+                                $errorDiv.text(body.errors[field]);
+                            }
+                        }
                     });
                     return;
                 }

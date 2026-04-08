@@ -80,6 +80,7 @@ class ImeiController extends Controller
 
     /**
      * Store a newly created resource in storage.
+     * Permite crear un IMEI individual O múltiples IMEIs en una transacción
      */
     public function store(Request $request)
     {
@@ -87,6 +88,12 @@ class ImeiController extends Controller
             abort(403, 'No tienes permiso para realizar esta acción.');
         }
 
+        // Verificar si es creación de múltiples IMEIs o un solo IMEI
+        if ($request->has('imeis') && is_array($request->input('imeis'))) {
+            return $this->storeMultiple($request);
+        }
+
+        // Creación de un solo IMEI (puede venir de edición llamando a store)
         $reglas = [
             'imei' => 'required|string|max:50|unique:imei,imei',
             'caracteristicas' => 'nullable|string|max:1000',
@@ -111,6 +118,70 @@ class ImeiController extends Controller
             DB::rollBack();
             return response()->json([
                 'error' => 'Error al crear el IMEI: ' . $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Crear múltiples IMEIs en una transacción
+     */
+    private function storeMultiple(Request $request)
+    {
+        $reglas = [
+            'imeis' => 'required|array|min:1',
+            'imeis.*.imei' => 'required|string|max:50|distinct',
+            'imeis.*.caracteristicas' => 'nullable|string|max:1000',
+            'telefono_id' => 'required|exists:telefono,id',
+        ];
+
+        $request->validate($reglas, [
+            'imeis.required' => 'Debe agregar al menos un IMEI.',
+            'imeis.min' => 'Debe agregar al menos un IMEI.',
+            'imeis.*.imei.required' => 'El IMEI es requerido.',
+            'imeis.*.imei.distinct' => 'No puede repetir IMEIs en la misma operación.',
+            'telefono_id.required' => 'Debe seleccionar un teléfono.',
+            'telefono_id.exists' => 'El teléfono seleccionado no existe.',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $creados = [];
+            $duplicados = [];
+            $telefonoId = $request->input('telefono_id');
+
+            foreach ($request->input('imeis') as $imeiData) {
+                // Verificar si el IMEI ya existe
+                if (Imei::where('imei', $imeiData['imei'])->exists()) {
+                    $duplicados[] = $imeiData['imei'];
+                    continue;
+                }
+
+                $imei = new Imei([
+                    'imei' => $imeiData['imei'],
+                    'caracteristicas' => $imeiData['caracteristicas'] ?? null,
+                    'telefono_id' => $telefonoId,
+                ]);
+                $imei->save();
+                $creados[] = $imei->load('telefono.persona');
+            }
+
+            DB::commit();
+
+            $mensaje = count($creados) . ' IMEI(s) registrado(s) correctamente.';
+            if (!empty($duplicados)) {
+                $mensaje .= ' (' . count($duplicados) . ' duplicado(s) ignorado(s): ' . implode(', ', $duplicados) . ')';
+            }
+
+            return response()->json([
+                'success' => $mensaje,
+                'creados' => $creados,
+                'duplicados' => $duplicados,
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => 'Error al crear los IMEIs: ' . $e->getMessage(),
             ], 500);
         }
     }
