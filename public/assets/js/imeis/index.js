@@ -17,6 +17,8 @@
     const $paginacion = $("#paginacionImeis");
     const $detallesPagina = $("#detalles-pagina");
 
+    let totalPages = 0;
+
     /**
      * Cargar listado de IMEIs con paginación y filtros
      */
@@ -154,7 +156,7 @@
      * Renderizar paginación
      */
     function renderPaginacion(total, page, size) {
-        const totalPages = Math.ceil(total / size);
+        totalPages = Math.ceil(total / size);
         let html = "";
 
         html += `<li class="page-item ${page <= 1 ? "disabled" : ""}">
@@ -185,14 +187,6 @@
         </li>`;
 
         $paginacion.html(html);
-
-        $paginacion.on("click", ".page-link[data-page]", function (e) {
-            e.preventDefault();
-            const p = parseInt($(this).data("page"));
-            if (p >= 1 && p <= totalPages) {
-                cargarImeis(p);
-            }
-        });
     }
 
     /**
@@ -583,6 +577,17 @@
      */
     $(document).on("click", ".btn-vincular-telefono", function () {
         abrirModalVincularTelefono($(this).val());
+    });
+
+    /**
+     * Paginación - Solo se registra una vez
+     */
+    $(document).on("click", "#paginacionImeis .page-link[data-page]", function (e) {
+        e.preventDefault();
+        const p = parseInt($(this).data("page"));
+        if (p >= 1 && p <= totalPages) {
+            cargarImeis(p);
+        }
     });
 
     /**

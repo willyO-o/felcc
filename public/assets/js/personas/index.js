@@ -11,6 +11,7 @@
     let pageSize = 10;
     let searchTimeout = null;
     let filePondInstance = null;
+    let totalPages = 0;
 
     const $listado = $("#listadoPersonas");
     const $loading = $("#loadingPersonas");
@@ -396,7 +397,7 @@
     }
 
     function renderPaginacion(total, page, size) {
-        const totalPages = Math.ceil(total / size);
+        totalPages = Math.ceil(total / size);
         let html = "";
 
         html += `<li class="page-item ${page <= 1 ? "disabled" : ""}">
@@ -427,14 +428,6 @@
         </li>`;
 
         $paginacion.html(html);
-
-        $paginacion.on("click", ".page-link[data-page]", function (e) {
-            e.preventDefault();
-            const p = parseInt($(this).data("page"));
-            if (p >= 1 && p <= totalPages) {
-                cargarPersonas(p);
-            }
-        });
     }
 
     function abrirModalCrear() {
@@ -714,6 +707,17 @@
         }
         $("#modalPersona").off("hidden.bs.modal", limpiarFilePond);
     }
+
+    /**
+     * Paginación - Solo se registra una vez
+     */
+    $(document).on("click", "#paginacionPersonas .page-link[data-page]", function (e) {
+        e.preventDefault();
+        const p = parseInt($(this).data("page"));
+        if (p >= 1 && p <= totalPages) {
+            cargarPersonas(p);
+        }
+    });
 
     $(document).ready(function () {
         cargarPersonas();
