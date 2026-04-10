@@ -6,23 +6,32 @@
     <div class="row">
         <div class="col-md-6 mb-3">
             <label class="form-label fw-500">IMEI:</label>
-            <p id="detalleImei"></p>
+            <p id="detalleImei"> {{ $datos->imei }} </p>
         </div>
         <div class="col-md-6 mb-3">
             <label class="form-label fw-500">Fecha de Registro:</label>
-            <p id="detalleFechaRegistro"></p>
+            <p id="detalleFechaRegistro"> {{ $datos->created_at->format('d/m/Y H:i') }} </p>
         </div>
     </div>
 
     <div class="mb-3">
         <label class="form-label fw-500">Características:</label>
-        <p id="detalleCaracteristicas"></p>
+        <p id="detalleCaracteristicas"> {{ $datos->caracteristicas ?? '—' }} </p>
     </div>
 
     <div class="mb-3">
         <label class="form-label fw-500">Teléfono Vinculado:</label>
         <div id="detalleVinculacion">
-            <p class="text-muted">Cargando información...</p>
+            @forelse ($datos->telefonos as $telefono)
+                <p class="text-primary mb-1">
+                    {{ $telefono->numero_celular }}
+                    @if ($telefono->persona)
+                        - {{ $telefono->persona->nombres }} {{ $telefono->persona->apellidos }} (C.I.: {{ $telefono->persona->ci }})
+                    @endif
+                </p>
+            @empty
+                <p class="text-danger">No hay teléfonos vinculados.</p>
+            @endforelse
         </div>
     </div>
 

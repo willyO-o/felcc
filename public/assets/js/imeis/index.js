@@ -94,16 +94,18 @@
             // Procesar teléfono vinculado
             let telefonoVinculado = "Sin vincular";
             let claseTelefono = "text-danger";
-            let botonesVinculacion = '';
 
 
             const telefonos = imei.telefonos || [];
 
             const telefonosHtml = telefonos.length > 0
-                ? `<div class="d-flex flex-wrap gap-1">${telefonos.map(tel => `<span class="badge badge-outline-secondary">${escapeHtml(tel.numero_celular)}</span>`).join('')}</div>`
+                ? `<div class="d-flex flex-wrap gap-1">
+                ${telefonos.map(tel => `<span class="badge badge-outline-secondary">
+                    ${escapeHtml(tel.numero_celular)}  ${escapeHtml(tel.persona ? " - "+ tel.persona.nombres+ ' ' + tel.persona.apellidos : '')} </span>`).join('<br>')}
+                    </div>`
                 : '<small class="text-muted">Sin teléfonos</small>';
 
-            // telefonoVinculado
+
 
             html += /*html */`
                 <tr>
@@ -115,8 +117,9 @@
                     <td>
                         <div class="d-flex align-items-center gap-2">
                             ${telefonosHtml}
-                            <small class="${claseTelefono}">${telefonoVinculado}</small>
-                            ${botonesVinculacion}
+                            <button class="btn btn-sm btn-soft-secondary btn-vincular-telefono" value="${imei.id}" title="Vincular teléfono">
+                                <i class="mdi mdi-phone-plus align-middle"></i>
+                            </button>
                         </div>
                     </td>
                     <td>${fecha}</td>
@@ -199,49 +202,6 @@
         }).done(function (data) {
             $("#modalDetallesContent").html(data);
 
-            // Poblar detalles del modal
-            const imei = data.imei || {};
-
-            $("#detalleImei").text(escapeHtml(imei.imei || "—"));
-            $("#detalleCaracteristicas").text(escapeHtml(imei.caracteristicas || "—"));
-            $("#detalleUltActualizacion").text(
-                imei.updated_at
-                    ? new Date(imei.updated_at).toLocaleDateString("es-BO", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                    })
-                    : "—"
-            );
-            $("#detalleFechaRegistro").text(
-                imei.created_at
-                    ? new Date(imei.created_at).toLocaleDateString("es-BO", {
-                        year: "numeric",
-                        month: "short",
-                        day: "numeric",
-                    })
-                    : "—"
-            );
-
-            // Procesar teléfono vinculado
-            let vinculacionHtml = '<p class="text-muted">Sin vincular</p>';
-            if (imei.telefono) {
-                vinculacionHtml = `
-                    <div class="alert alert-info mb-0">
-                        <div class="fw-bold">${escapeHtml(imei.telefono.numero_celular || "—")}</div>
-                        ${imei.telefono.persona ? `<small>${escapeHtml(imei.telefono.persona.nombres + ' ' + imei.telefono.persona.apellidos)}</small>` : '<small class="text-muted">Sin persona vinculada</small>'}
-                    </div>
-                `;
-            }
-            $("#detalleVinculacion").html(vinculacionHtml);
-
-            // Evento para editar desde los detalles
-            $("#btnEditarImeiDetalle").off("click").on("click", function () {
-                bootstrap.Modal.getInstance(document.getElementById("modalDetalles")).hide();
-                editarImei(id);
-            });
 
             const modal = new bootstrap.Modal(document.getElementById("modalDetalles"));
             modal.show();
@@ -313,6 +273,7 @@
         $telefonoSelect.select2({
             placeholder: "Buscar teléfono (3+ caracteres)",
             allowClear: true,
+            multiple: true,
             minimumInputLength: 3,
             ajax: {
                 url: "/telefonos-imeis-search",
@@ -544,12 +505,11 @@
         $btn.html('<i class="ri-loader-4-line align-middle me-1"></i> Vinculando...');
 
         $.ajax({
-            url: `/imeis/${imeiId}`,
-            type: "PUT",
+            url: `/imeis-vincular-telefono/${imeiId}`,
+            type: "POST",
             dataType: "json",
             data: {
                 telefono_id: telefonoId,
-                _method: 'PUT'
             },
             headers: {
                 "X-CSRF-TOKEN": csrfToken,

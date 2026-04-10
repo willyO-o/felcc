@@ -52,10 +52,14 @@ class TelefonoController extends Controller
                         });
                         break;
                     case 'ci_persona':
-                        $query->whereRaw('ci LIKE ?', ["%{$search}%"]);
+                        $query->whereHas('persona', function ($q) use ($search) {
+                            $q->whereRaw('ci LIKE ?', ["%{$search}%"]);
+                        });
                         break;
                     case 'nombre_persona':
-                        $query->whereRaw('CONCAT(COALESCE(nombres, ""), " ", COALESCE(apellidos, "")) LIKE ?', ["%{$search}%"]);
+                        $query->whereHas('persona', function ($q) use ($search) {
+                            $q->whereRaw('CONCAT(COALESCE(nombres, ""), " ", COALESCE(apellidos, "")) LIKE ?', ["%{$search}%"]);
+                        });
                         break;
                     case 'callap':
                         $query->whereRaw('callapp LIKE ?', ["%{$search}%"]);
@@ -286,7 +290,7 @@ class TelefonoController extends Controller
             $query->where(function ($q) use ($search) {
                 $q->whereRaw('numero_celular LIKE ?', ["%{$search}%"])
                     ->orWhereHas('persona', function ($q2) use ($search) {
-                        $q2->whereRaw('CONCAT(nombres, " ", apellidos) LIKE ?', ["%{$search}%"]);
+                        $q2->whereRaw('CONCAT(COALESCE(nombres, ""), " ", COALESCE(apellidos, "")) LIKE ?', ["%{$search}%"]);
                     });
             });
         }

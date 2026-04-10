@@ -88,24 +88,40 @@ class ImeiController extends Controller
             abort(403, 'No tienes permiso para realizar esta acción.');
         }
 
-        $reglas = [
-            'imei' => 'required|string|max:50|unique:imei,imei',
-            'caracteristicas' => 'nullable|string|max:1000',
-            'telefono_id' => 'nullable|exists:telefono,id',
-        ];
+        try {
 
-        $request->validate($reglas);
+            DB::beginTransaction();
+
+            $reglas = [
+                'imei' => 'required|string|max:50|unique:imei,imei',
+                'caracteristicas' => 'nullable|string|max:1000',
+                'telefono_id' => 'nullable|exists:telefono,id',
+            ];
+
+            $request->validate($reglas);
 
 
 
-        $data = $request->only('imei', 'caracteristicas', 'telefono_id');
-        $imeiRecord = Imei::create($data);
+            $data = $request->only('imei', 'caracteristicas');
+            $imeiRecord = Imei::create($data);
 
+            if ($request->filled('telefono_id')) {
+                $telefonoIds = $request->input('telefono_id', []);
+                $imeiRecord->telefonos()->sync($telefonoIds);
+            }
 
-        return response()->json([
-            'success' => 'IMEI registrado correctamente.',
-            'datos' => $imeiRecord->load('telefono.persona'),
-        ], 201);
+            DB::commit();
+
+            return response()->json([
+                'success' => 'IMEI registrado correctamente.',
+                'datos' => $imeiRecord->load('telefonos.persona'),
+            ], 201);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => 'Error al registrar el IMEI: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -113,7 +129,7 @@ class ImeiController extends Controller
      */
     public function show(string $id)
     {
-        $datos = Imei::with('telefono.persona')->findOrFail($id);
+        $datos = Imei::with(['telefonos', 'telefonos.persona'])->findOrFail($id);
         return view('imeis.show', compact('datos'));
     }
 
@@ -126,7 +142,8 @@ class ImeiController extends Controller
             abort(403, 'No tienes permiso para realizar esta acción.');
         }
 
-        $imei = Imei::with('telefono')->findOrFail($id);
+        $imei = Imei::with(['telefonos', 'telefonos.persona'])->findOrFail($id);
+
 
         return view('imeis.formulario', compact('imei'));
     }
@@ -150,13 +167,29 @@ class ImeiController extends Controller
 
         $request->validate($reglas);
 
-        $imei->update($request->all());
+        try {
+            DB::beginTransaction();
 
+            $data = $request->only('imei', 'caracteristicas');
+            $imei->update($data);
 
-        return response()->json([
-            'success' => 'IMEI actualizado correctamente.',
-            'datos' => $imei->load('telefono.persona'),
-        ], 200);
+            if ($request->has('telefono_id')) {
+                $telefonoIds = $request->input('telefono_id', []);
+                $imei->telefonos()->sync($telefonoIds);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => 'IMEI actualizado correctamente.',
+                'datos' => $imei->load('telefonos.persona'),
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => 'Error al actualizar el IMEI: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -187,4 +220,39 @@ class ImeiController extends Controller
         }
     }
 
+
+    public function vincularTelefono(Request $request, string $id)
+    {
+        if (!request()->user()->hasAnyPermission(['imeis_all', 'imeis_crear'])) {
+            abort(403, 'No tienes permiso para realizar esta acción.');
+        }
+
+        $imei = Imei::findOrFail($id);
+
+        $reglas = [
+            'telefono_id' => 'required|exists:telefono,id',
+        ];
+
+        $request->validate($reglas);
+
+        try {
+            DB::beginTransaction();
+
+            $telefonoId = $request->input('telefono_id');
+            $imei->telefonos()->syncWithoutDetaching($telefonoId);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => 'Teléfono vinculado al IMEI correctamente.',
+                'datos' => $imei->load('telefonos.persona'),
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'error' => 'Error al vincular el teléfono al IMEI: ' . $e->getMessage(),
+            ], 500);
+        }
+
+    }
 }

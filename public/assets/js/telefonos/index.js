@@ -688,6 +688,17 @@
     });
 
     /**
+     * Paginación - Solo se registra una vez
+     */
+    $(document).on("click", "#paginacionTelefonos .page-link[data-page]", function (e) {
+        e.preventDefault();
+        const p = parseInt($(this).data("page"));
+        if (p >= 1 && p <= totalPages) {
+            cargarTelefonos(p);
+        }
+    });
+
+    /**
      * Inicialización cuando el documento está listo
      */
 

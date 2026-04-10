@@ -64,6 +64,7 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::resource('imeis', App\Http\Controllers\ImeiController::class);
     Route::get('/telefonos-imeis-search', [App\Http\Controllers\TelefonoController::class, 'searchTelefonos'])->name('imeis.telefonos-search');
+    Route::post('/imeis-vincular-telefono/{id}', [App\Http\Controllers\ImeiController::class, 'vincularTelefono'])->name('imeis.vincular-telefono');
 
     Route::resource('vehiculos', App\Http\Controllers\VehiculoController::class);
     Route::post('/vehiculos/{vehiculo}/vincular-persona', [App\Http\Controllers\VehiculoController::class, 'vincularPersona'])->name('vehiculos.vincular-persona');
