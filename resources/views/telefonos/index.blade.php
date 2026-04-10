@@ -61,8 +61,8 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Número Celular</th>
-                                    <th scope="col">Persona</th>
                                     <th scope="col">Persona del Caso</th>
+                                    <th scope="col">Caso</th>
                                     <th scope="col">Respuesta Req.</th>
                                     <th scope="col">IMEIs Asociados</th>
                                     <th scope="col">Fecha Registro</th>

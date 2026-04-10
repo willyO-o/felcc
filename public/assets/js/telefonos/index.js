@@ -113,6 +113,12 @@
                         <span class="fw-bold">${escapeHtml(numero)}</span>
                         ${telefono.empresa ? `<br><small class="text-muted">${escapeHtml(telefono.empresa)}</small>` : ''}
                     </td>
+
+                    <td>
+                        ${persona_caso !== "—" ? `<span class="">${escapeHtml(persona_caso)}</span>` : '—'}
+                    </td>
+                    <td>${escapeHtml(caso)}</td>
+
                     <td>
                         <div class=" gap-2">
                             <div>
@@ -121,10 +127,6 @@
                             </div>
                             ${!tienePersona ? `<button class="btn btn-sm btn-soft-secondary btn-vincular-persona" value="${telefono.id}" title="Vincular persona"><i class="ri-user-add-line align-bottom"></i></button>` : ''}
                         </div>
-                    </td>
-                    <td>${escapeHtml(caso)}</td>
-                    <td>
-                        ${persona_caso !== "—" ? `<span class="">${escapeHtml(persona_caso)}</span>` : '—'}
                     </td>
                     <td>
                         <div class=" gap-2">
@@ -683,17 +685,6 @@
      */
     $(document).on("click", ".btn-agregar-imei", function () {
         abrirModalAgregarIMEI($(this).val());
-    });
-
-    /**
-     * Paginación - Solo se registra una vez
-     */
-    $(document).on("click", "#paginacionTelefonos .page-link[data-page]", function (e) {
-        e.preventDefault();
-        const p = parseInt($(this).data("page"));
-        if (p >= 1 && p <= totalPages) {
-            cargarTelefonos(p);
-        }
     });
 
     /**
