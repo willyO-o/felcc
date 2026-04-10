@@ -7,6 +7,8 @@ use App\Models\Persona;
 use App\Models\Pais;
 use App\Models\Mandamiento;
 use App\Models\Telefono;
+use App\Models\Imei;
+use App\Models\ImeiTelefono;
 use App\Models\TipoMandamiento;
 use App\Models\Juzgado;
 use App\Models\Delito;
@@ -680,6 +682,154 @@ class Importacion extends Controller
 
                 if (!$telefono) {
                     throw new \Exception("Error al crear teléfono en fila " . ($index + 2) . "Numero: " . $fila['NUMERO_DE_CELULAR'] ?? 'Sin número');
+                }
+                $contador++;
+            }
+
+
+            DB::commit();
+
+            return $contador;
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+            return ["error" => $e->getMessage()];
+        }
+    }
+
+
+    public function storeIMEI(Request $request)
+    {
+
+        $request->validate([
+            'archivo' => 'required|file|extensions:csv|max:10240',
+        ], [
+            'archivo.required' => 'El archivo es obligatorio',
+            'archivo.extensions' => 'El archivo debe ser CSV',
+            'archivo.max' => 'El archivo no debe exceder 10MB',
+        ]);
+
+        $path = $request->file('archivo')->storeAs(
+            'csv_imports',
+            'telefono_' . $request->file('archivo')->getClientOriginalName(),
+            'local'
+        );
+
+        $reader = ReaderEntityFactory::createReaderFromFile(Storage::disk('local')->path($path));
+
+        $delimiter = $this->detectDelimiter(Storage::disk('local')->path($path));
+        $reader->setFieldDelimiter($delimiter);
+
+        $reader->open(Storage::disk('local')->path($path));
+
+        $data = [];
+        $cabeceras = [];
+        $filasVaciasConsecutivas = 0;
+        $umbralFilasVacias = 20; // Si encuentra 20 filas vacías seguidas, se detiene
+        $columnasRequeridas = ['NUMERO_ASOCIADO', 'NUMERO_IMEI'];
+
+        foreach ($reader->getSheetIterator() as $sheet) {
+
+            foreach ($sheet->getRowIterator() as $index => $row) {
+                $cells = $row->toArray();
+
+                if ($index === 1) {
+                    $cabeceras = $this->convertirCabeceras($cells);
+
+                    // /verificar si el archivo tiene las columnas necesarias la indispensable es el numero de celular
+                    $faltantes = array_diff($columnasRequeridas, $cabeceras);
+                    if (in_array(['NUMERO_ASOCIADO', 'NUMERO_IMEI'], $faltantes)) {
+                        return response()->json([
+                            'errors' => 'El archivo debe contener al menos la columna NUMERO_DE_CELULAR. Columnas faltantes: ' . implode(', ', $faltantes),
+                            'message' => 'El archivo debe contener al menos la columna NUMERO_DE_CELULAR. Columnas faltantes: ' . implode(', ', $faltantes)
+                        ], 422);
+                    }
+                    continue;
+                }
+
+                // Verificar si la fila está completamente vacía
+                $filaVacia = empty(array_filter($cells, function ($celda) {
+                    return $celda !== null && trim($celda) !== '';
+                }));
+
+                if ($filaVacia) {
+                    $filasVaciasConsecutivas++;
+
+                    // Si hay más de X filas vacías seguidas, detener
+                    if ($filasVaciasConsecutivas > $umbralFilasVacias) {
+                        break 2; // Rompe ambos foreach
+                    }
+
+                    continue; // Saltar fila vacía pero continuar leyendo
+                }
+
+                // Si encontramos datos, resetear el contador de filas vacías
+                $filasVaciasConsecutivas = 0;
+
+                $filaAsociativa = array_combine($cabeceras, $cells);
+                $data[] = $filaAsociativa;
+            }
+            break; // Solo la primera hoja
+        }
+
+        $resultado = $this->vincularImeiTelefono($data);
+
+
+        if (!is_numeric($resultado)) {
+            return response()->json([
+                'error' => "No se pudieron importar los telefonos. Error: { $resultado[error] }"
+            ], 500);
+        }
+
+        return response()->json([
+            'success' => 'Migración de telefonos completada, Se importaron ' . $resultado . ' telefonos',
+            'total' => $resultado,
+            'importadas' => $resultado,
+            'errores' => []
+        ], 200);
+
+        return $path;
+    }
+
+
+    private function vincularImeiTelefono($data)
+    {
+
+
+        try {
+            DB::beginTransaction();
+
+            $contador = 0;
+
+            foreach ($data as $index => $fila) {
+
+
+
+                $datos  = [
+                    'imei' => campoDB($fila['NUMERO_IMEI'] ?? null),
+                ];
+
+                $imei = Imei::firstOrCreate($datos);
+
+
+                $telefono = Telefono::firstOrCreate([
+                    'numero_celular' => campoDB($fila['NUMERO_ASOCIADO'] ?? null),
+                ]);
+
+                $datosVincular = [
+                    'telefono_id' => $telefono->id,
+                    'imei_id' => $imei->id
+                ];
+
+                // if($datosVincular['telefono_id'] === null){
+                //     throw new \Exception("No se encontró un teléfono con el número " . ($fila['NUMERO_ASOCIADO'] ?? 'Sin número') . " en la fila " . ($index + 2));
+                // }
+
+                $imeiTelefono = ImeiTelefono::firstOrCreate($datosVincular);
+
+
+                if (!$imeiTelefono) {
+                    throw new \Exception("Error al crear Vinculo IMEI-Teléfono en fila " . ($index + 2) . "Numero: " . $fila['NUMERO_IMEI'] ?? 'Sin número');
                 }
                 $contador++;
             }

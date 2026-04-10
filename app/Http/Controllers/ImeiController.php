@@ -19,7 +19,7 @@ class ImeiController extends Controller
         }
 
         if ($request->ajax()) {
-            $query = Imei::with('telefono.persona')
+            $query = Imei::with(['telefonos', 'telefonos.persona'])
                 ->orderBy('id', 'desc');
 
             if ($request->filled('search') && !$request->filled('filtro')) {
@@ -28,7 +28,7 @@ class ImeiController extends Controller
                 $query->where(function ($q) use ($search) {
                     $q->whereRaw('imei LIKE ?', ["%{$search}%"])
                         ->orWhereRaw('caracteristicas LIKE ?', ["%{$search}%"])
-                        ->orWhereHas('telefono', function ($q2) use ($search) {
+                        ->orWhereHas('telefonos', function ($q2) use ($search) {
                             $q2->whereRaw('numero_celular LIKE ?', ["%{$search}%"]);
                         });
                 });
@@ -45,7 +45,8 @@ class ImeiController extends Controller
                         $query->whereRaw('caracteristicas LIKE ?', ["%{$search}%"]);
                         break;
                     case 'numero':
-                        $query->whereHas('telefono', function ($q) use ($search) {
+                        //modificar la relacion muchos a muchos para buscar por numero de telefono
+                        $query->whereHas('telefonos', function ($q) use ($search) {
                             $q->whereRaw('numero_celular LIKE ?', ["%{$search}%"]);
                         });
                         break;

@@ -38,6 +38,19 @@ class Telefono extends Model
      */
     public function imeis()
     {
-        return $this->hasMany(Imei::class, 'telefono_id');
+        return $this->belongsToMany(Imei::class, 'imei_telefono', 'telefono_id', 'imei_id');
+    }
+
+
+    public static function idTelefonoNumero($numero)
+    {
+        $telefono = static::where('numero_celular', $numero)->first();
+
+        if ($telefono) {
+            $telefono = static::create([
+                'numero_celular' => $numero,
+            ]);
+        }
+        return $telefono->id;
     }
 }

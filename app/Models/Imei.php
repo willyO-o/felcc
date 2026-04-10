@@ -13,15 +13,14 @@ class Imei extends Model
     protected $fillable = [
         'imei',
         'caracteristicas',
-        'telefono_id',
     ];
 
     /**
      * Un IMEI pertenece a un Teléfono
      */
-    public function telefono()
+    public function telefonos()
     {
-        return $this->belongsTo(Telefono::class, 'telefono_id');
+        return $this->belongsToMany(Telefono::class, 'imei_telefono', 'imei_id', 'telefono_id');
     }
 }
 

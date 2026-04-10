@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('imei', function (Blueprint $table) {
             $table->id();
             $table->string('imei')->unique();
-            $table->foreignId('telefono_id')->nullable()->constrained('telefono')->onDelete('restrict');
             $table->text('caracteristicas')->nullable();
             $table->timestamps();
             $table->softDeletes();
@@ -24,6 +23,16 @@ return new class extends Migration
         Schema::table('telefono', function (Blueprint $table) {
             $table->dropColumn('imeis_asociados');
         });
+
+        Schema::create('imei_telefono', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('imei_id');
+            $table->unsignedBigInteger('telefono_id');
+            $table->timestamps();
+
+            $table->foreign('imei_id')->references('id')->on('imei')->onDelete('cascade');
+            $table->foreign('telefono_id')->references('id')->on('telefono')->onDelete('cascade');
+        });
     }
 
     /**
@@ -32,6 +41,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('imei');
+        Schema::dropIfExists('imei_telefono');
         Schema::table('telefono', function (Blueprint $table) {
             $table->json('imeis_asociados')->nullable();
         });

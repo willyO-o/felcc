@@ -94,18 +94,14 @@
             let claseTelefono = "text-danger";
             let botonesVinculacion = '';
 
-            if (imei.telefono) {
-                telefonoVinculado = escapeHtml(imei.telefono.numero_celular || "—");
-                if (imei.telefono.persona) {
-                    telefonoVinculado += ` - ${escapeHtml(imei.telefono.persona.nombres + ' ' + imei.telefono.persona.apellidos)}`;
-                }
-                claseTelefono = "";
-            } else {
-                // Mostrar botón para vincular si no hay teléfono
-                botonesVinculacion = `<button class="btn btn-sm btn-soft-info btn-vincular-telefono" value="${imei.id}" title="Vincular teléfono">
-                    <i class="mdi mdi-phone-plus align-bottom"></i>
-                </button>`;
-            }
+
+            const telefonos = imei.telefonos || [];
+
+            const telefonosHtml = telefonos.length > 0
+                ? `<div class="d-flex flex-wrap gap-1">${telefonos.map(tel => `<span class="badge badge-outline-secondary">${escapeHtml(tel.numero_celular)}</span>`).join('')}</div>`
+                : '<small class="text-muted">Sin teléfonos</small>';
+
+            // telefonoVinculado
 
             html += /*html */`
                 <tr>
@@ -116,6 +112,7 @@
                     </td>
                     <td>
                         <div class="d-flex align-items-center gap-2">
+                            ${telefonosHtml}
                             <small class="${claseTelefono}">${telefonoVinculado}</small>
                             ${botonesVinculacion}
                         </div>
