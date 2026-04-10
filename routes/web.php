@@ -45,6 +45,7 @@ Route::group(['middleware' => ['auth']], function () {
     // Rutas de importación de telefonos
     Route::get('/telefonos/importar', [App\Http\Controllers\Importacion::class, 'indexTelefono'])->name('telefonos.importar.index');
     Route::post('/telefonos/importar', [App\Http\Controllers\Importacion::class, 'storeTelefono'])->name('telefonos.importar.store');
+    Route::post('/imeis/importar', [App\Http\Controllers\Importacion::class, 'storeIMEI'])->name('imeis.importar.store');
 
 
 

@@ -17,89 +17,201 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title">Importación Masiva de Telefonos</h5>
-                </div>
-                <div class="card-body">
-                    {{-- Área de carga --}}
-                    <div class="row mb-4">
-                        <div class="col-12">
-                            <div class="border-2 border-dashed rounded-3 p-5 text-center" id="dropZone"
-                                style="border-color: #dee2e6; cursor: pointer; transition: all 0.3s;">
-                                <div id="uploadIcon">
-                                    <i class="ri-upload-cloud-2-line" style="font-size: 3rem; color: #0ab39c;"></i>
-                                    <p class="text-muted mt-3 mb-1">Arrastra tu archivo aquí o haz clic para seleccionar</p>
-                                    <small class="text-muted">Formatos: CSV, XLSX, XLS (máx. 10MB)</small>
-                                </div>
-                                <input type="file" id="archivoInput" accept=".csv,.xlsx,.xls" style="display: none;">
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Info archivo --}}
-                    <div id="infoArchivo" style="display: none;">
-                        <div class="alert alert-info">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <strong id="nombreArchivo"></strong>
-                                    <small id="tamañoArchivo" class="d-block text-muted"></small>
-                                </div>
-                                <button type="button" class="btn btn-sm btn-secondary"
-                                    onclick="limpiarArchivo()">Cambiar</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    {{-- Botones de acción --}}
-                    <div class="row gap-2">
-                        <div class="col-12">
-                            <button type="button" class="btn btn-primary w-100" id="btnImportar" style="display: none;"
-                                onclick="importarArchivo()">
-                                <i class="ri-download-line me-1"></i> Importar Teléfonos
-                            </button>
-                        </div>
-                    </div>
-
-                    {{-- Barra de progreso --}}
-                    <div id="progressContainer" style="display: none;" class="mt-3">
-                        <div class="progress" style="height: 25px;">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar"
-                                role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0"
-                                aria-valuemax="100">
-                                <span id="progressText">0%</span>
-                            </div>
-                        </div>
-                        <p class="text-muted small mt-2" id="progressInfo">Procesando...</p>
-                    </div>
-
-                    {{-- Resultados --}}
-                    <div id="resultContainer" style="display: none;" class="mt-4">
-                        <div class="alert" id="resultAlert"></div>
-
-                        <div id="statsContent"></div>
-
-                        <div id="erroresContent" style="display: none;">
-                            <h6 class="mt-3 mb-2">Errores encontrados:</h6>
-                            <div class="table-responsive">
-                                <table class="table table-sm table-bordered" id="tablaErrores">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>Fila</th>
-                                            <th>Nombre</th>
-                                            <th>Error</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody></tbody>
-                                </table>
-                            </div>
-                        </div>
-
-                        <div class="mt-3">
-                            <a href="{{ route('telefonos.index') }}" class="btn btn-primary">
-                                <i class="ri-check-line me-1"></i> Ver Teléfonos
+                    <ul class="nav nav-tabs nav-tabs-custom card-header-tabs border-bottom-0" role="tablist">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-bs-toggle="tab"
+                                href="#telefonosTab" role="tab">
+                                <i class="ri-phone-line me-2"></i>Importar Teléfonos
                             </a>
-                            <button type="button" class="btn btn-secondary" onclick="limpiarResultados()">
-                                <i class="ri-refresh-line me-1"></i> Importar Otro
-                            </button>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab"
+                                href="#imeisTab" role="tab">
+                                <i class="ri-smartphone-line me-2"></i>Importar IMEIs
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="tab-content">
+                    {{-- TAB TELEFONOS --}}
+                    <div class="tab-pane fade show active" id="telefonosTab" role="tabpanel">
+                        <div class="card-body">
+                            {{-- Área de carga --}}
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="border-2 border-dashed rounded-3 p-5 text-center" id="dropZone_tel"
+                                        style="border-color: #dee2e6; cursor: pointer; transition: all 0.3s;">
+                                        <div id="uploadIcon_tel">
+                                            <div class="mb-3">
+                                                <i class="ri-phone-line" style="font-size: 4rem; color: #0ab39c;"></i>
+                                            </div>
+                                            <p class="text-muted mt-3 mb-1"><strong>Importar Teléfonos</strong></p>
+                                            <p class="text-muted mb-1">Arrastra tu archivo aquí o haz clic para seleccionar</p>
+                                            <small class="text-muted">Formatos: CSV, XLSX, XLS (máx. 10MB)</small>
+                                        </div>
+                                        <input type="file" id="archivoInput_tel" accept=".csv,.xlsx,.xls" style="display: none;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Info archivo --}}
+                            <div id="infoArchivo_tel" style="display: none;">
+                                <div class="alert alert-info">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong id="nombreArchivo_tel"></strong>
+                                            <small id="tamañoArchivo_tel" class="d-block text-muted"></small>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-secondary"
+                                            onclick="limpiarArchivo('_tel')">Cambiar</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Botones de acción --}}
+                            <div class="row gap-2">
+                                <div class="col-12">
+                                    <button type="button" class="btn btn-primary w-100" id="btnImportar_tel" style="display: none;"
+                                        onclick="importarArchivo('_tel', 'telefonos')">
+                                        <i class="ri-download-line me-1"></i> Importar Teléfonos
+                                    </button>
+                                </div>
+                            </div>
+
+                            {{-- Barra de progreso --}}
+                            <div id="progressContainer_tel" style="display: none;" class="mt-3">
+                                <div class="progress" style="height: 25px;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar_tel"
+                                        role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0"
+                                        aria-valuemax="100">
+                                        <span id="progressText_tel">0%</span>
+                                    </div>
+                                </div>
+                                <p class="text-muted small mt-2" id="progressInfo_tel">Procesando...</p>
+                            </div>
+
+                            {{-- Resultados --}}
+                            <div id="resultContainer_tel" style="display: none;" class="mt-4">
+                                <div class="alert" id="resultAlert_tel"></div>
+
+                                <div id="statsContent_tel"></div>
+
+                                <div id="erroresContent_tel" style="display: none;">
+                                    <h6 class="mt-3 mb-2">Errores encontrados:</h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered" id="tablaErrores_tel">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Fila</th>
+                                                    <th>Nombre</th>
+                                                    <th>Error</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="mt-3">
+                                    <a href="{{ route('telefonos.index') }}" class="btn btn-primary">
+                                        <i class="ri-check-line me-1"></i> Ver Teléfonos
+                                    </a>
+                                    <button type="button" class="btn btn-secondary" onclick="limpiarResultados('_tel')">
+                                        <i class="ri-refresh-line me-1"></i> Importar Otro
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- TAB IMEIS --}}
+                    <div class="tab-pane fade" id="imeisTab" role="tabpanel">
+                        <div class="card-body">
+                            {{-- Área de carga --}}
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <div class="border-2 border-dashed rounded-3 p-5 text-center" id="dropZone_imei"
+                                        style="border-color: #dee2e6; cursor: pointer; transition: all 0.3s;">
+                                        <div id="uploadIcon_imei">
+                                            <div class="mb-3">
+                                                <i class="ri-smartphone-line" style="font-size: 4rem; color: #0ab39c;"></i>
+                                            </div>
+                                            <p class="text-muted mt-3 mb-1"><strong>Importar IMEIs</strong></p>
+                                            <p class="text-muted mb-1">Arrastra tu archivo aquí o haz clic para seleccionar</p>
+                                            <small class="text-muted">Formatos: CSV, XLSX, XLS (máx. 10MB)</small>
+                                        </div>
+                                        <input type="file" id="archivoInput_imei" accept=".csv,.xlsx,.xls" style="display: none;">
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Info archivo --}}
+                            <div id="infoArchivo_imei" style="display: none;">
+                                <div class="alert alert-info">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <strong id="nombreArchivo_imei"></strong>
+                                            <small id="tamañoArchivo_imei" class="d-block text-muted"></small>
+                                        </div>
+                                        <button type="button" class="btn btn-sm btn-secondary"
+                                            onclick="limpiarArchivo('_imei')">Cambiar</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Botones de acción --}}
+                            <div class="row gap-2">
+                                <div class="col-12">
+                                    <button type="button" class="btn btn-primary w-100" id="btnImportar_imei" style="display: none;"
+                                        onclick="importarArchivo('_imei', 'imeis')">
+                                        <i class="ri-download-line me-1"></i> Importar IMEIs
+                                    </button>
+                                </div>
+                            </div>
+
+                            {{-- Barra de progreso --}}
+                            <div id="progressContainer_imei" style="display: none;" class="mt-3">
+                                <div class="progress" style="height: 25px;">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar_imei"
+                                        role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0"
+                                        aria-valuemax="100">
+                                        <span id="progressText_imei">0%</span>
+                                    </div>
+                                </div>
+                                <p class="text-muted small mt-2" id="progressInfo_imei">Procesando...</p>
+                            </div>
+
+                            {{-- Resultados --}}
+                            <div id="resultContainer_imei" style="display: none;" class="mt-4">
+                                <div class="alert" id="resultAlert_imei"></div>
+
+                                <div id="statsContent_imei"></div>
+
+                                <div id="erroresContent_imei" style="display: none;">
+                                    <h6 class="mt-3 mb-2">Errores encontrados:</h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-bordered" id="tablaErrores_imei">
+                                            <thead class="table-light">
+                                                <tr>
+                                                    <th>Fila</th>
+                                                    <th>Nombre</th>
+                                                    <th>Error</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+
+                                <div class="mt-3">
+                                    <a href="{{ route('imeis.index') }}" class="btn btn-primary">
+                                        <i class="ri-check-line me-1"></i> Ver IMEIs
+                                    </a>
+                                    <button type="button" class="btn btn-secondary" onclick="limpiarResultados('_imei')">
+                                        <i class="ri-refresh-line me-1"></i> Importar Otro
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -250,15 +362,23 @@
                     <h5 class="card-title">Información</h5>
                 </div>
                 <div class="card-body small">
-                    <div class="row g-2">
+                    <div class="row g-2 mb-3">
                         <div class="col-6">
                             <div class="text-center p-2 bg-light rounded">
                                 <div class="fw-bold">{{ \App\Models\Telefono::count() }}</div>
-                                <small class="text-muted">Total Teléfonos</small>
+                                <small class="text-muted">Teléfonos</small>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="text-center p-2 bg-light rounded">
+                                <div class="fw-bold">{{ \App\Models\Imei::count() }}</div>
+                                <small class="text-muted">IMEIs</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-12">
+                            <div class="text-center p-2 bg-warning bg-opacity-10 rounded">
                                 <div class="fw-bold">Máx 10 MB</div>
                                 <small class="text-muted">Tamaño Archivo</small>
                             </div>
@@ -270,12 +390,14 @@
     </div>
 
     <style>
-        #dropZone:hover {
+        #dropZone_tel:hover,
+        #dropZone_imei:hover {
             border-color: #0ab39c !important;
             background-color: rgba(10, 179, 156, 0.05);
         }
 
-        #dropZone.dragover {
+        #dropZone_tel.dragover,
+        #dropZone_imei.dragover {
             border-color: #0ab39c !important;
             background-color: rgba(10, 179, 156, 0.1);
         }
@@ -284,58 +406,98 @@
 
 @section('js')
     <script>
-        let archivoSeleccionado = null;
+        // Variables para cada tipo de importación
+        let archivoSeleccionado_tel = null;
+        let archivoSeleccionado_imei = null;
 
-        const dropZone = document.getElementById('dropZone');
-        const archivoInput = document.getElementById('archivoInput');
+        // Inicializar drag and drop para Teléfonos
+        const dropZone_tel = document.getElementById('dropZone_tel');
+        const archivoInput_tel = document.getElementById('archivoInput_tel');
 
-        // Drag and drop
-        dropZone.addEventListener('click', () => archivoInput.click());
-
-        dropZone.addEventListener('dragover', (e) => {
+        dropZone_tel.addEventListener('click', () => archivoInput_tel.click());
+        dropZone_tel.addEventListener('dragover', (e) => {
             e.preventDefault();
-            dropZone.classList.add('dragover');
+            dropZone_tel.classList.add('dragover');
         });
-
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('dragover');
+        dropZone_tel.addEventListener('dragleave', () => {
+            dropZone_tel.classList.remove('dragover');
         });
-
-        dropZone.addEventListener('drop', (e) => {
+        dropZone_tel.addEventListener('drop', (e) => {
             e.preventDefault();
-            dropZone.classList.remove('dragover');
+            dropZone_tel.classList.remove('dragover');
             const files = e.dataTransfer.files;
             if (files.length > 0) {
-                seleccionarArchivo(files[0]);
+                seleccionarArchivo(files[0], '_tel');
             }
         });
-
-        archivoInput.addEventListener('change', (e) => {
+        archivoInput_tel.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
-                seleccionarArchivo(e.target.files[0]);
+                seleccionarArchivo(e.target.files[0], '_tel');
             }
         });
 
-        function seleccionarArchivo(archivo) {
-            archivoSeleccionado = archivo;
-            document.getElementById('uploadIcon').style.display = 'none';
-            document.getElementById('infoArchivo').style.display = 'block';
-            document.getElementById('btnImportar').style.display = 'block';
+        // Inicializar drag and drop para IMEIs
+        const dropZone_imei = document.getElementById('dropZone_imei');
+        const archivoInput_imei = document.getElementById('archivoInput_imei');
 
-            document.getElementById('nombreArchivo').textContent = archivo.name;
-            document.getElementById('tamañoArchivo').textContent =
+        dropZone_imei.addEventListener('click', () => archivoInput_imei.click());
+        dropZone_imei.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone_imei.classList.add('dragover');
+        });
+        dropZone_imei.addEventListener('dragleave', () => {
+            dropZone_imei.classList.remove('dragover');
+        });
+        dropZone_imei.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone_imei.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                seleccionarArchivo(files[0], '_imei');
+            }
+        });
+        archivoInput_imei.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                seleccionarArchivo(e.target.files[0], '_imei');
+            }
+        });
+
+        // Seleccionar archivo
+        function seleccionarArchivo(archivo, sufijo) {
+            // Guardar referencia del archivo
+            if (sufijo === '_tel') {
+                archivoSeleccionado_tel = archivo;
+            } else {
+                archivoSeleccionado_imei = archivo;
+            }
+
+            document.getElementById('uploadIcon' + sufijo).style.display = 'none';
+            document.getElementById('infoArchivo' + sufijo).style.display = 'block';
+            document.getElementById('btnImportar' + sufijo).style.display = 'block';
+
+            document.getElementById('nombreArchivo' + sufijo).textContent = archivo.name;
+            document.getElementById('tamañoArchivo' + sufijo).textContent =
                 `${(archivo.size / 1024 / 1024).toFixed(2)} MB`;
         }
 
-        function limpiarArchivo() {
-            archivoSeleccionado = null;
-            archivoInput.value = '';
-            document.getElementById('uploadIcon').style.display = 'block';
-            document.getElementById('infoArchivo').style.display = 'none';
-            document.getElementById('btnImportar').style.display = 'none';
+        // Limpiar archivo
+        function limpiarArchivo(sufijo) {
+            if (sufijo === '_tel') {
+                archivoSeleccionado_tel = null;
+            } else {
+                archivoSeleccionado_imei = null;
+            }
+
+            document.getElementById('archivoInput' + sufijo).value = '';
+            document.getElementById('uploadIcon' + sufijo).style.display = 'block';
+            document.getElementById('infoArchivo' + sufijo).style.display = 'none';
+            document.getElementById('btnImportar' + sufijo).style.display = 'none';
         }
 
-        function importarArchivo() {
+        // Importar archivo
+        function importarArchivo(sufijo, tipo) {
+            const archivoSeleccionado = sufijo === '_tel' ? archivoSeleccionado_tel : archivoSeleccionado_imei;
+
             if (!archivoSeleccionado) {
                 Swal.fire('Error', 'Selecciona un archivo', 'error');
                 return;
@@ -345,19 +507,22 @@
             formData.append('archivo', archivoSeleccionado);
             formData.append('_token', '{{ csrf_token() }}');
 
-            document.getElementById('progressContainer').style.display = 'block';
-            document.getElementById('btnImportar').disabled = true;
+            document.getElementById('progressContainer' + sufijo).style.display = 'block';
+            document.getElementById('btnImportar' + sufijo).disabled = true;
 
             // Simular progreso
             let progress = 0;
             const progressInterval = setInterval(() => {
                 if (progress < 90) {
                     progress += Math.random() * 30;
-                    actualizarProgreso(Math.min(progress, 90));
+                    actualizarProgreso(Math.min(progress, 90), sufijo);
                 }
             }, 200);
 
-            $.post('{{ route('telefonos.importar.store') }}', formData, {
+            // Determinar la ruta según el tipo
+            let ruta = tipo === 'telefonos' ? '{{ route('telefonos.importar.store') }}' : '{{ route('imeis.importar.store') }}';
+
+            $.post(ruta, formData, {
                     processData: false,
                     contentType: false,
                     headers: {
@@ -367,36 +532,33 @@
                 })
                 .done(data => {
                     clearInterval(progressInterval);
-                    actualizarProgreso(100);
+                    actualizarProgreso(100, sufijo);
 
                     setTimeout(() => {
-                        document.getElementById('progressContainer').style.display = 'none';
-                        mostrarResultados(data);
-                        // document.getElementById('btnImportar').disabled = false;
+                        document.getElementById('progressContainer' + sufijo).style.display = 'none';
+                        mostrarResultados(data, sufijo);
                     }, 500);
                 })
                 .fail(err => {
-
                     clearInterval(progressInterval);
-
-
-                    document.getElementById('btnImportar').disabled = false;
+                    document.getElementById('btnImportar' + sufijo).disabled = false;
                     Swal.fire('Error', 'Error al importar: ' + err.responseJSON.message, 'error');
                 });
-
         }
 
-        function actualizarProgreso(valor) {
-            document.getElementById('progressBar').style.width = valor + '%';
-            document.getElementById('progressBar').setAttribute('aria-valuenow', valor);
-            document.getElementById('progressText').textContent = Math.round(valor) + '%';
+        // Actualizar progreso
+        function actualizarProgreso(valor, sufijo) {
+            document.getElementById('progressBar' + sufijo).style.width = valor + '%';
+            document.getElementById('progressBar' + sufijo).setAttribute('aria-valuenow', valor);
+            document.getElementById('progressText' + sufijo).textContent = Math.round(valor) + '%';
         }
 
-        function mostrarResultados(data) {
-            const container = document.getElementById('resultContainer');
-            const alert = document.getElementById('resultAlert');
-            const statsContent = document.getElementById('statsContent');
-            const erroresContent = document.getElementById('erroresContent');
+        // Mostrar resultados
+        function mostrarResultados(data, sufijo) {
+            const container = document.getElementById('resultContainer' + sufijo);
+            const alert = document.getElementById('resultAlert' + sufijo);
+            const statsContent = document.getElementById('statsContent' + sufijo);
+            const erroresContent = document.getElementById('erroresContent' + sufijo);
 
             if (data.errors) {
                 alert.className = 'alert alert-danger';
@@ -432,7 +594,7 @@
                 // Errores si los hay
                 if (data?.errores?.length > 0) {
                     erroresContent.style.display = 'block';
-                    const tbody = document.querySelector('#tablaErrores tbody');
+                    const tbody = document.querySelector('#tablaErrores' + sufijo + ' tbody');
                     tbody.innerHTML = '';
                     data.errores.forEach(error => {
                         tbody.innerHTML += `
@@ -451,10 +613,11 @@
             container.style.display = 'block';
         }
 
-        function limpiarResultados() {
-            document.getElementById('resultContainer').style.display = 'none';
-            limpiarArchivo();
-            actualizarProgreso(0);
+        // Limpiar resultados
+        function limpiarResultados(sufijo) {
+            document.getElementById('resultContainer' + sufijo).style.display = 'none';
+            limpiarArchivo(sufijo);
+            actualizarProgreso(0, sufijo);
         }
     </script>
 @endsection

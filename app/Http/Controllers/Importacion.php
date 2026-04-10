@@ -583,6 +583,7 @@ class Importacion extends Controller
         $cabeceras = [];
         $filasVaciasConsecutivas = 0;
         $umbralFilasVacias = 20; // Si encuentra 20 filas vacías seguidas, se detiene
+        $columnasRequeridas = ['NUMERO_DE_CELULAR', 'PERSONA_DEL_CASO', 'CASO', 'EMPRESA', 'RESP_A_REQ', 'CI', 'INFO', 'CALLAPP', 'TRUECALL', 'UNINET'];
 
         foreach ($reader->getSheetIterator() as $sheet) {
 
@@ -591,6 +592,17 @@ class Importacion extends Controller
 
                 if ($index === 1) {
                     $cabeceras = $this->convertirCabeceras($cells);
+
+                    // /verificar si el archivo tiene las columnas necesarias la indispensable es el numero de celular
+                    $faltantes = array_diff($columnasRequeridas, $cabeceras);
+                    if (in_array('NUMERO_DE_CELULAR', $faltantes)) {
+                        return response()->json([
+                            'errors' => 'El archivo debe contener al menos la columna NUMERO_DE_CELULAR. Columnas faltantes: ' . implode(', ', $faltantes),
+                            'message' => 'El archivo debe contener al menos la columna NUMERO_DE_CELULAR. Columnas faltantes: ' . implode(', ', $faltantes)
+                        ], 422);
+                    }
+
+
                     continue;
                 }
 
