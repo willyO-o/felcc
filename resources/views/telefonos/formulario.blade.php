@@ -85,36 +85,6 @@
                     <div id="error-respuesta_requerimiento" class="invalid-feedback"></div>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="mb-3">
-                    <label class="form-label">IMEI Asociados</label>
-                    <div class="input-group mb-2">
-                        <input type="text" class="form-control txtNumero" id="nuevoIMEI"
-                            placeholder="Ingresa el IMEI">
-                        <button class="btn btn-outline-secondary" type="button" id="btnAgregarIMEI">
-                            <i class="ri-add-line align-middle"></i> Agregar
-                        </button>
-                    </div>
-                    <div id="listaIMEIs" class="d-flex flex-wrap gap-2">
-                        @if ($telefono->imeis_asociados && is_array($telefono->imeis_asociados))
-                            @foreach ($telefono->imeis_asociados as $imei)
-                                <span class="badge badge-outline-secondary d-flex align-items-center gap-2"
-                                    data-imei="{{ $imei }}">
-                                    {{ $imei }}
-                                    <button type="button" value="{{ $imei }}"
-                                        class="btn-remove-imei btn btn-secondary py-0 px-1 border-0 text-white cursor-pointer"
-                                        title="Eliminar">
-                                        <i class="ri-close-line"></i>
-                                    </button>
-                                </span>
-                            @endforeach
-                        @endif
-                    </div>
-                    <input type="hidden" id="imeis_asociados" name="imeis_asociados" value="">
-                    <div id="error-imeis_asociados" class="invalid-feedback"></div>
-                </div>
-
-            </div>
 
             <div class="col-md-6">
                 <div class="mb-3">
@@ -127,32 +97,30 @@
             </div>
 
 
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="callapp" class="form-label">CallApp</label>
-                        <input type="text" class="form-control" id="callapp" name="callapp"
-                            value="{{ $telefono->callapp ?? '' }}" placeholder="Información CallApp">
-                        <div id="error-callapp" class="invalid-feedback"></div>
-                    </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="callapp" class="form-label">CallApp</label>
+                    <input type="text" class="form-control" id="callapp" name="callapp"
+                        value="{{ $telefono->callapp ?? '' }}" placeholder="Información CallApp">
+                    <div id="error-callapp" class="invalid-feedback"></div>
                 </div>
+            </div>
 
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="truecall" class="form-label">TrueCall</label>
-                        <input type="text" class="form-control" id="truecall" name="truecall"
-                            value="{{ $telefono->truecall ?? '' }}" placeholder="Información TrueCall">
-                        <div id="error-truecall" class="invalid-feedback"></div>
-                    </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="truecall" class="form-label">TrueCall</label>
+                    <input type="text" class="form-control" id="truecall" name="truecall"
+                        value="{{ $telefono->truecall ?? '' }}" placeholder="Información TrueCall">
+                    <div id="error-truecall" class="invalid-feedback"></div>
                 </div>
+            </div>
 
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="uninet" class="form-label">UniNet</label>
-                        <input type="text" class="form-control" id="uninet" name="uninet"
-                            value="{{ $telefono->uninet ?? '' }}" placeholder="Información UniNet">
-                        <div id="error-uninet" class="invalid-feedback"></div>
-                    </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    <label for="uninet" class="form-label">UniNet</label>
+                    <input type="text" class="form-control" id="uninet" name="uninet"
+                        value="{{ $telefono->uninet ?? '' }}" placeholder="Información UniNet">
+                    <div id="error-uninet" class="invalid-feedback"></div>
                 </div>
             </div>
         </div>

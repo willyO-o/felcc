@@ -1,12 +1,12 @@
 @extends('layouts.app')
 
-@section('page-title', 'Importar Personas desde CSV')
+@section('page-title', 'Importar Telefonos desde CSV')
 
 @section('breadcrumb')
     <div class="page-title-right">
         <ol class="breadcrumb m-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('personas.index') }}">Personas</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('telefonos.index') }}">Telefonos</a></li>
             <li class="breadcrumb-item active">Importar</li>
         </ol>
     </div>
@@ -17,13 +17,14 @@
         <div class="col-md-8">
             <div class="card">
                 <div class="card-header">
-                    <h5 class="card-title">Importación Masiva de Personas</h5>
+                    <h5 class="card-title">Importación Masiva de Telefonos</h5>
                 </div>
                 <div class="card-body">
                     {{-- Área de carga --}}
                     <div class="row mb-4">
                         <div class="col-12">
-                            <div class="border-2 border-dashed rounded-3 p-5 text-center" id="dropZone" style="border-color: #dee2e6; cursor: pointer; transition: all 0.3s;">
+                            <div class="border-2 border-dashed rounded-3 p-5 text-center" id="dropZone"
+                                style="border-color: #dee2e6; cursor: pointer; transition: all 0.3s;">
                                 <div id="uploadIcon">
                                     <i class="ri-upload-cloud-2-line" style="font-size: 3rem; color: #0ab39c;"></i>
                                     <p class="text-muted mt-3 mb-1">Arrastra tu archivo aquí o haz clic para seleccionar</p>
@@ -42,7 +43,8 @@
                                     <strong id="nombreArchivo"></strong>
                                     <small id="tamañoArchivo" class="d-block text-muted"></small>
                                 </div>
-                                <button type="button" class="btn btn-sm btn-secondary" onclick="limpiarArchivo()">Cambiar</button>
+                                <button type="button" class="btn btn-sm btn-secondary"
+                                    onclick="limpiarArchivo()">Cambiar</button>
                             </div>
                         </div>
                     </div>
@@ -50,8 +52,9 @@
                     {{-- Botones de acción --}}
                     <div class="row gap-2">
                         <div class="col-12">
-                            <button type="button" class="btn btn-primary w-100" id="btnImportar" style="display: none;" onclick="importarArchivo()">
-                                <i class="ri-download-line me-1"></i> Importar Personas
+                            <button type="button" class="btn btn-primary w-100" id="btnImportar" style="display: none;"
+                                onclick="importarArchivo()">
+                                <i class="ri-download-line me-1"></i> Importar Teléfonos
                             </button>
                         </div>
                     </div>
@@ -59,7 +62,9 @@
                     {{-- Barra de progreso --}}
                     <div id="progressContainer" style="display: none;" class="mt-3">
                         <div class="progress" style="height: 25px;">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar"
+                                role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0"
+                                aria-valuemax="100">
                                 <span id="progressText">0%</span>
                             </div>
                         </div>
@@ -89,8 +94,8 @@
                         </div>
 
                         <div class="mt-3">
-                            <a href="{{ route('personas.index') }}" class="btn btn-primary">
-                                <i class="ri-check-line me-1"></i> Ver Personas
+                            <a href="{{ route('telefonos.index') }}" class="btn btn-primary">
+                                <i class="ri-check-line me-1"></i> Ver Teléfonos
                             </a>
                             <button type="button" class="btn btn-secondary" onclick="limpiarResultados()">
                                 <i class="ri-refresh-line me-1"></i> Importar Otro
@@ -112,16 +117,19 @@
                         {{-- Encabezados requeridos --}}
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRequired">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseRequired">
                                     <i class="ri-checkbox-circle-line me-2 text-success"></i> Campos Obligatorios
                                 </button>
                             </h2>
-                            <div id="collapseRequired" class="accordion-collapse collapse show" data-bs-parent="#accordionCampos">
+                            <div id="collapseRequired" class="accordion-collapse collapse show"
+                                data-bs-parent="#accordionCampos">
                                 <div class="accordion-body p-2">
                                     <ul class="list-unstyled small">
                                         <li class="mb-2">
                                             <strong>NOMBRE</strong><br>
-                                            <small class="text-muted">Nombre completo de la persona. Se parseará automáticamente en nombres y apellidos.</small>
+                                            <small class="text-muted">Nombre completo de la persona. Se parseará
+                                                automáticamente en nombres y apellidos.</small>
                                         </li>
                                     </ul>
                                 </div>
@@ -131,11 +139,13 @@
                         {{-- Campos opcionales básicos --}}
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseBasic">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseBasic">
                                     <i class="ri-file-text-line me-2 text-info"></i> Datos Básicos
                                 </button>
                             </h2>
-                            <div id="collapseBasic" class="accordion-collapse collapse" data-bs-parent="#accordionCampos">
+                            <div id="collapseBasic" class="accordion-collapse collapse"
+                                data-bs-parent="#accordionCampos">
                                 <div class="accordion-body p-2">
                                     <ul class="list-unstyled small">
                                         <li class="mb-2">
@@ -158,14 +168,17 @@
                         {{-- Datos SEGIP --}}
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSEGIP">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseSEGIP">
                                     <i class="ri-identity-card-line me-2 text-primary"></i> Datos SEGIP
                                 </button>
                             </h2>
-                            <div id="collapseSEGIP" class="accordion-collapse collapse" data-bs-parent="#accordionCampos">
+                            <div id="collapseSEGIP" class="accordion-collapse collapse"
+                                data-bs-parent="#accordionCampos">
                                 <div class="accordion-body p-2">
                                     <p class="small text-muted mb-2">🔄 <strong>Parsing Automático</strong></p>
-                                    <p class="small mb-2">La columna <strong>DATOS_SEGIP</strong> contiene toda la información del SEGIP. El sistema extrae automáticamente:</p>
+                                    <p class="small mb-2">La columna <strong>DATOS_SEGIP</strong> contiene toda la
+                                        información del SEGIP. El sistema extrae automáticamente:</p>
                                     <ul class="list-unstyled small">
                                         <li>✓ Fecha de Nacimiento</li>
                                         <li>✓ Lugar de Nacimiento</li>
@@ -184,11 +197,13 @@
                         {{-- Ejemplo de formato --}}
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseExample">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseExample">
                                     <i class="ri-file-csv-line me-2 text-warning"></i> Ejemplo CSV
                                 </button>
                             </h2>
-                            <div id="collapseExample" class="accordion-collapse collapse" data-bs-parent="#acordionCampos">
+                            <div id="collapseExample" class="accordion-collapse collapse"
+                                data-bs-parent="#acordionCampos">
                                 <div class="accordion-body p-2">
                                     <pre class="small bg-light p-2 rounded" style="overflow-x: auto;"><code>N REGISTRO;NOMBRE;CI;DATOS_SEGIP;responsable;ESTADO
 1;JUAN PEREZ GARCIA;1234567;Fecha de Nacimiento: 15/01/1990...;JHONY;En investigación
@@ -200,11 +215,13 @@
                         {{-- Validaciones --}}
                         <div class="accordion-item">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseValidation">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#collapseValidation">
                                     <i class="ri-error-warning-line me-2 text-danger"></i> Validaciones
                                 </button>
                             </h2>
-                            <div id="collapseValidation" class="accordion-collapse collapse" data-bs-parent="#acordionCampos">
+                            <div id="collapseValidation" class="accordion-collapse collapse"
+                                data-bs-parent="#acordionCampos">
                                 <div class="accordion-body p-2">
                                     <ul class="list-unstyled small">
                                         <li class="mb-2">⚠️ Los CIs duplicados se actualizarán</li>
@@ -236,8 +253,8 @@
                     <div class="row g-2">
                         <div class="col-6">
                             <div class="text-center p-2 bg-light rounded">
-                                <div class="fw-bold">{{ \App\Models\Persona::count() }}</div>
-                                <small class="text-muted">Total Personas</small>
+                                <div class="fw-bold">{{ \App\Models\Telefono::count() }}</div>
+                                <small class="text-muted">Total Teléfonos</small>
                             </div>
                         </div>
                         <div class="col-6">
@@ -340,30 +357,33 @@
                 }
             }, 200);
 
-            fetch('{{ route('personas.importar.store') }}', {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
-            })
-                .then(res => res.json())
-                .then(data => {
+            $.post('{{ route('telefonos.importar.store') }}', formData, {
+                    processData: false,
+                    contentType: false,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .done(data => {
                     clearInterval(progressInterval);
                     actualizarProgreso(100);
 
                     setTimeout(() => {
                         document.getElementById('progressContainer').style.display = 'none';
                         mostrarResultados(data);
-                        document.getElementById('btnImportar').disabled = false;
+                        // document.getElementById('btnImportar').disabled = false;
                     }, 500);
                 })
-                .catch(err => {
+                .fail(err => {
+
                     clearInterval(progressInterval);
+
+
                     document.getElementById('btnImportar').disabled = false;
-                    Swal.fire('Error', 'Error al importar: ' + err.message, 'error');
+                    Swal.fire('Error', 'Error al importar: ' + err.responseJSON.message, 'error');
                 });
+
         }
 
         function actualizarProgreso(valor) {
@@ -378,9 +398,9 @@
             const statsContent = document.getElementById('statsContent');
             const erroresContent = document.getElementById('erroresContent');
 
-            if (data.error) {
+            if (data.errors) {
                 alert.className = 'alert alert-danger';
-                alert.innerHTML = `<i class="ri-error-warning-line me-2"></i> ${data.error}`;
+                alert.innerHTML = `<i class="ri-error-warning-line me-2"></i> ${data.message}`;
             } else {
                 alert.className = 'alert alert-success';
                 alert.innerHTML = `<i class="ri-check-circle-line me-2"></i> ${data.success}`;
@@ -401,8 +421,8 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="text-center p-3 ${data.errores.length > 0 ? 'bg-warning' : 'bg-success'} bg-opacity-10 rounded">
-                                <div class="h4 ${data.errores.length > 0 ? 'text-warning' : 'text-success'} mb-0">${data.errores.length}</div>
+                            <div class="text-center p-3 ${data?.errores?.length > 0 ? 'bg-warning' : 'bg-success'} bg-opacity-10 rounded">
+                                <div class="h4 ${data?.errores?.length > 0 ? 'text-warning' : 'text-success'} mb-0">${data?.errores?.length}</div>
                                 <small class="text-muted">Errores</small>
                             </div>
                         </div>
@@ -410,7 +430,7 @@
                 `;
 
                 // Errores si los hay
-                if (data.errores.length > 0) {
+                if (data?.errores?.length > 0) {
                     erroresContent.style.display = 'block';
                     const tbody = document.querySelector('#tablaErrores tbody');
                     tbody.innerHTML = '';

@@ -51,7 +51,7 @@
                 @endcanany
 
 
-                @canany([ 'tecnico_felcc'])
+                @canany(['tecnico_felcc'])
                     <!-- Mandamientos -->
                     <li class="nav-item">
                         <a class="nav-link menu-link" href="{{ route('mandamientos.create') }}">
@@ -103,7 +103,7 @@
                 @endcanany
 
 
-                @canany(['superadmin', 'administrador', ])
+                @canany(['superadmin', 'administrador'])
                     <!-- Usuarios -->
                     <li class="menu-title"><span data-key="t-menu">Importar</span></li>
 
@@ -118,11 +118,15 @@
                                     <a href="{{ route('personas.importar.index') }}" class="nav-link">Importar Personas</a>
                                 </li>
 
+
                                 <li class="nav-item">
                                     <a href="{{ route('importar.mandamientos.index') }}" class="nav-link">Importar
                                         Mandamientos</a>
                                 </li>
-
+                                <li class="nav-item">
+                                    <a href="{{ route('telefonos.importar.index') }}" class="nav-link">Importar
+                                        Telefonos</a>
+                                </li>
                                 <li class="nav-item d-none">
                                     <a href="{{ route('usuarios.index') }}" class="nav-link">Importar Registro</a>
                                 </li>

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Persona;
 use App\Models\Pais;
 use App\Models\Mandamiento;
+use App\Models\Telefono;
 use App\Models\TipoMandamiento;
 use App\Models\Juzgado;
 use App\Models\Delito;
@@ -19,7 +20,7 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 
 
 
-class ImportarPersonasController extends Controller
+class Importacion extends Controller
 {
 
     // protected $cabeceras  = [
@@ -405,7 +406,7 @@ class ImportarPersonasController extends Controller
 
         $path = $request->file('archivo')->storeAs(
             'csv_imports',
-            $request->file('archivo')->getClientOriginalName(),
+            "mandamiento_" . $request->file('archivo')->getClientOriginalName(),
             'local'
         );
 
@@ -432,7 +433,7 @@ class ImportarPersonasController extends Controller
                 }
 
                 // Verificar si la fila está completamente vacía
-                $filaVacia = empty(array_filter($cells, function($celda) {
+                $filaVacia = empty(array_filter($cells, function ($celda) {
                     return $celda !== null && trim($celda) !== '';
                 }));
 
@@ -533,6 +534,140 @@ class ImportarPersonasController extends Controller
 
                 if (!$mandamient) {
                     throw new \Exception("Error al crear mandamiento en fila " . ($index + 2));
+                }
+                $contador++;
+            }
+
+
+            DB::commit();
+
+            return $contador;
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+            return ["error" => $e->getMessage()];
+        }
+    }
+
+    public function indexTelefono()
+    {
+        return view('importar.indexTelefonoImportar');
+    }
+
+
+    public function storeTelefono(Request $request)
+    {
+
+        $request->validate([
+            'archivo' => 'required|file|extensions:csv|max:10240',
+        ], [
+            'archivo.required' => 'El archivo es obligatorio',
+            'archivo.extensions' => 'El archivo debe ser CSV',
+            'archivo.max' => 'El archivo no debe exceder 10MB',
+        ]);
+
+        $path = $request->file('archivo')->storeAs(
+            'csv_imports',
+            'telefono_' . $request->file('archivo')->getClientOriginalName(),
+            'local'
+        );
+
+        $reader = ReaderEntityFactory::createReaderFromFile(Storage::disk('local')->path($path));
+
+        $delimiter = $this->detectDelimiter(Storage::disk('local')->path($path));
+        $reader->setFieldDelimiter($delimiter);
+
+        $reader->open(Storage::disk('local')->path($path));
+
+        $data = [];
+        $cabeceras = [];
+        $filasVaciasConsecutivas = 0;
+        $umbralFilasVacias = 20; // Si encuentra 20 filas vacías seguidas, se detiene
+
+        foreach ($reader->getSheetIterator() as $sheet) {
+
+            foreach ($sheet->getRowIterator() as $index => $row) {
+                $cells = $row->toArray();
+
+                if ($index === 1) {
+                    $cabeceras = $this->convertirCabeceras($cells);
+                    continue;
+                }
+
+                // Verificar si la fila está completamente vacía
+                $filaVacia = empty(array_filter($cells, function ($celda) {
+                    return $celda !== null && trim($celda) !== '';
+                }));
+
+                if ($filaVacia) {
+                    $filasVaciasConsecutivas++;
+
+                    // Si hay más de X filas vacías seguidas, detener
+                    if ($filasVaciasConsecutivas > $umbralFilasVacias) {
+                        break 2; // Rompe ambos foreach
+                    }
+
+                    continue; // Saltar fila vacía pero continuar leyendo
+                }
+
+                // Si encontramos datos, resetear el contador de filas vacías
+                $filasVaciasConsecutivas = 0;
+
+                $filaAsociativa = array_combine($cabeceras, $cells);
+                $data[] = $filaAsociativa;
+            }
+            break; // Solo la primera hoja
+        }
+
+        $resultado = $this->registrarDatosTelefonos($data);
+
+        if (!is_numeric($resultado)) {
+            return response()->json([
+                'error' => "No se pudieron importar los telefonos. Error: { $resultado[error] }"
+            ], 500);
+        }
+
+        return response()->json([
+            'success' => 'Migración de telefonos completada, Se importaron ' . $resultado . ' telefonos',
+            'total' => $resultado,
+            'importadas' => $resultado,
+            'errores' => []
+        ], 200);
+
+        return $path;
+    }
+
+    private function registrarDatosTelefonos($data)
+    {
+
+
+        try {
+            DB::beginTransaction();
+
+            $contador = 0;
+
+            foreach ($data as $index => $fila) {
+
+
+                $nombreCompleto = $this->separarNombreApellidos($fila['RESP_A_REQ'] ?? '', true);
+
+                $datos  = [
+                    'numero_celular' => campoDB($fila['NUMERO_DE_CELULAR'] ?? null),
+                    'persona_caso' => campoDB($fila['PERSONA_DEL_CASO'] ?? null),
+                    'caso' => campoDB($fila['CASO'] ?? null),
+                    'empresa' => campoDB($fila['EMPRESA'] ?? null),
+                    'respuesta_requerimiento' => campoDB($fila['RESP_A_REQ'] ?? null),
+                    'persona_id' => Persona::idPersonaDatos(['nombres' => $nombreCompleto['nombres'], 'apellidos' => $nombreCompleto['apellidos'], 'ci' => limpiarCI($fila['CI'] ?? null)]),
+                    'informacion' => campoDB($fila['INFO'] ?? null),
+                    'callapp' => $fila['CALLAPP'] ?? null,
+                    'truecall' => $fila['TRUECALL'] ?? null,
+                    'uninet' => $fila['UNINET'] ?? null,
+                ];
+
+                $telefono = Telefono::create($datos);
+
+                if (!$telefono) {
+                    throw new \Exception("Error al crear teléfono en fila " . ($index + 2) . "Numero: " . $fila['NUMERO_DE_CELULAR'] ?? 'Sin número');
                 }
                 $contador++;
             }

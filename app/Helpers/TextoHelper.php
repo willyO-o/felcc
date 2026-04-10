@@ -62,3 +62,17 @@ if (!function_exists('campoDB')) {
         return $cadena;
     }
 }
+
+if (!function_exists('limpiarCI')) {
+    function limpiarCI($cadena)
+    {
+
+        if (!$cadena) {
+            return nuloSiVacio($cadena);
+        }
+        $cadena = convertirMayusculas($cadena);
+        $cadena = preg_replace('/[^A-Z0-9]/', '', $cadena);
+
+        return $cadena;
+    }
+}

@@ -95,24 +95,16 @@ class ImeiController extends Controller
 
         $request->validate($reglas);
 
-        try {
-            DB::beginTransaction();
 
-            $data = $request->only('imei', 'caracteristicas', 'telefono_id');
-            $imeiRecord = Imei::create($data);
 
-            DB::commit();
+        $data = $request->only('imei', 'caracteristicas', 'telefono_id');
+        $imeiRecord = Imei::create($data);
 
-            return response()->json([
-                'success' => 'IMEI registrado correctamente.',
-                'datos' => $imeiRecord->load('telefono.persona'),
-            ], 201);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'error' => 'Error al crear el IMEI: ' . $e->getMessage(),
-            ], 500);
-        }
+
+        return response()->json([
+            'success' => 'IMEI registrado correctamente.',
+            'datos' => $imeiRecord->load('telefono.persona'),
+        ], 201);
     }
 
     /**
@@ -150,31 +142,20 @@ class ImeiController extends Controller
         $imei = Imei::findOrFail($id);
 
         $reglas = [
-            'imei' => 'required|string|max:50|unique:imei,imei,' . $id,
-            'caracteristicas' => 'nullable|string|max:1000',
-            'telefono_id' => 'nullable|exists:telefono,id',
+            'imei' => 'sometimes|required|string|max:50|unique:imei,imei,' . $id,
+            'caracteristicas' => 'sometimes|nullable|string|max:1000',
+            'telefono_id' => 'sometimes|nullable|exists:telefono,id',
         ];
 
         $request->validate($reglas);
 
-        try {
-            DB::beginTransaction();
+        $imei->update($request->all());
 
-            $data = $request->only('imei', 'caracteristicas', 'telefono_id');
-            $imei->update($data);
 
-            DB::commit();
-
-            return response()->json([
-                'success' => 'IMEI actualizado correctamente.',
-                'datos' => $imei->load('telefono.persona'),
-            ], 200);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return response()->json([
-                'error' => 'Error al actualizar el IMEI: ' . $e->getMessage(),
-            ], 500);
-        }
+        return response()->json([
+            'success' => 'IMEI actualizado correctamente.',
+            'datos' => $imei->load('telefono.persona'),
+        ], 200);
     }
 
     /**
@@ -205,39 +186,4 @@ class ImeiController extends Controller
         }
     }
 
-    /**
-     * Buscar teléfonos para Select2 con AJAX
-     */
-    public function searchTelefonos(Request $request)
-    {
-        if (!request()->user()->hasAnyPermission(['imeis_all', 'imeis_crear', 'imeis_editar', 'imeis_listar'])) {
-            abort(403, 'No tienes permiso para realizar esta acción.');
-        }
-
-        $search = $request->q ?? '';
-
-        $query = Telefono::select('id', 'numero_celular', 'persona_id')
-            ->with('persona')
-            ->orderBy('numero_celular');
-
-        if ($search) {
-            $search = str_replace('%', ' ', $search);
-            $query->where(function ($q) use ($search) {
-                $q->whereRaw('numero_celular LIKE ?', ["%{$search}%"])
-                    ->orWhereHas('persona', function ($q2) use ($search) {
-                        $q2->whereRaw('CONCAT(nombres, " ", apellidos) LIKE ?', ["%{$search}%"]);
-                    });
-            });
-        }
-
-        $telefonos = $query->get()->map(function ($telefono) {
-            return [
-                'id' => $telefono->id,
-                'text' => $telefono->numero_celular .
-                    ($telefono->persona ? ' - ' . $telefono->persona->nombres . ' ' . $telefono->persona->apellidos : ''),
-            ];
-        });
-
-        return response()->json($telefonos);
-    }
 }

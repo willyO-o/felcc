@@ -39,7 +39,7 @@
                         <div class="mt-xl-0 mt-5">
                             <div class="d-flex">
                                 <div class="flex-grow-1">
-                                    <h2> {{ $datos->nombre }} {{ $datos->apellidos }} </h2>
+                                    <h2> {{ $datos->nombres }} {{ $datos->apellidos }} </h2>
                                     <div class="hstack gap-3 flex-wrap">
                                         <div><a href="#" class="text-primary d-block"><span
                                                     class="text-muted fw-medium">C.I.:

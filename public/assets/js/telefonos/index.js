@@ -91,15 +91,10 @@
                 : "—";
 
             // Procesar IMEIs
-            let imeis = [];
-            if (typeof telefono.imeis_asociados === 'string' && telefono.imeis_asociados) {
-                imeis = telefono.imeis_asociados.split(',').map(i => i.trim()).filter(i => i);
-            } else if (Array.isArray(telefono.imeis_asociados)) {
-                imeis = telefono.imeis_asociados;
-            }
+            let imeis = telefono.imeis || [];
 
             const imeisHtml = imeis.length > 0
-                ? `<div class="d-flex flex-wrap gap-1">${imeis.map(imei => `<span class="badge badge-outline-secondary">${escapeHtml(imei)}</span>`).join('')}</div>`
+                ? `<div class="d-flex flex-wrap gap-1">${imeis.map(imei => `<span class="badge badge-outline-secondary">${escapeHtml(imei.imei)}</span>`).join('')}</div>`
                 : '<small class="text-muted">Sin IMEIs</small>';
 
             // Procesar persona
@@ -133,7 +128,7 @@
                     <td>
                         <div class=" gap-2">
                             <div>${imeisHtml}</div>
-                            <button class="btn btn-sm btn-outline-secondary  p-1 py-0 btn-agregar-imei" value="${telefono.id}" title="Agregar IMEI">
+                            <button class="btn btn-sm btn-outline-secondary  p-1 py-0 btn-agregar-imei d-none" value="${telefono.id}" title="Agregar IMEI">
                                 <i class="ri-add-line align-bottom"></i>
                             </button>
                         </div>

@@ -95,14 +95,18 @@ class Persona extends Model
             $persona = static::where('ci', $datos['ci'])->first();
         }
 
-        if(!$persona && !empty($datos['nombre']))
+        if(!$persona && !empty($datos['nombres']))
         {
-            $persona = static::whereRaw("CONCAT(nombres, ' ', apellidos) = ?", [$datos['nombre']. ' ' . $datos['apellidos']])->first();
+            $persona = static::whereRaw("CONCAT(nombres, ' ', apellidos) = ?", [$datos['nombres']. ' ' . $datos['apellidos']])->first();
         }
 
 
-        if (!$persona) {
+        if (!$persona && (!empty($datos['nombres'] || !empty($datos['ci'])))) {
             $persona = static::create($datos);
+        }
+
+        if (!$persona) {
+            return null;
         }
 
         return $persona->id;

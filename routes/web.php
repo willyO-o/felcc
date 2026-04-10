@@ -27,8 +27,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     // Mandamientos
 
-    Route::get('mandamientos/importar', [App\Http\Controllers\ImportarPersonasController::class, 'indexMandamientoImportar'])->name('importar.mandamientos.index');
-    Route::post('mandamientos/importar', [App\Http\Controllers\ImportarPersonasController::class, 'importarMandamientos'])->name('importar.mandamientos.importar');
+    Route::get('mandamientos/importar', [App\Http\Controllers\Importacion::class, 'indexMandamientoImportar'])->name('importar.mandamientos.index');
+    Route::post('mandamientos/importar', [App\Http\Controllers\Importacion::class, 'importarMandamientos'])->name('importar.mandamientos.importar');
     Route::resource('mandamientos', App\Http\Controllers\MandamientoController::class);
     Route::resource('tipos-mandamientos', App\Http\Controllers\TipoMandamientoController::class);
     Route::delete('/multimedia/{id}', [App\Http\Controllers\MultimediaController::class, 'destroy'])->name('multimedia.destroy');
@@ -38,10 +38,19 @@ Route::group(['middleware' => ['auth']], function () {
     // Route::get('consultas/registro-criminal', [App\Http\Controllers\RegistroCriminalController::class, 'consultarRegistroCriminal'])->name('consultas.registro-criminal');
 
 
-    // Rutas de importación de personas
-    Route::get('/personas/importar', [App\Http\Controllers\ImportarPersonasController::class, 'index'])->name('personas.importar.index');
-    Route::post('/personas/importar', [App\Http\Controllers\ImportarPersonasController::class, 'store'])->name('personas.importar.store');
-    Route::get('/personas/importar/plantilla', [App\Http\Controllers\ImportarPersonasController::class, 'plantilla'])->name('personas.importar.plantilla');
+    // Rutas de importación de personast
+    Route::get('/personas/importar', [App\Http\Controllers\Importacion::class, 'index'])->name('personas.importar.index');
+    Route::post('/personas/importar', [App\Http\Controllers\Importacion::class, 'store'])->name('personas.importar.store');
+    Route::get('/personas/importar/plantilla', [App\Http\Controllers\Importacion::class, 'plantilla'])->name('personas.importar.plantilla');
+    // Rutas de importación de telefonos
+    Route::get('/telefonos/importar', [App\Http\Controllers\Importacion::class, 'indexTelefono'])->name('telefonos.importar.index');
+    Route::post('/telefonos/importar', [App\Http\Controllers\Importacion::class, 'storeTelefono'])->name('telefonos.importar.store');
+
+
+
+
+
+
     Route::resource('personas', PersonaController::class);
 
     Route::resource('juzgados', App\Http\Controllers\JuzgadoController::class);
@@ -53,7 +62,7 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/telefonos/{telefono}/agregar-imei', [App\Http\Controllers\TelefonoController::class, 'agregarIMEI'])->name('telefonos.agregar-imei');
 
     Route::resource('imeis', App\Http\Controllers\ImeiController::class);
-    Route::get('/telefonos-imeis-search', [App\Http\Controllers\ImeiController::class, 'searchTelefonos'])->name('imeis.telefonos-search');
+    Route::get('/telefonos-imeis-search', [App\Http\Controllers\TelefonoController::class, 'searchTelefonos'])->name('imeis.telefonos-search');
 
     Route::resource('vehiculos', App\Http\Controllers\VehiculoController::class);
     Route::post('/vehiculos/{vehiculo}/vincular-persona', [App\Http\Controllers\VehiculoController::class, 'vincularPersona'])->name('vehiculos.vincular-persona');

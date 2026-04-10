@@ -19,7 +19,7 @@ class TelefonoController extends Controller
         }
 
         if ($request->ajax()) {
-            $query = Telefono::with('persona')
+            $query = Telefono::with(['persona', 'imeis'])
                 ->orderBy('id', 'desc');
 
             if ($request->filled('search') && !$request->filled('filtro')) {
@@ -33,7 +33,6 @@ class TelefonoController extends Controller
                             $q2->whereRaw('ci LIKE ?', ["%{$search}%"])
                                 ->orWhereRaw('CONCAT(COALESCE(nombres, ""), " ", COALESCE(apellidos, "")) LIKE ?', ["%{$search}%"]);
                         });
-
                 });
             }
 
@@ -47,7 +46,10 @@ class TelefonoController extends Controller
                         $query->whereRaw('numero_celular LIKE ?', ["%{$search}%"]);
                         break;
                     case 'imei':
-                        $query->whereJSONContains('imeis_asociados', $search);
+                        //revisar la relacion con la tabla imei, para hacer una consulta mas eficiente, por ahora se hace con whereRaw
+                        $query->whereHas('imeis', function ($q) use ($search) {
+                            $q->whereRaw('imei LIKE ?', ["%{$search}%"]);
+                        });
                         break;
                     case 'ci_persona':
                         $query->whereRaw('ci LIKE ?', ["%{$search}%"]);
@@ -67,7 +69,6 @@ class TelefonoController extends Controller
                     case 'respuesta_requerimiento':
                         $query->whereRaw('respuesta_requerimiento LIKE ?', ["%{$search}%"]);
                         break;
-
                 }
             }
 
@@ -111,7 +112,6 @@ class TelefonoController extends Controller
             'persona_caso' => 'nullable|string|max:255',
             'caso' => 'nullable|string|max:255',
             'empresa' => 'nullable|string|max:150',
-            'imeis_asociados' => 'nullable|string',
             'respuesta_requerimiento' => 'nullable|string|max:255',
             'persona_id' => 'nullable|exists:persona,id',
             'informacion' => 'nullable|string|max:500',
@@ -126,12 +126,6 @@ class TelefonoController extends Controller
             DB::beginTransaction();
 
             $data = $request->all();
-
-            // Si hay IMEIs, convertirlos a array (el cast los convierte a JSON)
-            if ($request->filled('imeis_asociados')) {
-                $imeis = array_filter(array_map('trim', explode(',', $request->imeis_asociados)));
-                $data['imeis_asociados'] = $imeis;
-            }
 
             $telefono = Telefono::create($data);
 
@@ -154,7 +148,7 @@ class TelefonoController extends Controller
      */
     public function show(string $id)
     {
-        $datos = Telefono::with('persona')->findOrFail($id);
+        $datos = Telefono::with('persona')->with('imeis')->findOrFail($id);
         return view('telefonos.show', compact('datos'));
     }
 
@@ -188,7 +182,6 @@ class TelefonoController extends Controller
             'persona_caso' => 'nullable|string|max:255',
             'caso' => 'nullable|string|max:255',
             'empresa' => 'nullable|string|max:150',
-            'imeis_asociados' => 'nullable|string',
             'respuesta_requerimiento' => 'nullable|string|max:255',
             'persona_id' => 'nullable|exists:persona,id',
             'informacion' => 'nullable|string|max:500',
@@ -204,13 +197,6 @@ class TelefonoController extends Controller
 
             $data = $request->all();
 
-            // Si hay IMEIs, convertirlos a array
-            if ($request->filled('imeis_asociados')) {
-                $imeis = array_filter(array_map('trim', explode(',', $request->imeis_asociados)));
-                $data['imeis_asociados'] = $imeis;
-            } else {
-                $data['imeis_asociados'] = null;
-            }
 
             $telefono->update($data);
 
@@ -281,10 +267,48 @@ class TelefonoController extends Controller
     }
 
     /**
+     * Buscar teléfonos para Select2 con AJAX
+     */
+    public function searchTelefonos(Request $request)
+    {
+        if (!request()->user()->hasAnyPermission(['imeis_all', 'imeis_crear', 'imeis_editar', 'imeis_listar'])) {
+            abort(403, 'No tienes permiso para realizar esta acción.');
+        }
+
+        $search = $request->q ?? '';
+
+        $query = Telefono::select('id', 'numero_celular', 'persona_id')
+            ->with('persona')
+            ->orderBy('numero_celular');
+
+        if ($search) {
+            $search = str_replace('%', ' ', $search);
+            $query->where(function ($q) use ($search) {
+                $q->whereRaw('numero_celular LIKE ?', ["%{$search}%"])
+                    ->orWhereHas('persona', function ($q2) use ($search) {
+                        $q2->whereRaw('CONCAT(nombres, " ", apellidos) LIKE ?', ["%{$search}%"]);
+                    });
+            });
+        }
+
+        $telefonos = $query->get()->map(function ($telefono) {
+            return [
+                'id' => $telefono->id,
+                'text' => $telefono->numero_celular .
+                    ($telefono->persona ? ' - ' . $telefono->persona->nombres . ' ' . $telefono->persona->apellidos : ''),
+            ];
+        });
+
+        return response()->json($telefonos);
+    }
+
+    /**
      * Agregar un IMEI a un teléfono
      */
     public function agregarIMEI(Request $request, string $id)
     {
+
+        // a eliminar
         $request->validate([
             'imei' => 'required|string|min:10|max:50'
         ]);

@@ -103,7 +103,7 @@
             } else {
                 // Mostrar botón para vincular si no hay teléfono
                 botonesVinculacion = `<button class="btn btn-sm btn-soft-info btn-vincular-telefono" value="${imei.id}" title="Vincular teléfono">
-                    <i class="ri-phone-add-line align-bottom"></i>
+                    <i class="mdi mdi-phone-plus align-bottom"></i>
                 </button>`;
             }
 

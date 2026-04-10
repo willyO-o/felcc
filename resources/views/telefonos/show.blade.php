@@ -38,7 +38,8 @@
                 <div class="mb-3">
                     <h6 class="text-muted">Relacionado con</h6>
                     <p class="fw-bold">
-                        <a href="javascript:void(0);" onclick="window.open('{{ route('personas.show', $datos->persona->id) }}', '_blank')">
+                        <a href="javascript:void(0);"
+                            onclick="window.open('{{ route('personas.show', $datos->persona->id) }}', '_blank')">
                             {{ $datos->persona->nombres }} {{ $datos->persona->apellidos }}
                         </a>
                     </p>
@@ -62,13 +63,13 @@
             </div>
         @endif
 
-        @if ($datos->imeis_asociados && count($datos->imeis_asociados) > 0)
+        @if ($datos->imeis && count($datos->imeis) > 0)
             <div class="col-12">
                 <div class="mb-3">
                     <h6 class="text-muted">IMEI Asociados</h6>
                     <div>
-                        @foreach ($datos->imeis_asociados as $imei)
-                            <span class="badge badge-outline-secondary me-2">{{ $imei }}</span>
+                        @foreach ($datos->imeis as $imei)
+                            <span class="badge badge-outline-secondary me-2">{{ $imei->imei }}</span>
                         @endforeach
                     </div>
                 </div>
@@ -77,26 +78,20 @@
 
         <div class="col-12">
             <div class="row">
-                @if ($datos->callapp)
-                    <div class="col-md-4">
-                        <h6 class="text-muted">CallApp</h6>
-                        <p class="fw-bold">{{ $datos->callapp }}</p>
-                    </div>
-                @endif
+                <div class="col-md-4">
+                    <h6 class="text-muted">CallApp</h6>
+                    <p class="fw-bold">{{ $datos->callapp ?? '—' }}</p>
+                </div>
 
-                @if ($datos->truecall)
-                    <div class="col-md-4">
-                        <h6 class="text-muted">TrueCall</h6>
-                        <p class="fw-bold">{{ $datos->truecall }}</p>
-                    </div>
-                @endif
+                <div class="col-md-4">
+                    <h6 class="text-muted">TrueCall</h6>
+                    <p class="fw-bold">{{ $datos->truecall ?? '—'   }}</p>
+                </div>
 
-                @if ($datos->uninet)
-                    <div class="col-md-4">
-                        <h6 class="text-muted">UniNet</h6>
-                        <p class="fw-bold">{{ $datos->uninet }}</p>
-                    </div>
-                @endif
+                <div class="col-md-4">
+                    <h6 class="text-muted">UniNet</h6>
+                    <p class="fw-bold">{{ $datos->uninet ?? '—' }}</p>
+                </div>
             </div>
         </div>
 

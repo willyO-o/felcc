@@ -40,7 +40,7 @@
                                 <option value="numero">Número</option>
                                 <option value="imei">IMEI</option>
                                 <option value="ci_persona">CI Persona</option>
-                                <option value="nombre_persona">Persona</option>
+                                <option value="nombre_persona">Nombre Persona</option>
                                 <option value="callap">CallAPP</option>
                                 <option value="truecall">TrueCall</option>
                                 <option value="uninet">Uninet</option>
