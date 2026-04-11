@@ -218,7 +218,7 @@
                     {{-- Descargar plantilla --}}
                     <div class="mt-3">
                         <a href="{{ url('plantillas/plantilla-importacion-mandamientos.xlsx') }}"
-                            download="plantilla-importacion-mandamientos.xlsx"
+                            download
                             class="btn btn-sm btn-outline-primary w-100">
                             <i class="ri-download-line me-1"></i> Descargar Plantilla
                         </a>

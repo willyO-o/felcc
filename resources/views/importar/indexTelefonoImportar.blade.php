@@ -153,10 +153,9 @@
                                                     <div class="accordion-body p-2">
                                                         <ul class="list-unstyled small">
                                                             <li class="mb-2">
-                                                                <strong>NOMBRE</strong><br>
-                                                                <small class="text-muted">Nombre completo de la persona. Se
-                                                                    parseará
-                                                                    automáticamente en nombres y apellidos.</small>
+                                                                <strong>NUMERO DE CELULAR</strong><br>
+                                                                <small class="text-muted">Número de teléfono celular de la
+                                                                    persona.</small>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -175,75 +174,20 @@
                                                     data-bs-parent="#accordionCampos">
                                                     <div class="accordion-body p-2">
                                                         <ul class="list-unstyled small">
-                                                            <li class="mb-2">
-                                                                <strong>CI</strong><br>
-                                                                <small class="text-muted">Cédula de Identidad (solo
-                                                                    números)</small>
-                                                            </li>
-                                                            <li class="mb-2">
-                                                                <strong>responsable</strong><br>
-                                                                <small class="text-muted">Nombre del
-                                                                    responsable/investigador</small>
-                                                            </li>
-                                                            <li class="mb-2">
-                                                                <strong>ESTADO</strong><br>
-                                                                <small class="text-muted">Estado de investigación de la
-                                                                    persona</small>
-                                                            </li>
+                                                            <li>✓ NUMERO DE CELULAR</li>
+                                                            <li>✓ PERSONA DEL CASO</li>
+                                                            <li>✓ CASO</li>
+                                                            <li>✓ EMPRESA</li>
+                                                            <li>✓ C.I.</li>
+                                                            <li>✓ INFO</li>
+                                                            <li>✓ CALLAPP</li>
+                                                            <li>✓ TRUECALL</li>
+                                                            <li>✓ UNINET</li>
                                                         </ul>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            {{-- Datos SEGIP --}}
-                                            <div class="accordion-item">
-                                                <h2 class="accordion-header">
-                                                    <button class="accordion-button collapsed" type="button"
-                                                        data-bs-toggle="collapse" data-bs-target="#collapseSEGIP">
-                                                        <i class="ri-identity-card-line me-2 text-primary"></i> Datos SEGIP
-                                                    </button>
-                                                </h2>
-                                                <div id="collapseSEGIP" class="accordion-collapse collapse"
-                                                    data-bs-parent="#accordionCampos">
-                                                    <div class="accordion-body p-2">
-                                                        <p class="small text-muted mb-2">🔄 <strong>Parsing
-                                                                Automático</strong></p>
-                                                        <p class="small mb-2">La columna <strong>DATOS_SEGIP</strong>
-                                                            contiene toda la
-                                                            información del SEGIP. El sistema extrae automáticamente:</p>
-                                                        <ul class="list-unstyled small">
-                                                            <li>✓ Fecha de Nacimiento</li>
-                                                            <li>✓ Lugar de Nacimiento</li>
-                                                            <li>✓ Domicilio</li>
-                                                            <li>✓ Teléfono</li>
-                                                            <li>✓ Género</li>
-                                                            <li>✓ Estado Civil</li>
-                                                            <li>✓ Nombre del Cónyuge</li>
-                                                            <li>✓ Ocupación</li>
-                                                            <li>✓ País</li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {{-- Ejemplo de formato --}}
-                                            <div class="accordion-item">
-                                                <h2 class="accordion-header">
-                                                    <button class="accordion-button collapsed" type="button"
-                                                        data-bs-toggle="collapse" data-bs-target="#collapseExample">
-                                                        <i class="ri-file-csv-line me-2 text-warning"></i> Ejemplo CSV
-                                                    </button>
-                                                </h2>
-                                                <div id="collapseExample" class="accordion-collapse collapse"
-                                                    data-bs-parent="#acordionCampos">
-                                                    <div class="accordion-body p-2">
-                                                        <pre class="small bg-light p-2 rounded" style="overflow-x: auto;"><code>
-                                        N REGISTRO;NOMBRE;CI;DATOS_SEGIP;responsable;ESTADO
-                                        1;JUAN PEREZ GARCIA;1234567;Fecha de Nacimiento: 15/01/1990...;JHONY;En investigación
-                                        2;MARIA LOPEZ QUISPE;7654321;Fecha de Nacimiento: 22/03/1985...;ENZO;Pendiente</code></pre>
-                                                    </div>
-                                                </div>
-                                            </div>
 
                                             {{-- Validaciones --}}
                                             <div class="accordion-item">
@@ -257,11 +201,10 @@
                                                     data-bs-parent="#acordionCampos">
                                                     <div class="accordion-body p-2">
                                                         <ul class="list-unstyled small">
-                                                            <li class="mb-2">⚠️ Los CIs duplicados se actualizarán</li>
-                                                            <li class="mb-2">✓ Las fechas se validan automáticamente</li>
-                                                            <li class="mb-2">✓ Los géneros se normalizan
-                                                                (MASCULINO/FEMENINO)</li>
-                                                            <li class="mb-2">✓ Los países se buscan en la BD</li>
+                                                            <li class="mb-2">⚠️ Los teléfonos duplicados se actualizarán</li>
+                                                            <li class="mb-2">✓ Los números de teléfono se validan automáticamente</li>
+                                                            <li class="mb-2">✓ Los formatos de teléfono se normalizan</li>
+                                                            <li class="mb-2">✓ Los C.I. y respuesta a requerimiento, se enlazan al teléfono</li>
                                                             <li class="mb-2">✓ Los registros vacíos se ignoran</li>
                                                         </ul>
                                                     </div>
@@ -271,7 +214,7 @@
 
                                         {{-- Descargar plantilla --}}
                                         <div class="mt-3">
-                                            <a href="{{ route('personas.importar.plantilla') }}"
+                                            <a href="{{ url('plantillas/plantilla-importacion-telefonos.xlsx')}}" download
                                                 class="btn btn-sm btn-outline-primary w-100">
                                                 <i class="ri-download-line me-1"></i> Descargar Plantilla
                                             </a>
@@ -439,97 +382,24 @@
                                                     <div class="accordion-body p-2">
                                                         <ul class="list-unstyled small">
                                                             <li class="mb-2">
-                                                                <strong>NOMBRE</strong><br>
-                                                                <small class="text-muted">Nombre completo de la persona. Se
-                                                                    parseará
-                                                                    automáticamente en nombres y apellidos.</small>
+                                                                <strong>NUMERO ASOCIADO</strong><br>
+                                                                <small class="text-muted">
+                                                                    Número de teléfono asociado al IMEI. Se usará para
+                                                                    enlazar el IMEI a un telefono nuevo o existente.
+                                                                </small>
+                                                            </li>
+                                                            <li class="mb-2">
+                                                                <strong>NUMERO IMEI</strong><br>
+                                                                <small class="text-muted">
+                                                                    Número de identificación del dispositivo. Se usará para
+                                                                    identificar el IMEI en la base de datos.
+                                                                </small>
                                                             </li>
                                                         </ul>
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            {{-- Campos opcionales básicos --}}
-                                            <div class="accordion-item">
-                                                <h2 class="accordion-header">
-                                                    <button class="accordion-button collapsed" type="button"
-                                                        data-bs-toggle="collapse" data-bs-target="#collapseBasic">
-                                                        <i class="ri-file-text-line me-2 text-info"></i> Datos Básicos
-                                                    </button>
-                                                </h2>
-                                                <div id="collapseBasic" class="accordion-collapse collapse"
-                                                    data-bs-parent="#accordionCampos">
-                                                    <div class="accordion-body p-2">
-                                                        <ul class="list-unstyled small">
-                                                            <li class="mb-2">
-                                                                <strong>CI</strong><br>
-                                                                <small class="text-muted">Cédula de Identidad (solo
-                                                                    números)</small>
-                                                            </li>
-                                                            <li class="mb-2">
-                                                                <strong>responsable</strong><br>
-                                                                <small class="text-muted">Nombre del
-                                                                    responsable/investigador</small>
-                                                            </li>
-                                                            <li class="mb-2">
-                                                                <strong>ESTADO</strong><br>
-                                                                <small class="text-muted">Estado de investigación de la
-                                                                    persona</small>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {{-- Datos SEGIP --}}
-                                            <div class="accordion-item">
-                                                <h2 class="accordion-header">
-                                                    <button class="accordion-button collapsed" type="button"
-                                                        data-bs-toggle="collapse" data-bs-target="#collapseSEGIP">
-                                                        <i class="ri-identity-card-line me-2 text-primary"></i> Datos SEGIP
-                                                    </button>
-                                                </h2>
-                                                <div id="collapseSEGIP" class="accordion-collapse collapse"
-                                                    data-bs-parent="#accordionCampos">
-                                                    <div class="accordion-body p-2">
-                                                        <p class="small text-muted mb-2">🔄 <strong>Parsing
-                                                                Automático</strong></p>
-                                                        <p class="small mb-2">La columna <strong>DATOS_SEGIP</strong>
-                                                            contiene toda la
-                                                            información del SEGIP. El sistema extrae automáticamente:</p>
-                                                        <ul class="list-unstyled small">
-                                                            <li>✓ Fecha de Nacimiento</li>
-                                                            <li>✓ Lugar de Nacimiento</li>
-                                                            <li>✓ Domicilio</li>
-                                                            <li>✓ Teléfono</li>
-                                                            <li>✓ Género</li>
-                                                            <li>✓ Estado Civil</li>
-                                                            <li>✓ Nombre del Cónyuge</li>
-                                                            <li>✓ Ocupación</li>
-                                                            <li>✓ País</li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {{-- Ejemplo de formato --}}
-                                            <div class="accordion-item">
-                                                <h2 class="accordion-header">
-                                                    <button class="accordion-button collapsed" type="button"
-                                                        data-bs-toggle="collapse" data-bs-target="#collapseExample">
-                                                        <i class="ri-file-csv-line me-2 text-warning"></i> Ejemplo CSV
-                                                    </button>
-                                                </h2>
-                                                <div id="collapseExample" class="accordion-collapse collapse"
-                                                    data-bs-parent="#acordionCampos">
-                                                    <div class="accordion-body p-2">
-                                                        <pre class="small bg-light p-2 rounded" style="overflow-x: auto;"><code>
-                                        N REGISTRO;NOMBRE;CI;DATOS_SEGIP;responsable;ESTADO
-                                        1;JUAN PEREZ GARCIA;1234567;Fecha de Nacimiento: 15/01/1990...;JHONY;En investigación
-                                        2;MARIA LOPEZ QUISPE;7654321;Fecha de Nacimiento: 22/03/1985...;ENZO;Pendiente</code></pre>
-                                                    </div>
-                                                </div>
-                                            </div>
 
                                             {{-- Validaciones --}}
                                             <div class="accordion-item">
@@ -543,12 +413,9 @@
                                                     data-bs-parent="#acordionCampos">
                                                     <div class="accordion-body p-2">
                                                         <ul class="list-unstyled small">
-                                                            <li class="mb-2">⚠️ Los CIs duplicados se actualizarán</li>
-                                                            <li class="mb-2">✓ Las fechas se validan automáticamente</li>
-                                                            <li class="mb-2">✓ Los géneros se normalizan
-                                                                (MASCULINO/FEMENINO)</li>
-                                                            <li class="mb-2">✓ Los países se buscan en la BD</li>
-                                                            <li class="mb-2">✓ Los registros vacíos se ignoran</li>
+                                                            <li class="mb-2">⚠️ Los números de IMEI duplicados se actualizarán</li>
+                                                            <li class="mb-2">✓ Los teléfonos se validan automáticamente</li>
+                                                            <li class="mb-2">✓ Los datos se insertan en la base de datos</li>
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -557,7 +424,7 @@
 
                                         {{-- Descargar plantilla --}}
                                         <div class="mt-3">
-                                            <a href="{{ route('personas.importar.plantilla') }}"
+                                            <a href="{{ url('plantillas/plantilla-importacion-imeis.xlsx') }}" download
                                                 class="btn btn-sm btn-outline-primary w-100">
                                                 <i class="ri-download-line me-1"></i> Descargar Plantilla
                                             </a>
