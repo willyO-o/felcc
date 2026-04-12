@@ -16,12 +16,7 @@ class Vehiculo extends Model
         'descripcion',
         'responsable',
         'caso_relacionado',
-        'bsisa',
-        'ci_bsisa',
-        'ruat',
-        'anh',
-        'itb',
-        'soat',
+
     ];
 
     /**
@@ -38,7 +33,21 @@ class Vehiculo extends Model
     public function personas()
     {
         return $this->belongsToMany(Persona::class, 'vehiculo_caso', 'vehiculo_id', 'persona_id')
-            ->withPivot('tipo', 'caso', 'registro_criminal_id')
+            ->withPivot('tipo', 'numero_informacion', 'registro_criminal_id')
             ->withTimestamps();
+    }
+    public  function inspecciones()
+    {
+        return $this->hasMany(InspeccionTecnica::class, 'vehiculo_id');
+
+    }
+    public function multimedia()
+    {
+        return $this->hasMany(Multimedia::class, 'id_vehiculo');
+    }
+
+    public function cargios()
+    {
+        return $this->hasMany(Cargio::class, 'vehiculo_id');
     }
 }

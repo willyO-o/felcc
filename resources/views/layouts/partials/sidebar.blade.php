@@ -127,6 +127,10 @@
                                     <a href="{{ route('telefonos.importar.index') }}" class="nav-link">Importar
                                         Telefonos</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a href="{{ route('vehiculos.importar.index') }}" class="nav-link">Importar
+                                        Vehículos</a>
+                                </li>
                                 <li class="nav-item d-none">
                                     <a href="{{ route('usuarios.index') }}" class="nav-link">Importar Registro</a>
                                 </li>

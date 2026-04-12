@@ -33,6 +33,7 @@ class Persona extends Model
         'madre',
         'grupo_sanguineo',
         'alias',
+        'nit_persona',
 
     ];
 

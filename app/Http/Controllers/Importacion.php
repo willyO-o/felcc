@@ -12,6 +12,8 @@ use App\Models\ImeiTelefono;
 use App\Models\TipoMandamiento;
 use App\Models\Juzgado;
 use App\Models\Delito;
+use App\Models\Vehiculo;
+use App\Models\VehiculoCaso;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -25,32 +27,6 @@ use Box\Spout\Reader\Common\Creator\ReaderEntityFactory;
 class Importacion extends Controller
 {
 
-    // protected $cabeceras  = [
-    //     'hoja_ruta' => 'HR',
-    //     'id_persona' => 'ID_PERSONA',
-    //     'nombres' => 'NOMBRE',
-    //     'apellidos' => 'APELLIDOS',
-    //     'id_tipo_mandamiento' => 'ID_TIPO_MANDAMIENTO',
-    //     'tipo_mandamiento' => 'TIPO_MANDAMIENTO',
-    //     'tipo_documento' => 'ORIGINAL_FOTOCOPIA',
-    //     'id_delito' => 'ID_DELITO',
-    //     'delito' => 'DELITO',
-    //     'id_juzgado' => 'ID_JUZGADO',
-    //     'juzgado' => 'JUZGADO',
-    //     'estado' => 'ESTADO',
-    //     'domicilio' => 'DOMICILIO',
-    //     'ci' => 'CI',
-    //     'vehiculos' => 'VEHICULOS',
-    //     'telefono' => 'TELEFONO',
-    //     'asignado' => 'ASIGNADO',
-    //     'actividades_realizadas' => 'ACTIVIDADES_REALIZADAS',
-
-    //     'fecha_ejecucion' => 'FECHA_EJECUCION',
-    //     'detalle_ejecucion' => 'DETALLE_EJECUCION',
-    // ];
-    /**
-     * Mostrar vista de importación
-     */
     public function index()
     {
         return view('importar.index');
@@ -711,7 +687,7 @@ class Importacion extends Controller
 
         $path = $request->file('archivo')->storeAs(
             'csv_imports',
-            'telefono_' . $request->file('archivo')->getClientOriginalName(),
+            'imei_' . $request->file('archivo')->getClientOriginalName(),
             'local'
         );
 
@@ -834,6 +810,183 @@ class Importacion extends Controller
                 $contador++;
             }
 
+
+            DB::commit();
+
+            return $contador;
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+            return ["error" => $e->getMessage()];
+        }
+    }
+
+
+    public function indexVehiculo()
+    {
+        return view('importar.indexVehiculoImportar');
+    }
+
+    public function storeVehiculo(Request $request)
+    {
+
+
+        $request->validate([
+            'archivo' => 'required|file|extensions:csv|max:10240',
+        ], [
+            'archivo.required' => 'El archivo es obligatorio',
+            'archivo.extensions' => 'El archivo debe ser CSV',
+            'archivo.max' => 'El archivo no debe exceder 10MB',
+        ]);
+
+        $path = $request->file('archivo')->storeAs(
+            'csv_imports',
+            'vehiculos_' . $request->file('archivo')->getClientOriginalName(),
+            'local'
+        );
+
+        $reader = ReaderEntityFactory::createReaderFromFile(Storage::disk('local')->path($path));
+
+        $delimiter = $this->detectDelimiter(Storage::disk('local')->path($path));
+        $reader->setFieldDelimiter($delimiter);
+
+        $reader->open(Storage::disk('local')->path($path));
+
+        $data = [];
+        $cabeceras = [];
+        $filasVaciasConsecutivas = 0;
+        $umbralFilasVacias = 20; // Si encuentra 20 filas vacías seguidas, se detiene
+        $columnasRequeridas = ['PLACA', 'CARACTERISTICAS', 'RESPONSABLE', 'CASO_RELACIONADO', 'RUAT', 'CI_RUAT', 'BSISA', 'CI_BSISA', 'SOAT', 'CI_SOAT'];
+
+        foreach ($reader->getSheetIterator() as $sheet) {
+
+            foreach ($sheet->getRowIterator() as $index => $row) {
+                $cells = $row->toArray();
+
+                if ($index === 1) {
+                    $cabeceras = $this->convertirCabeceras($cells);
+
+                    // /verificar si el archivo tiene las columnas necesarias la indispensable es el numero de celular
+                    $faltantes = array_diff($columnasRequeridas, $cabeceras);
+                    if (in_array('PLACA', $faltantes)) {
+                        return response()->json([
+                            'errors' => 'El archivo debe contener al menos la columna PLACA. Columnas faltantes: ' . implode(', ', $faltantes),
+                            'message' => 'El archivo debe contener al menos la columna PLACA. Columnas faltantes: ' . implode(', ', $faltantes)
+                        ], 422);
+                    }
+
+
+                    continue;
+                }
+
+                // Verificar si la fila está completamente vacía
+                $filaVacia = empty(array_filter($cells, function ($celda) {
+                    return $celda !== null && trim($celda) !== '';
+                }));
+
+                if ($filaVacia) {
+                    $filasVaciasConsecutivas++;
+
+                    // Si hay más de X filas vacías seguidas, detener
+                    if ($filasVaciasConsecutivas > $umbralFilasVacias) {
+                        break 2; // Rompe ambos foreach
+                    }
+
+                    continue; // Saltar fila vacía pero continuar leyendo
+                }
+
+                // Si encontramos datos, resetear el contador de filas vacías
+                $filasVaciasConsecutivas = 0;
+
+                $filaAsociativa = array_combine($cabeceras, $cells);
+                $data[] = $filaAsociativa;
+            }
+            break; // Solo la primera hoja
+        }
+
+        $resultado = $this->registrarDatosVehiculos($data);
+
+        if (!is_numeric($resultado)) {
+            return response()->json([
+                'error' => "No se pudieron importar los vehículos. Error: { $resultado[error] }"
+            ], 500);
+        }
+
+        return response()->json([
+            'success' => 'Migración de vehículos completada, Se importaron ' . $resultado . ' vehículos',
+            'total' => $resultado,
+            'importadas' => $resultado,
+            'errores' => []
+        ], 200);
+
+        return $path;
+    }
+
+    private function registrarDatosVehiculos($data)
+    {
+
+
+        try {
+            DB::beginTransaction();
+
+            $contador = 0;
+
+            foreach ($data as $index => $fila) {
+
+
+                if (!empty(limpiarCI($fila['PLACA'] ?? null))) {
+                    $datos  = [
+                        'placa' => limpiarCI($fila['PLACA'] ?? null),
+                        'descripcion' => campoDB($fila['CARACTERISTICAS'] ?? null),
+                        'responsable' => campoDB($fila['RESPONSABLE'] ?? null),
+                        'caso_relacionado' => campoDB($fila['CASO_RELACIONADO'] ?? null),
+                    ];
+
+
+                    $vehiculo = Vehiculo::firstOrCreate(['placa' => $datos['placa']], $datos);
+
+
+                    if (!$vehiculo) {
+                        throw new \Exception("Error al crear vehículo en fila " . ($index + 2) . "Placa: " . $fila['PLACA'] ?? 'Sin placa');
+                    }
+
+                    if (!empty($fila['RUAT'] ?? null) || !empty($fila['CI_RUAT'] ?? null)) {
+                        $nombreCompleto = $this->separarNombreApellidos($fila['RUAT'] ?? '', true);
+                        $personaRuat = Persona::idPersonaDatos(['nombres' => $nombreCompleto['nombres'], 'apellidos' => $nombreCompleto['apellidos'], 'ci' => limpiarCI($fila['CI_RUAT'] ?? null)]);
+
+                        VehiculoCaso::firstOrCreate([
+                            'vehiculo_id' => $vehiculo->id,
+                            'persona_id' => $personaRuat,
+                            'tipo' => 'RUAT'
+                        ]);
+                    }
+
+                    if (!empty($fila['BSISA'] ?? null) || !empty($fila['CI_BSISA'] ?? null)) {
+                        $nombreCompleto = $this->separarNombreApellidos($fila['BSISA'] ?? '', true);
+                        $personaBsisa = Persona::idPersonaDatos(['nombres' => $nombreCompleto['nombres'], 'apellidos' => $nombreCompleto['apellidos'], 'ci' => limpiarCI($fila['CI_BSISA'] ?? null)]);
+
+                        VehiculoCaso::firstOrCreate([
+                            'vehiculo_id' => $vehiculo->id,
+                            'persona_id' => $personaBsisa,
+                            'tipo' => 'BSISA'
+                        ]);
+                    }
+
+                    if (!empty($fila['SOAT'] ?? null) || !empty($fila['CI_SOAT'] ?? null)) {
+                        $nombreCompleto = $this->separarNombreApellidos($fila['SOAT'] ?? '', true);
+                        $personaSoat = Persona::idPersonaDatos(['nombres' => $nombreCompleto['nombres'], 'apellidos' => $nombreCompleto['apellidos'], 'ci' => limpiarCI($fila['CI_SOAT'] ?? null)]);
+
+                        VehiculoCaso::firstOrCreate([
+                            'vehiculo_id' => $vehiculo->id,
+                            'persona_id' => $personaSoat,
+                            'tipo' => 'SOAT'
+                        ]);
+                    }
+
+
+                    $contador++;
+                }
+            }
 
             DB::commit();
 

@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PersonaController;
-
+use App\Http\Controllers\Importacion;
 
 
 Route::get('/', function () {
@@ -27,8 +27,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/dashboard', [App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
     // Mandamientos
 
-    Route::get('mandamientos/importar', [App\Http\Controllers\Importacion::class, 'indexMandamientoImportar'])->name('importar.mandamientos.index');
-    Route::post('mandamientos/importar', [App\Http\Controllers\Importacion::class, 'importarMandamientos'])->name('importar.mandamientos.importar');
+    Route::get('mandamientos/importar', [Importacion::class, 'indexMandamientoImportar'])->name('importar.mandamientos.index');
+    Route::post('mandamientos/importar', [Importacion::class, 'importarMandamientos'])->name('importar.mandamientos.importar');
     Route::resource('mandamientos', App\Http\Controllers\MandamientoController::class);
     Route::resource('tipos-mandamientos', App\Http\Controllers\TipoMandamientoController::class);
     Route::delete('/multimedia/{id}', [App\Http\Controllers\MultimediaController::class, 'destroy'])->name('multimedia.destroy');
@@ -39,15 +39,17 @@ Route::group(['middleware' => ['auth']], function () {
 
 
     // Rutas de importación de personast
-    Route::get('/personas/importar', [App\Http\Controllers\Importacion::class, 'index'])->name('personas.importar.index');
-    Route::post('/personas/importar', [App\Http\Controllers\Importacion::class, 'store'])->name('personas.importar.store');
-    Route::get('/personas/importar/plantilla', [App\Http\Controllers\Importacion::class, 'plantilla'])->name('personas.importar.plantilla');
+    Route::get('/personas/importar', [Importacion::class, 'index'])->name('personas.importar.index');
+    Route::post('/personas/importar', [Importacion::class, 'store'])->name('personas.importar.store');
+    Route::get('/personas/importar/plantilla', [Importacion::class, 'plantilla'])->name('personas.importar.plantilla');
     // Rutas de importación de telefonos
-    Route::get('/telefonos/importar', [App\Http\Controllers\Importacion::class, 'indexTelefono'])->name('telefonos.importar.index');
-    Route::post('/telefonos/importar', [App\Http\Controllers\Importacion::class, 'storeTelefono'])->name('telefonos.importar.store');
-    Route::post('/imeis/importar', [App\Http\Controllers\Importacion::class, 'storeIMEI'])->name('imeis.importar.store');
+    Route::get('/telefonos/importar', [Importacion::class, 'indexTelefono'])->name('telefonos.importar.index');
+    Route::post('/telefonos/importar', [Importacion::class, 'storeTelefono'])->name('telefonos.importar.store');
+    Route::post('/imeis/importar', [Importacion::class, 'storeIMEI'])->name('imeis.importar.store');
 
-
+    // Rutas de importación de vehiculos
+    Route::get('/vehiculos/importar', [Importacion::class, 'indexVehiculo'])->name('vehiculos.importar.index');
+    Route::post('/vehiculos/importar', [Importacion::class, 'storeVehiculo'])->name('vehiculos.importar.store');
 
 
 

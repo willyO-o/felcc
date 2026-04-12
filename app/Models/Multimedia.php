@@ -15,6 +15,7 @@ class Multimedia extends Model
         'id_mandamiento',
         'id_persona',
         'tipo_archivo',
+        'id_vehiculo',
     ];
 
     /**

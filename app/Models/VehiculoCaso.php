@@ -13,7 +13,7 @@ class VehiculoCaso extends Model
         'persona_id',
         'registro_criminal_id',
         'tipo',
-        'caso',
+        'numero_informacion',
     ];
 
     /**
