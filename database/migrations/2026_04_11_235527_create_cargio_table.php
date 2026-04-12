@@ -48,7 +48,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('vehiculo_id')->constrained('vehiculo')->onDelete('restrict');
             $table->foreignId('estacion_servicio_id')->constrained('estacion_servicio')->onDelete('restrict');
-            $table->foreignId('persona_id')->nullable()->constrained('persona')->onDelete('restrict');
+            $table->string('nit_consumidor', 50)->nullable();
+            $table->string('razon_social', 240)->nullable();
             $table->string('departamento', 140)->nullable();
             $table->string('producto', 240)->nullable();
             $table->string('factura', 20)->nullable();

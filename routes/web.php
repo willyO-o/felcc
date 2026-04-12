@@ -50,6 +50,7 @@ Route::group(['middleware' => ['auth']], function () {
     // Rutas de importación de vehiculos
     Route::get('/vehiculos/importar', [Importacion::class, 'indexVehiculo'])->name('vehiculos.importar.index');
     Route::post('/vehiculos/importar', [Importacion::class, 'storeVehiculo'])->name('vehiculos.importar.store');
+    Route::post('/vehiculos/carguios/importar', [Importacion::class, 'storeCarguiosVehiculo'])->name('vehiculos.carguios.importar.store');
 
 
 

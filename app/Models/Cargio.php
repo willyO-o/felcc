@@ -11,7 +11,8 @@ class Cargio extends Model
     protected $fillable = [
         'vehiculo_id',
         'estacion_servicio_id',
-        'persona_id',
+        'nit_consumidor',
+        'razon_social',
         'departamento',
         'producto',
         'factura',
@@ -32,9 +33,6 @@ class Cargio extends Model
         return $this->belongsTo(EstacionServicio::class, 'estacion_servicio_id');
     }
 
-    public function persona()
-    {
-        return $this->belongsTo(Persona::class, 'persona_id');
-    }
+
 
 }

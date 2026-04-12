@@ -18,4 +18,23 @@ class EstacionServicio extends Model
     {
         return $this->hasMany(Cargio::class, 'estacion_servicio_id');
     }
+
+
+    public static function idEstacionDatos( $nit,$eess)
+    {
+        $estacion = static::where('nit', $nit)->first();
+
+        if(!$estacion) {
+            $estacion = static::where('eess', $eess)->first();
+        }
+
+        if(!$estacion) {
+            $estacion = static::create([
+                'eess' => $eess,
+                'nit' => $nit,
+            ]);
+        }
+        return $estacion->id;
+    }
+
 }

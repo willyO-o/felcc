@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Carbon;
+
 if (!function_exists('eliminarEspaciosMultiples')) {
     function eliminarEspaciosMultiples($cadena)
     {
@@ -62,6 +64,45 @@ if (!function_exists('campoDB')) {
         return $cadena;
     }
 }
+if (!function_exists('campoDBNumero')) {
+    function campoDBNumero($cadena)
+    {
+
+        if (!$cadena) {
+            return nuloSiVacio($cadena);
+        }
+        $cadena = eliminarEspaciosMultiples($cadena);
+        $cadena = str_replace(',', '.', $cadena);
+        $cadena = preg_replace('/[^0-9.]/', '', $cadena);
+        //eliminar todos los puntos excepto el último
+        $cadena = preg_replace('/\.(?=.*\.)/', '', $cadena);
+
+        return $cadena;
+    }
+}
+if (!function_exists('campoDBFechaHora')) {
+    function campoDBFechaHora($cadena)
+    {
+
+
+        if (!$cadena) {
+            return nuloSiVacio($cadena);
+        }
+
+
+        $cadena = eliminarEspaciosMultiples($cadena);
+
+        $cadena = str_replace(['/', '.'], '-', $cadena);
+
+        try {
+            $fecha = Carbon::parse($cadena);
+            return $fecha->toDateTimeString();
+        } catch (\Exception $e) {
+            return nuloSiVacio($cadena);
+        }
+    }
+}
+
 
 if (!function_exists('limpiarCI')) {
     function limpiarCI($cadena)

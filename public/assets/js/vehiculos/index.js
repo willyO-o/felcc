@@ -18,7 +18,6 @@
     const $paginacion = $("#paginacionVehiculos");
     const $detallesPagina = $("#detalles-pagina");
     const $searchInput = $("#searchVehiculos");
-    const $btnNuevo = $("#btnNuevoVehiculo");
 
     /**
      * Cargar listado de vehículos con paginación y filtros

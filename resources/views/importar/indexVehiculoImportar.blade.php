@@ -24,8 +24,8 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" data-bs-toggle="tab" href="#imeisTab" role="tab">
-                                <i class="ri-smartphone-line me-2"></i>Importar IMEIs
+                            <a class="nav-link" data-bs-toggle="tab" href="#carguiosTab" role="tab">
+                                <i class=" ri-gas-station-fill me-2"></i>Importar Carguios Vehículos
                             </a>
                         </li>
                     </ul>
@@ -52,10 +52,10 @@
                                                         </p>
                                                         <p class="text-muted mb-1">Arrastra tu archivo aquí o haz clic para
                                                             seleccionar</p>
-                                                        <small class="text-muted">Formatos: CSV, XLSX, XLS (máx.
+                                                        <small class="text-muted">Formatos: CSV  o  XLSX (máx.
                                                             10MB)</small>
                                                     </div>
-                                                    <input type="file" id="archivoInput_tel" accept=".csv,.xlsx,.xls"
+                                                    <input type="file" id="archivoInput_tel" accept=".csv,.xlsx"
                                                         style="display: none;">
                                                 </div>
                                             </div>
@@ -80,7 +80,7 @@
                                             <div class="col-12">
                                                 <button type="button" class="btn btn-primary w-100" id="btnImportar_tel"
                                                     style="display: none;" onclick="importarArchivo('_tel', 'vehiculos')">
-                                                    <i class="ri-download-line me-1"></i> Importar Teléfonos
+                                                    <i class="ri-download-line me-1"></i> Importar Vehículos
                                                 </button>
                                             </div>
                                         </div>
@@ -231,14 +231,14 @@
                                         <div class="row g-2 mb-3">
                                             <div class="col-6">
                                                 <div class="text-center p-2 bg-light rounded">
-                                                    <div class="fw-bold">{{ \App\Models\Telefono::count() }}</div>
-                                                    <small class="text-muted">Teléfonos</small>
+                                                    <div class="fw-bold">{{ \App\Models\Vehiculo::count() }}</div>
+                                                    <small class="text-muted">Vehículos</small>
                                                 </div>
                                             </div>
                                             <div class="col-6">
                                                 <div class="text-center p-2 bg-light rounded">
-                                                    <div class="fw-bold">{{ \App\Models\Imei::count() }}</div>
-                                                    <small class="text-muted">IMEIs</small>
+                                                    <div class="fw-bold">{{ \App\Models\Cargio::count() }}</div>
+                                                    <small class="text-muted">Carguios</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -257,8 +257,8 @@
 
                     </div>
 
-                    {{-- TAB IMEIS --}}
-                    <div class="tab-pane p-3 fade" id="imeisTab" role="tabpanel">
+                    {{-- TAB CARGUIOS --}}
+                    <div class="tab-pane p-3 fade" id="carguiosTab" role="tabpanel">
 
                         <div class="row">
                             <div class="col-md-7">
@@ -269,36 +269,36 @@
                                         <div class="row mb-4">
                                             <div class="col-12">
                                                 <div class="border-2 border-dashed rounded-3 p-5 text-center"
-                                                    id="dropZone_imei"
+                                                    id="dropZone_carguios"
                                                     style="border-color: #dee2e6; cursor: pointer; transition: all 0.3s;">
-                                                    <div id="uploadIcon_imei">
+                                                    <div id="uploadIcon_carguios">
                                                         <div class="mb-3">
-                                                            <i class="ri-smartphone-line"
+                                                            <i class=" ri-gas-station-fill"
                                                                 style="font-size: 4rem; color: #0ab39c;"></i>
                                                         </div>
-                                                        <p class="text-muted mt-3 mb-1"><strong>Importar IMEIs</strong></p>
+                                                        <p class="text-muted mt-3 mb-1"><strong>Importar Carguios</strong></p>
                                                         <p class="text-muted mb-1">Arrastra tu archivo aquí o haz clic para
                                                             seleccionar
                                                         </p>
-                                                        <small class="text-muted">Formatos: CSV, XLSX, XLS (máx.
+                                                        <small class="text-muted">Formatos: CSV o XLSX (máx.
                                                             10MB)</small>
                                                     </div>
-                                                    <input type="file" id="archivoInput_imei" accept=".csv,.xlsx,.xls"
+                                                    <input type="file" id="archivoInput_carguios" accept=".csv,.xlsx"
                                                         style="display: none;">
                                                 </div>
                                             </div>
                                         </div>
 
                                         {{-- Info archivo --}}
-                                        <div id="infoArchivo_imei" style="display: none;">
+                                        <div id="infoArchivo_carguios" style="display: none;">
                                             <div class="alert alert-info">
                                                 <div class="d-flex justify-content-between align-items-center">
                                                     <div>
-                                                        <strong id="nombreArchivo_imei"></strong>
-                                                        <small id="tamañoArchivo_imei" class="d-block text-muted"></small>
+                                                        <strong id="nombreArchivo_carguios"></strong>
+                                                        <small id="tamañoArchivo_carguios" class="d-block text-muted"></small>
                                                     </div>
                                                     <button type="button" class="btn btn-sm btn-secondary"
-                                                        onclick="limpiarArchivo('_imei')">Cambiar</button>
+                                                        onclick="limpiarArchivo('_carguios')">Cambiar</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -307,35 +307,35 @@
                                         <div class="row gap-2">
                                             <div class="col-12">
                                                 <button type="button" class="btn btn-primary w-100"
-                                                    id="btnImportar_imei" style="display: none;"
-                                                    onclick="importarArchivo('_imei', 'imeis')">
-                                                    <i class="ri-download-line me-1"></i> Importar IMEIs
+                                                    id="btnImportar_carguios" style="display: none;"
+                                                    onclick="importarArchivo('_carguios', 'carguios')">
+                                                    <i class="ri-download-line me-1"></i> Importar Carguios
                                                 </button>
                                             </div>
                                         </div>
 
                                         {{-- Barra de progreso --}}
-                                        <div id="progressContainer_imei" style="display: none;" class="mt-3">
+                                        <div id="progressContainer_carguios" style="display: none;" class="mt-3">
                                             <div class="progress" style="height: 25px;">
                                                 <div class="progress-bar progress-bar-striped progress-bar-animated"
-                                                    id="progressBar_imei" role="progressbar" style="width: 0%"
+                                                    id="progressBar_carguios" role="progressbar" style="width: 0%"
                                                     aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
-                                                    <span id="progressText_imei">0%</span>
+                                                    <span id="progressText_carguios">0%</span>
                                                 </div>
                                             </div>
-                                            <p class="text-muted small mt-2" id="progressInfo_imei">Procesando...</p>
+                                            <p class="text-muted small mt-2" id="progressInfo_carguios">Procesando...</p>
                                         </div>
 
                                         {{-- Resultados --}}
-                                        <div id="resultContainer_imei" style="display: none;" class="mt-4">
-                                            <div class="alert" id="resultAlert_imei"></div>
+                                        <div id="resultContainer_carguios" style="display: none;" class="mt-4">
+                                            <div class="alert" id="resultAlert_carguios"></div>
 
-                                            <div id="statsContent_imei"></div>
+                                            <div id="statsContent_carguios"></div>
 
-                                            <div id="erroresContent_imei" style="display: none;">
+                                            <div id="erroresContent_carguios" style="display: none;">
                                                 <h6 class="mt-3 mb-2">Errores encontrados:</h6>
                                                 <div class="table-responsive">
-                                                    <table class="table table-sm table-bordered" id="tablaErrores_imei">
+                                                    <table class="table table-sm table-bordered" id="tablaErrores_carguios">
                                                         <thead class="table-light">
                                                             <tr>
                                                                 <th>Fila</th>
@@ -349,11 +349,11 @@
                                             </div>
 
                                             <div class="mt-3">
-                                                <a href="{{ route('imeis.index') }}" class="btn btn-primary">
-                                                    <i class="ri-check-line me-1"></i> Ver IMEIs
+                                                <a href="{{ route('vehiculos.index') }}" class="btn btn-primary">
+                                                    <i class="ri-check-line me-1"></i> Ver Vehículos y Carguios
                                                 </a>
                                                 <button type="button" class="btn btn-secondary"
-                                                    onclick="limpiarResultados('_imei')">
+                                                    onclick="limpiarResultados('_carguios')">
                                                     <i class="ri-refresh-line me-1"></i> Importar Otro
                                                 </button>
                                             </div>
@@ -441,14 +441,14 @@
                                         <div class="row g-2 mb-3">
                                             <div class="col-6">
                                                 <div class="text-center p-2 bg-light rounded">
-                                                    <div class="fw-bold">{{ \App\Models\Telefono::count() }}</div>
-                                                    <small class="text-muted">Teléfonos</small>
+                                                    <div class="fw-bold">{{ \App\Models\Vehiculo::count() }}</div>
+                                                    <small class="text-muted">Vehículos</small>
                                                 </div>
                                             </div>
                                             <div class="col-6">
                                                 <div class="text-center p-2 bg-light rounded">
-                                                    <div class="fw-bold">{{ \App\Models\Imei::count() }}</div>
-                                                    <small class="text-muted">IMEIs</small>
+                                                    <div class="fw-bold">{{ \App\Models\Cargio::count() }}</div>
+                                                    <small class="text-muted">Carguios</small>
                                                 </div>
                                             </div>
                                         </div>
@@ -477,13 +477,13 @@
 
     <style>
         #dropZone_tel:hover,
-        #dropZone_imei:hover {
+        #dropZone_carguios:hover {
             border-color: #0ab39c !important;
             background-color: rgba(10, 179, 156, 0.05);
         }
 
         #dropZone_tel.dragover,
-        #dropZone_imei.dragover {
+        #dropZone_carguios.dragover {
             border-color: #0ab39c !important;
             background-color: rgba(10, 179, 156, 0.1);
         }
@@ -494,7 +494,7 @@
     <script>
         // Variables para cada tipo de importación
         let archivoSeleccionado_tel = null;
-        let archivoSeleccionado_imei = null;
+        let archivoSeleccionado_carguios = null;
 
         // Inicializar drag and drop para Teléfonos
         const dropZone_tel = document.getElementById('dropZone_tel');
@@ -522,29 +522,29 @@
             }
         });
 
-        // Inicializar drag and drop para IMEIs
-        const dropZone_imei = document.getElementById('dropZone_imei');
-        const archivoInput_imei = document.getElementById('archivoInput_imei');
+        // Inicializar drag and drop para Carguios
+        const dropZone_carguios = document.getElementById('dropZone_carguios');
+        const archivoInput_carguios = document.getElementById('archivoInput_carguios');
 
-        dropZone_imei.addEventListener('click', () => archivoInput_imei.click());
-        dropZone_imei.addEventListener('dragover', (e) => {
+        dropZone_carguios.addEventListener('click', () => archivoInput_carguios.click());
+        dropZone_carguios.addEventListener('dragover', (e) => {
             e.preventDefault();
-            dropZone_imei.classList.add('dragover');
+            dropZone_carguios.classList.add('dragover');
         });
-        dropZone_imei.addEventListener('dragleave', () => {
-            dropZone_imei.classList.remove('dragover');
+        dropZone_carguios.addEventListener('dragleave', () => {
+            dropZone_carguios.classList.remove('dragover');
         });
-        dropZone_imei.addEventListener('drop', (e) => {
+        dropZone_carguios.addEventListener('drop', (e) => {
             e.preventDefault();
-            dropZone_imei.classList.remove('dragover');
+            dropZone_carguios.classList.remove('dragover');
             const files = e.dataTransfer.files;
             if (files.length > 0) {
-                seleccionarArchivo(files[0], '_imei');
+                seleccionarArchivo(files[0], '_carguios');
             }
         });
-        archivoInput_imei.addEventListener('change', (e) => {
+        archivoInput_carguios.addEventListener('change', (e) => {
             if (e.target.files.length > 0) {
-                seleccionarArchivo(e.target.files[0], '_imei');
+                seleccionarArchivo(e.target.files[0], '_carguios');
             }
         });
 
@@ -554,7 +554,7 @@
             if (sufijo === '_tel') {
                 archivoSeleccionado_tel = archivo;
             } else {
-                archivoSeleccionado_imei = archivo;
+                archivoSeleccionado_carguios = archivo;
             }
 
             document.getElementById('uploadIcon' + sufijo).style.display = 'none';
@@ -571,7 +571,9 @@
             if (sufijo === '_tel') {
                 archivoSeleccionado_tel = null;
             } else {
-                archivoSeleccionado_imei = null;
+                archivoSeleccionado_carguios = null;
+                document.getElementById('btnImportar_carguios').disabled = false;
+
             }
 
             document.getElementById('archivoInput' + sufijo).value = '';
@@ -582,7 +584,7 @@
 
         // Importar archivo
         function importarArchivo(sufijo, tipo) {
-            const archivoSeleccionado = sufijo === '_tel' ? archivoSeleccionado_tel : archivoSeleccionado_imei;
+            const archivoSeleccionado = sufijo === '_tel' ? archivoSeleccionado_tel : archivoSeleccionado_carguios;
 
             if (!archivoSeleccionado) {
                 Swal.fire('Error', 'Selecciona un archivo', 'error');
@@ -607,7 +609,7 @@
 
             // Determinar la ruta según el tipo
             let ruta = tipo === 'vehiculos' ? '{{ route('vehiculos.importar.store') }}' :
-                '{{ route('vehiculos.importar.store') }}';
+                '{{ route('vehiculos.carguios.importar.store') }}';
 
             $.post(ruta, formData, {
                     processData: false,
