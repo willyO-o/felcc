@@ -52,7 +52,8 @@
                                                         </p>
                                                         <p class="text-muted mb-1">Arrastra tu archivo aquí o haz clic para
                                                             seleccionar</p>
-                                                        <small class="text-muted font-weight-bold">Formatos: <span class="text-danger  ">SOLO CSV  </span>   (máx.
+                                                        <small class="text-muted font-weight-bold">Formatos: <span
+                                                                class="text-danger  ">SOLO CSV </span> (máx.
                                                             10MB)</small>
                                                     </div>
                                                     <input type="file" id="archivoInput_tel" accept=".csv"
@@ -154,7 +155,8 @@
                                                         <ul class="list-unstyled small">
                                                             <li class="mb-2">
                                                                 <strong>PLACA</strong><br>
-                                                                <small class="text-muted">Número de placa del vehículo.</small>
+                                                                <small class="text-muted">Número de placa del
+                                                                    vehículo.</small>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -214,7 +216,7 @@
 
                                         {{-- Descargar plantilla --}}
                                         <div class="mt-3">
-                                            <a href="{{ url('plantillas/plantilla-importacion-vehiculos.xlsx')}}" download
+                                            <a href="{{ url('plantillas/plantilla-importacion-vehiculos.xlsx') }}" download
                                                 class="btn btn-sm btn-outline-primary w-100">
                                                 <i class="ri-download-line me-1"></i> Descargar Plantilla
                                             </a>
@@ -276,7 +278,8 @@
                                                             <i class=" ri-gas-station-fill"
                                                                 style="font-size: 4rem; color: #0ab39c;"></i>
                                                         </div>
-                                                        <p class="text-muted mt-3 mb-1"><strong>Importar Carguios</strong></p>
+                                                        <p class="text-muted mt-3 mb-1"><strong>Importar Carguios</strong>
+                                                        </p>
                                                         <p class="text-muted mb-1">Arrastra tu archivo aquí o haz clic para
                                                             seleccionar
                                                         </p>
@@ -295,7 +298,8 @@
                                                 <div class="d-flex justify-content-between align-items-center">
                                                     <div>
                                                         <strong id="nombreArchivo_carguios"></strong>
-                                                        <small id="tamañoArchivo_carguios" class="d-block text-muted"></small>
+                                                        <small id="tamañoArchivo_carguios"
+                                                            class="d-block text-muted"></small>
                                                     </div>
                                                     <button type="button" class="btn btn-sm btn-secondary"
                                                         onclick="limpiarArchivo('_carguios')">Cambiar</button>
@@ -335,7 +339,8 @@
                                             <div id="erroresContent_carguios" style="display: none;">
                                                 <h6 class="mt-3 mb-2">Errores encontrados:</h6>
                                                 <div class="table-responsive">
-                                                    <table class="table table-sm table-bordered" id="tablaErrores_carguios">
+                                                    <table class="table table-sm table-bordered"
+                                                        id="tablaErrores_carguios">
                                                         <thead class="table-light">
                                                             <tr>
                                                                 <th>Fila</th>
@@ -384,28 +389,62 @@
                                                             <li class="mb-2">
                                                                 <strong>PLACA</strong><br>
                                                                 <small class="text-muted">
-                                                                    Número de placa del vehículo. Se usará para identificar el vehículo en la base de datos.
+                                                                    Número de placa del vehículo. Se usará para identificar
+                                                                    el vehículo en la base de datos.
                                                                 </small>
                                                             </li>
                                                             <li class="mb-2">
                                                                 <strong>EESS</strong><br>
                                                                 <small class="text-muted">
-                                                                    Nombre de la estación de servicio donde se realizó el carguio. Se usará para identificar la estación en la base de datos.
+                                                                    Nombre de la estación de servicio donde se realizó el
+                                                                    carguio. Se usará para identificar la estación en la
+                                                                    base de datos.
                                                                 </small>
                                                             </li>
                                                             <li class="mb-2">
                                                                 <strong>NIT ESTACION</strong><br>
                                                                 <small class="text-muted">
-                                                                    Número de identificación de la estación de servicio. Se usará para
+                                                                    Número de identificación de la estación de servicio. Se
+                                                                    usará para
                                                                     identificar la estación en la base de datos.
                                                                 </small>
                                                             </li>
                                                             <li class="mb-2">
                                                                 <strong>FECHA VENTA</strong><br>
                                                                 <small class="text-muted">
-                                                                    Fecha en la que se realizó la venta. Se usará para identificar la venta en la base de datos.
+                                                                    Fecha en la que se realizó la venta. Se usará para
+                                                                    identificar la venta en la base de datos.
                                                                 </small>
                                                             </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="accordion-item">
+                                                <h2 class="accordion-header">
+                                                    <button class="accordion-button collapsed" type="button"
+                                                        data-bs-toggle="collapse" data-bs-target="#collapseBasic">
+                                                        <i class="ri-file-text-line me-2 text-info"></i> Datos Básicos
+                                                    </button>
+                                                </h2>
+                                                <div id="collapseBasic" class="accordion-collapse collapse"
+                                                    data-bs-parent="#accordionCampos">
+                                                    <div class="accordion-body p-2">
+
+                                                        <ul class="list-unstyled small">
+                                                            <li>✓ EESS</li>
+                                                            <li>✓ NIT ESTACION</li>
+                                                            <li>✓ DEPARTAMENTO</li>
+                                                            <li>✓ PRODUCTO</li>
+                                                            <li>✓ RAZON SOCIAL</li>
+                                                            <li>✓ NIT CONSUMIDOR</li>
+                                                            <li>✓ FACTURA</li>
+                                                            <li>✓ NRO AUTORIZACION</li>
+                                                            <li>✓ CODIGO CONTROL</li>
+                                                            <li>✓ CANTIDAD</li>
+                                                            <li>✓ MONTO BS.</li>
+                                                            <li>✓ FECHA VENTA</li>
+                                                            <li>✓ PLACA</li>
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -426,8 +465,10 @@
                                                         <ul class="list-unstyled small">
                                                             <li class="mb-2">⚠️ Los cargios existentes se ignoraran</li>
                                                             <li class="mb-2">✓ Los datos se validan automáticamente</li>
-                                                            <li class="mb-2">✓ Los datos se insertan en la base de datos</li>
-                                                            <li class="mb-2">✓ Se puede subir en formato excel con multiples hojas</li>
+                                                            <li class="mb-2">✓ Los datos se insertan en la base de datos
+                                                            </li>
+                                                            <li class="mb-2">✓ Se puede subir en formato excel con
+                                                                multiples hojas (todas deben estar con encabezados)</li>
                                                         </ul>
                                                     </div>
                                                 </div>
