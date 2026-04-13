@@ -109,7 +109,7 @@
 
     {{-- Modal Ver Detalles --}}
     <div class="modal fade" id="modalDetalles" tabindex="-1" aria-labelledby="modalDetallesLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
             <div class="modal-content" id="modalDetallesContent">
             </div>
         </div>

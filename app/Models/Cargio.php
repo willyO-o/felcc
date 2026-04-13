@@ -23,6 +23,10 @@ class Cargio extends Model
         'fecha_venta'
     ];
 
+    protected $casts = [
+        'fecha_venta' => 'datetime',
+    ];
+
     public function vehiculo()
     {
         return $this->belongsTo(Vehiculo::class, 'vehiculo_id');

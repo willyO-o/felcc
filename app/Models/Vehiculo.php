@@ -39,7 +39,6 @@ class Vehiculo extends Model
     public  function inspecciones()
     {
         return $this->hasMany(InspeccionTecnica::class, 'vehiculo_id');
-
     }
     public function multimedia()
     {
@@ -48,6 +47,7 @@ class Vehiculo extends Model
 
     public function cargios()
     {
-        return $this->hasMany(Cargio::class, 'vehiculo_id');
+        return $this->hasMany(Cargio::class, 'vehiculo_id')
+            ->orderBy('fecha_venta', 'desc');
     }
 }

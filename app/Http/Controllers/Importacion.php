@@ -1144,7 +1144,7 @@ class Importacion extends Controller
                     'nro_autorizacion' => campoDB($fila['NRO_AUTORIZACION'] ?? null),
                     'codigo_control' => campoDB($fila['CODIGO_CONTROL'] ?? null),
                     'cantidad' => campoDBNumero($fila['CANTIDAD'] ?? null),
-                    'monto' => campoDBNumero($fila['MONTO'] ?? null),
+                    'monto' => campoDBNumero($fila['MONTO_BS'] ?? null),
                     'fecha_venta' => campoDBFechaHora($fila['FECHA_VENTA'] ?? null)
                 ];
 

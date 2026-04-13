@@ -156,8 +156,8 @@ class VehiculoController extends Controller
             abort(403, 'No tienes permiso para ver vehículos.');
         }
 
-        $vehiculo = Vehiculo::with('casos.persona')->findOrFail($id);
-        return view('vehiculos.show', ['vehiculo' => $vehiculo]);
+        $vehiculo = Vehiculo::with(['casos.persona', 'cargios','cargios.estacionServicio'])->findOrFail($id);
+        return view('vehiculos.detalles', ['vehiculo' => $vehiculo]);
     }
 
     /**
