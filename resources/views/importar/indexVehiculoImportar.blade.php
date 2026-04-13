@@ -52,10 +52,10 @@
                                                         </p>
                                                         <p class="text-muted mb-1">Arrastra tu archivo aquí o haz clic para
                                                             seleccionar</p>
-                                                        <small class="text-muted">Formatos: CSV  o  XLSX (máx.
+                                                        <small class="text-muted font-weight-bold">Formatos: <span class="text-danger  ">SOLO CSV  </span>   (máx.
                                                             10MB)</small>
                                                     </div>
-                                                    <input type="file" id="archivoInput_tel" accept=".csv,.xlsx"
+                                                    <input type="file" id="archivoInput_tel" accept=".csv"
                                                         style="display: none;">
                                                 </div>
                                             </div>
@@ -153,9 +153,8 @@
                                                     <div class="accordion-body p-2">
                                                         <ul class="list-unstyled small">
                                                             <li class="mb-2">
-                                                                <strong>NUMERO DE CELULAR</strong><br>
-                                                                <small class="text-muted">Número de teléfono celular de la
-                                                                    persona.</small>
+                                                                <strong>PLACA</strong><br>
+                                                                <small class="text-muted">Número de placa del vehículo.</small>
                                                             </li>
                                                         </ul>
                                                     </div>
@@ -174,15 +173,16 @@
                                                     data-bs-parent="#accordionCampos">
                                                     <div class="accordion-body p-2">
                                                         <ul class="list-unstyled small">
-                                                            <li>✓ NUMERO DE CELULAR</li>
-                                                            <li>✓ PERSONA DEL CASO</li>
-                                                            <li>✓ CASO</li>
-                                                            <li>✓ EMPRESA</li>
-                                                            <li>✓ C.I.</li>
-                                                            <li>✓ INFO</li>
-                                                            <li>✓ CALLAPP</li>
-                                                            <li>✓ TRUECALL</li>
-                                                            <li>✓ UNINET</li>
+                                                            <li>✓ PLACA</li>
+                                                            <li>✓ CARACTERISTICAS</li>
+                                                            <li>✓ RESPONSABLE</li>
+                                                            <li>✓ CASO RELACIONADO</li>
+                                                            <li>✓ RUAT</li>
+                                                            <li>✓ CI RUAT</li>
+                                                            <li>✓ BSISA</li>
+                                                            <li>✓ CI BSISA</li>
+                                                            <li>✓ SOAT</li>
+                                                            <li>✓ CI SOAT</li>
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -201,10 +201,10 @@
                                                     data-bs-parent="#acordionCampos">
                                                     <div class="accordion-body p-2">
                                                         <ul class="list-unstyled small">
-                                                            <li class="mb-2">⚠️ Los teléfonos duplicados se actualizarán</li>
-                                                            <li class="mb-2">✓ Los números de teléfono se validan automáticamente</li>
-                                                            <li class="mb-2">✓ Los formatos de teléfono se normalizan</li>
-                                                            <li class="mb-2">✓ Los C.I. y respuesta a requerimiento, se enlazan al teléfono</li>
+                                                            <li class="mb-2">⚠️ Las placa duplicadas se actualizarán</li>
+                                                            <li class="mb-2">✓ Las placa se validan automáticamente</li>
+                                                            <li class="mb-2">✓ Los formatos de placa se normalizan</li>
+                                                            <li class="mb-2">✓ Los C.I. se enlazaran </li>
                                                             <li class="mb-2">✓ Los registros vacíos se ignoran</li>
                                                         </ul>
                                                     </div>
@@ -214,7 +214,7 @@
 
                                         {{-- Descargar plantilla --}}
                                         <div class="mt-3">
-                                            <a href="{{ url('plantillas/plantilla-importacion-telefonos.xlsx')}}" download
+                                            <a href="{{ url('plantillas/plantilla-importacion-vehiculos.xlsx')}}" download
                                                 class="btn btn-sm btn-outline-primary w-100">
                                                 <i class="ri-download-line me-1"></i> Descargar Plantilla
                                             </a>
@@ -382,17 +382,28 @@
                                                     <div class="accordion-body p-2">
                                                         <ul class="list-unstyled small">
                                                             <li class="mb-2">
-                                                                <strong>NUMERO ASOCIADO</strong><br>
+                                                                <strong>PLACA</strong><br>
                                                                 <small class="text-muted">
-                                                                    Número de teléfono asociado al IMEI. Se usará para
-                                                                    enlazar el IMEI a un telefono nuevo o existente.
+                                                                    Número de placa del vehículo. Se usará para identificar el vehículo en la base de datos.
                                                                 </small>
                                                             </li>
                                                             <li class="mb-2">
-                                                                <strong>NUMERO IMEI</strong><br>
+                                                                <strong>EESS</strong><br>
                                                                 <small class="text-muted">
-                                                                    Número de identificación del dispositivo. Se usará para
-                                                                    identificar el IMEI en la base de datos.
+                                                                    Nombre de la estación de servicio donde se realizó el carguio. Se usará para identificar la estación en la base de datos.
+                                                                </small>
+                                                            </li>
+                                                            <li class="mb-2">
+                                                                <strong>NIT ESTACION</strong><br>
+                                                                <small class="text-muted">
+                                                                    Número de identificación de la estación de servicio. Se usará para
+                                                                    identificar la estación en la base de datos.
+                                                                </small>
+                                                            </li>
+                                                            <li class="mb-2">
+                                                                <strong>FECHA VENTA</strong><br>
+                                                                <small class="text-muted">
+                                                                    Fecha en la que se realizó la venta. Se usará para identificar la venta en la base de datos.
                                                                 </small>
                                                             </li>
                                                         </ul>
@@ -413,9 +424,10 @@
                                                     data-bs-parent="#acordionCampos">
                                                     <div class="accordion-body p-2">
                                                         <ul class="list-unstyled small">
-                                                            <li class="mb-2">⚠️ Los números de IMEI duplicados se actualizarán</li>
-                                                            <li class="mb-2">✓ Los teléfonos se validan automáticamente</li>
+                                                            <li class="mb-2">⚠️ Los cargios existentes se ignoraran</li>
+                                                            <li class="mb-2">✓ Los datos se validan automáticamente</li>
                                                             <li class="mb-2">✓ Los datos se insertan en la base de datos</li>
+                                                            <li class="mb-2">✓ Se puede subir en formato excel con multiples hojas</li>
                                                         </ul>
                                                     </div>
                                                 </div>
@@ -424,7 +436,7 @@
 
                                         {{-- Descargar plantilla --}}
                                         <div class="mt-3">
-                                            <a href="{{ url('plantillas/plantilla-importacion-imeis.xlsx') }}" download
+                                            <a href="{{ url('plantillas/plantilla-importacion-cargios.xlsx') }}" download
                                                 class="btn btn-sm btn-outline-primary w-100">
                                                 <i class="ri-download-line me-1"></i> Descargar Plantilla
                                             </a>
@@ -448,7 +460,7 @@
                                             <div class="col-6">
                                                 <div class="text-center p-2 bg-light rounded">
                                                     <div class="fw-bold">{{ \App\Models\Cargio::count() }}</div>
-                                                    <small class="text-muted">Carguios</small>
+                                                    <small class="text-muted">Cargios</small>
                                                 </div>
                                             </div>
                                         </div>

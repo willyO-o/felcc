@@ -52,10 +52,10 @@
                                                         </p>
                                                         <p class="text-muted mb-1">Arrastra tu archivo aquí o haz clic para
                                                             seleccionar</p>
-                                                        <small class="text-muted">Formatos: CSV, XLSX, XLS (máx.
+                                                        <small class="text-muted font-weight-bold">Formatos: <span class="text-danger  ">SOLO CSV  </span>   (máx.
                                                             10MB)</small>
                                                     </div>
-                                                    <input type="file" id="archivoInput_tel" accept=".csv,.xlsx,.xls"
+                                                    <input type="file" id="archivoInput_tel" accept=".csv"
                                                         style="display: none;">
                                                 </div>
                                             </div>
@@ -280,10 +280,10 @@
                                                         <p class="text-muted mb-1">Arrastra tu archivo aquí o haz clic para
                                                             seleccionar
                                                         </p>
-                                                        <small class="text-muted">Formatos: CSV, XLSX, XLS (máx.
+                                                        <small class="text-muted font-weight-bold">Formatos: <span class="text-danger  ">SOLO CSV  </span>   (máx.
                                                             10MB)</small>
                                                     </div>
-                                                    <input type="file" id="archivoInput_imei" accept=".csv,.xlsx,.xls"
+                                                    <input type="file" id="archivoInput_imei" accept=".csv"
                                                         style="display: none;">
                                                 </div>
                                             </div>
