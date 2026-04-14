@@ -1,185 +1,162 @@
 <style>
     .detalles-vehiculo {
-        --color-primary: #7cb342;
-        --color-header: #9ccc65;
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-        font-size: 0.9375rem;
     }
 
+    /* Header con gradiente personalizado */
     .detalles-vehiculo .header-placa {
-        background: linear-gradient(135deg, #9ccc65 0%, #7cb342 100%);
-        padding: 15px 20px;
+        background-color: rgba(255, 255, 255, 0.03);
+        padding: 1.5rem;
         text-align: center;
-        margin: -15px -15px 20px -15px;
+        margin: -1rem -1rem 1.5rem -1rem;
+        border-radius: 0.375rem 0.375rem 0 0;
+    }
+
+    [data-bs-theme="light"] .detalles-vehiculo .header-placa {
+        background-color: rgba(255, 255, 255, 0.03);
     }
 
     .detalles-vehiculo .header-placa h1 {
         font-size: 1.75rem;
-        color: white;
+        color: #fff;
         margin: 0;
         font-weight: 600;
         letter-spacing: 2px;
     }
 
+    /* Secciones principales */
     .detalles-vehiculo .seccion-principal {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        margin-bottom: 20px;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .detalles-vehiculo .fotos-vehiculo {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    @media (min-width: 768px) {
+        .detalles-vehiculo .fotos-vehiculo {
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .detalles-vehiculo .fotos-vehiculo>* {
+            flex: 1 1 calc(50% - 0.5rem);
+            min-width: 0;
+        }
     }
 
     .detalles-vehiculo .foto-item {
-        /* width: 100%; */
         min-height: 200px;
-        background-color: #f8f9fa;
-        border: 2px solid #e9ecef;
-        border-radius: 4px;
         display: flex;
         align-items: center;
         justify-content: center;
-        color: #999;
-        font-size: 0.85rem;
+        border-radius: 0.375rem;
+        overflow: hidden;
+        background-color: var(--bs-secondary-bg);
+        border: 1px solid var(--bs-border-color);
     }
 
     .detalles-vehiculo .foto-item img {
         width: 100%;
         height: 100%;
         object-fit: cover;
-        border-radius: 2px;
     }
 
-    .detalles-vehiculo .tabla-info {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .detalles-vehiculo .tabla-info th {
-        background-color: #9ccc65;
-        color: white;
-        padding: 10px;
-        text-align: left;
-        font-weight: 600;
-        font-size: 0.85rem;
-    }
-
-    .detalles-vehiculo .tabla-info td {
-        padding: 8px 10px;
-        border: 1px solid #e9ecef;
-        background-color: #fafbfc;
-        font-size: 0.9rem;
-    }
-
-    .detalles-vehiculo .tabla-info tr:nth-child(even) td {
-        background-color: #fff;
-    }
-
-    .detalles-vehiculo .seccion-registros {
-        margin-bottom: 20px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #e9ecef;
-    }
-
-    .detalles-vehiculo .seccion-registros>div {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 20px;
-    }
-
-    .detalles-vehiculo .seccion-registros h3 {
-        background-color: #9ccc65;
-        color: white;
-        padding: 8px 12px;
-        margin: 0 0 12px 0;
-        font-size: 0.85rem;
-        font-weight: 600;
-        border-radius: 3px;
-    }
-
-    .detalles-vehiculo .relacion-contenido {
+    .detalles-vehiculo .info-general {
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        justify-content: flex-start;
     }
 
-    .detalles-vehiculo .relacion-item {
-        padding: 8px 12px;
-        background-color: #f8f9fa;
-        border-left: 3px solid #9ccc65;
+    .detalles-vehiculo .info-general p {
+        margin-bottom: 0.5rem;
+        color: var(--bs-body-color);
+    }
+
+    /* Headers de sección */
+    .detalles-vehiculo .section-title {
+        /* background-color: #198754; */
+        color: #fff;
+        padding: 0.5rem 0.75rem;
+        margin-bottom: 1rem;
         font-size: 0.9rem;
+        font-weight: 600;
+        border-radius: 0.375rem;
+        display: inline-block;
+        width: 100%;
+    }
+
+    [data-bs-theme="dark"] .detalles-vehiculo .section-title {
+        /* background-color: #20c997; */
+    }
+
+    .detalles-vehiculo .badge-count {
+        margin-left: 0.5rem;
+    }
+
+    /* Items de relación */
+    .detalles-vehiculo .relacion-item {
+        padding: 0.75rem;
+        background-color: var(--bs-secondary-bg);
+        border-left: 3px solid var(--bs-success);
+        border-radius: 0 0.25rem 0.25rem 0;
         line-height: 1.4;
+        color: var(--bs-body-color);
     }
 
     .detalles-vehiculo .seccion-relacion {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        margin-bottom: 20px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #e9ecef;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--bs-border-color);
     }
 
-    .detalles-vehiculo .relacion-columna h3 {
-        background-color: #9ccc65;
-        color: white;
-        padding: 8px 12px;
-        margin: 0 0 12px 0;
-        font-size: 0.85rem;
-        font-weight: 600;
-        border-radius: 3px;
+    /* Secciones */
+    .detalles-vehiculo .seccion-registros {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid var(--bs-border-color);
+    }
+
+    .detalles-vehiculo .seccion-itv,
+    .detalles-vehiculo .seccion-ultimo-carguio {
+        margin-bottom: 1.5rem;
+    }
+
+    /* Tablas */
+    .detalles-vehiculo .tabla-info {
+        font-size: 0.9375rem;
     }
 
     .detalles-vehiculo .tabla-carguios,
     .detalles-vehiculo .tabla-itv,
     .detalles-vehiculo .tabla-ultimo-carguio {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.65rem;
-    }
-
-    .detalles-vehiculo .tabla-carguios th,
-    .detalles-vehiculo .tabla-itv th,
-    .detalles-vehiculo .tabla-ultimo-carguio th {
-        background-color: #9ccc65;
-        color: white;
-        padding: 8px 10px;
-        text-align: left;
-        font-weight: 600;
-    }
-
-    .detalles-vehiculo .tabla-carguios td,
-    .detalles-vehiculo .tabla-itv td,
-    .detalles-vehiculo .tabla-ultimo-carguio td {
-        padding: 8px 10px;
-        border: 1px solid #e9ecef;
-        background-color: #fafbfc;
-    }
-
-    .detalles-vehiculo .tabla-carguios tr:nth-child(even) td,
-    .detalles-vehiculo .tabla-itv tr:nth-child(even) td,
-    .detalles-vehiculo .tabla-ultimo-carguio tr:nth-child(even) td {
-        background-color: #fff;
-    }
-
-    .detalles-vehiculo .seccion-itv,
-    .detalles-vehiculo .seccion-ultimo-carguio {
-        margin-bottom: 20px;
-    }
-
-    .detalles-vehiculo .seccion-itv h3,
-    .detalles-vehiculo .seccion-ultimo-carguio h3 {
-        background-color: #9ccc65;
-        color: white;
-        padding: 8px 12px;
-        margin: 0 0 12px 0;
         font-size: 0.85rem;
-        font-weight: 600;
-        border-radius: 3px;
     }
 
+    /* Fila de énfasis (último carguio, última inspección) */
+    .detalles-vehiculo .enfasis td {
+        background-color: var(--bs-tertiary-bg) !important;
+    }
+
+    .detalles-vehiculo .table-success {
+        background-color: var(--bs-success) !important;
+        color: #fff;
+    }
+
+
+
+    /* Responsive */
     @media (max-width: 768px) {
         .detalles-vehiculo .seccion-principal {
             grid-template-columns: 1fr;
-            gap: 15px;
         }
 
         .detalles-vehiculo .seccion-relacion {
@@ -193,16 +170,19 @@
         .detalles-vehiculo .tabla-carguios,
         .detalles-vehiculo .tabla-itv,
         .detalles-vehiculo .tabla-ultimo-carguio {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
         }
 
         .detalles-vehiculo .tabla-carguios th,
         .detalles-vehiculo .tabla-itv th,
-        .detalles-vehiculo .tabla-ultimo-carguio th,
+        .detalles-vehiculo .tabla-ultimo-carguio th {
+            padding: 0.5rem;
+        }
+
         .detalles-vehiculo .tabla-carguios td,
         .detalles-vehiculo .tabla-itv td,
         .detalles-vehiculo .tabla-ultimo-carguio td {
-            padding: 6px 8px;
+            padding: 0.5rem;
         }
     }
 
@@ -211,11 +191,10 @@
         display: table;
         width: 100%;
         table-layout: fixed;
-        /* Importante para que las celdas alineen */
     }
 
     .seccion-registros .enfasis td {
-        background-color: #e5db91 !important;
+        background-color: #fbea4d6c ! important;
     }
 </style>
 <div class="modal-header">
@@ -226,29 +205,28 @@
 <div class="modal-body">
     <div class="detalles-vehiculo">
         <!-- Encabezado con Placa -->
-        <div class="header-placa">
-            <h1> {{ $vehiculo->placa }}</h1>
+        <div class="header-placa bg-soft-success">
+            <h1 class="text-dark"> {{ $vehiculo->placa }}</h1>
         </div>
 
         <!-- Sección Principal: Fotos e Información -->
         <div class="seccion-principal">
             <!-- Fotos del vehículo -->
-            <div class="fotos-vehiculo row g-3">
+            <div class="fotos-vehiculo">
                 @forelse ($vehiculo->multimedia as $foto)
-                    <div class="foto-item col-md-6 ">
-                        <img src="{{ asset('storage/' . $foto->ruta) }}" alt="Foto del vehículo">
+                    <div class="foto-item">
+                        <img src="{{ asset('storage/' . $foto->ruta) }}" alt="Foto del vehículo" class="img-fluid">
                     </div>
-
                 @empty
-                    <div class="foto-item col-md-6 ">
-                        <div class="foto-placeholder">Foto frontal</div>
+                    <div class="foto-item d-flex flex-column align-items-center justify-content-center text-muted">
+                        <i class="ri-image-2-line" style="font-size: 2rem;"></i>
+                        <small class="mt-2">Sin fotos</small>
                     </div>
-                    <div class="foto-item col-md-6 ">
-                        <div class="foto-placeholder">Foto lateral</div>
+                    <div class="foto-item d-flex flex-column align-items-center justify-content-center text-muted">
+                        <i class="ri-image-2-line" style="font-size: 2rem;"></i>
+                        <small class="mt-2">Sin fotos</small>
                     </div>
                 @endforelse
-
-
             </div>
 
             <!-- Información General -->
@@ -305,19 +283,19 @@
         <div class="seccion-registros mb-3">
 
 
-            <table class="tabla-info ">
+            <table class="tabla-info table table-sm table-striped align-middle">
                 <tbody>
                     <tr>
-                        <th class="text-center">
+                        <th class="text-center table-success">
                             Tipo de Registro
                         </th>
-                        <th class="text-center">
+                        <th class="text-center table-success">
                             Nombre
                         </th>
-                        <th class="text-center">
+                        <th class="text-center table-success">
                             C.I
                         </th>
-                        <th class="text-center">
+                        <th class="text-center table-success">
                             Teléfono
                         </th>
                     </tr>
@@ -375,112 +353,99 @@
         <!-- Sección RELACIÓN OTID -->
         <div class="seccion-relacion">
             <div class="relacion-columna">
-                <h3>Caso Relacionado</h3>
-                <div class="relacion-contenido">
-                    <div class="relacion-item">
-                        <strong></strong> {{ $vehiculo->caso_relacionado ?? '-' }}
-                    </div>
-
+                <h5 class="section-title bg-soft-success text-dark">Caso Relacionado</h5>
+                <div class="relacion-item">
+                    <strong>{{ $vehiculo->caso_relacionado ?? '-' }}</strong>
                 </div>
             </div>
 
             <div class="relacion-columna">
-                <h3>Responsable</h3>
-                <div class="relacion-contenido">
-                    <div class="relacion-item"> {{ $vehiculo->responsable ?? '-' }} </div>
-                </div>
+                <h5 class="section-title bg-soft-success text-dark">Responsable</h5>
+                <div class="relacion-item">{{ $vehiculo->responsable ?? '-' }}</div>
             </div>
         </div>
 
         <!-- Sección CARGUIOS -->
         <div class="seccion-registros">
-            <h3 class="text-center">
+            <h5 class="section-title text-center w-100 bg-soft-success text-dark">
                 CARGUIOS
-                <span class="badge bg-primary"> {{ $vehiculo->cargios->count() }}</span>
-            </h3>
+                <span class="badge bg-primary badge-count"> {{ $vehiculo->cargios->count() }}</span>
+            </h5>
 
-
-            <table class="tabla-carguios table-sm">
-                <thead>
+            <div class="table-responsive">
+                <table class="tabla-carguios  tabla-info table table-sm table-striped align-middle">
                     <tr>
-                        <th>NIT CONSUMIDOR</th>
-                        <th>RAZÓN SOCIAL</th>
-                        <th>ESTACION</th>
-                        <th>DEPARTAMENTO</th>
-                        <th>MONTO BS</th>
-                        <th>LITROS</th>
-                        <th>FECHA</th>
+                        <th class="table-success">NIT CONSUMIDOR</th>
+                        <th class="table-success">RAZÓN SOCIAL</th>
+                        <th class="table-success">ESTACION</th>
+                        <th class="table-success">DEPARTAMENTO</th>
+                        <th class="table-success">MONTO BS</th>
+                        <th class="table-success">LITROS</th>
+                        <th class="table-success">FECHA</th>
                     </tr>
-                </thead>
-                <tbody class="" style="max-height: 300px; overflow-y: auto; display: block;">
+                    <tbody style="max-height: 300px; overflow-y: auto; display: block;">
 
-                    @foreach ($vehiculo->cargios as $cargio)
-                        <tr class="{{ $loop->index == 0 ? 'enfasis' : '' }}">
-                            <td>{{ $cargio->nit_consumidor }}</td>
-                            <td>{{ $cargio->razon_social }}</td>
-                            <td>{{ $cargio->estacionServicio->eess }}</td>
-                            <td>{{ $cargio->departamento }}</td>
-                            <td>{{ $cargio->monto }}</td>
-                            <td>{{ $cargio->cantidad }}</td>
-                            <td>{{ $cargio->fecha_venta?->format('d/m/Y H:i') }}
-
-                                @if ($loop->index == 0)
-                                    {{-- calcular tiempo transcurrido desde el último carguio --}}
-
-                                    <span class="badge bg-warning text-dark">Último Carguio</span>
-                                    <br>
-                                    <span class="badge bg-soft-primary text-dark">
-                                        {{ $cargio->fecha_venta?->diffForHumans() }}
-                                    </span>
-                                @endif
-
-                            </td>
-                        </tr>
-                    @endforeach
-
-                </tbody>
-            </table>
+                        @foreach ($vehiculo->cargios as $cargio)
+                            <tr class="{{ $loop->index == 0 ? 'enfasis' : '' }}">
+                                <td>{{ $cargio->nit_consumidor }}</td>
+                                <td>{{ $cargio->razon_social }}</td>
+                                <td>{{ $cargio->estacionServicio->eess }}</td>
+                                <td>{{ $cargio->departamento }}</td>
+                                <td>{{ $cargio->monto }}</td>
+                                <td>{{ $cargio->cantidad }}</td>
+                                <td>{{ $cargio->fecha_venta?->format('d/m/Y H:i') }}
+                                    @if ($loop->index == 0)
+                                        <span class="badge bg-warning text-dark ms-2">Último Carguio</span>
+                                        <br>
+                                        <span class="badge bg-info text-dark mt-1">
+                                            {{ $cargio->fecha_venta?->diffForHumans() }}
+                                        </span>
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Sección ITV -->
-        <div class="seccion-itv ">
-            <h3 class="text-center">ITV <span class="badge bg-primary"> {{ $vehiculo->inspecciones->count() }}</span>
-            </h3>
-            <table class="tabla-itv">
-                <thead>
+        <div class="seccion-itv">
+            <h5 class="section-title text-center w-100 bg-soft-success text-dark">
+                ITV
+                <span class="badge bg-primary badge-count"> {{ $vehiculo->inspecciones->count() }}</span>
+            </h5>
+            <div class="table-responsive">
+                <table class="tabla-itv table table-sm table-striped align-middle">
                     <tr>
-                        <th>AÑO</th>
-                        <th>NOMBRE</th>
-                        <th>C.I.</th>
-                        <th>TELÉFONO</th>
-                        <th>DETALLE</th>
+                        <th class="table-success">AÑO</th>
+                        <th class="table-success">NOMBRE</th>
+                        <th class="table-success">C.I.</th>
+                        <th class="table-success">TELÉFONO</th>
+                        <th class="table-success">DETALLE</th>
                     </tr>
-                </thead>
-                <tbody>
+                    <tbody>
 
-                    @forelse ($vehiculo->inspecciones as $inspeccion)
-                        <tr class="{{ $loop->index == 0 ? 'enfasis' : '' }}">
-                            <td>{{ $inspeccion->anio }}</td>
-                            <td>{{ $inspeccion->persona?->nombres }} {{ $inspeccion->persona?->apellidos }}</td>
-                            <td>{{ $inspeccion->persona?->ci }}</td>
-                            <td>{{ $inspeccion->persona?->telefono }}</td>
-                            <td>{{ $inspeccion->resultado }}</td>
-                        </tr>
-
-                    @empty
-                        <tr>
-                            <td colspan="100%">
-                                <div class="text-center p-3">
-                                    No hay inspecciones técnicas vinculadas a este vehículo.
-                                </div>
-                            </td>
-
-                        </tr>
-                    @endforelse
-
-
-                </tbody>
-            </table>
+                        @forelse ($vehiculo->inspecciones as $inspeccion)
+                            <tr class="{{ $loop->index == 0 ? 'enfasis' : '' }}">
+                                <td>{{ $inspeccion->anio }}</td>
+                                <td>{{ $inspeccion->persona?->nombres }} {{ $inspeccion->persona?->apellidos }}</td>
+                                <td>{{ $inspeccion->persona?->ci }}</td>
+                                <td>{{ $inspeccion->persona?->telefono }}</td>
+                                <td>{{ $inspeccion->resultado }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="100%">
+                                    <div class="text-center p-3">
+                                        No hay inspecciones técnicas vinculadas a este vehículo.
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         <!-- Sección Último Carguio ANH -->
