@@ -29,7 +29,7 @@
     }
 
     .detalles-vehiculo .foto-item {
-        width: 100%;
+        /* width: 100%; */
         min-height: 200px;
         background-color: #f8f9fa;
         border: 2px solid #e9ecef;
@@ -233,17 +233,17 @@
         <!-- Sección Principal: Fotos e Información -->
         <div class="seccion-principal">
             <!-- Fotos del vehículo -->
-            <div class="fotos-vehiculo">
+            <div class="fotos-vehiculo row g-3">
                 @forelse ($vehiculo->multimedia as $foto)
-                    <div class="foto-item">
+                    <div class="foto-item col-md-6 ">
                         <img src="{{ asset('storage/' . $foto->ruta) }}" alt="Foto del vehículo">
                     </div>
 
                 @empty
-                    <div class="foto-item">
+                    <div class="foto-item col-md-6 ">
                         <div class="foto-placeholder">Foto frontal</div>
                     </div>
-                    <div class="foto-item">
+                    <div class="foto-item col-md-6 ">
                         <div class="foto-placeholder">Foto lateral</div>
                     </div>
                 @endforelse
