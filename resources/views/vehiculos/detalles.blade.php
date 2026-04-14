@@ -30,7 +30,7 @@
 
     .detalles-vehiculo .foto-item {
         width: 100%;
-        height: 200px;
+        min-height: 200px;
         background-color: #f8f9fa;
         border: 2px solid #e9ecef;
         border-radius: 4px;
@@ -234,12 +234,20 @@
         <div class="seccion-principal">
             <!-- Fotos del vehículo -->
             <div class="fotos-vehiculo">
-                <div class="foto-item">
-                    <div class="foto-placeholder">Foto frontal</div>
-                </div>
-                <div class="foto-item">
-                    <div class="foto-placeholder">Foto lateral</div>
-                </div>
+                @forelse ($vehiculo->multimedia as $foto)
+                    <div class="foto-item">
+                        <img src="{{ asset('storage/' . $foto->ruta) }}" alt="Foto del vehículo">
+                    </div>
+
+                @empty
+                    <div class="foto-item">
+                        <div class="foto-placeholder">Foto frontal</div>
+                    </div>
+                    <div class="foto-item">
+                        <div class="foto-placeholder">Foto lateral</div>
+                    </div>
+                @endforelse
+
 
             </div>
 
@@ -453,7 +461,7 @@
                     @forelse ($vehiculo->inspecciones as $inspeccion)
                         <tr class="{{ $loop->index == 0 ? 'enfasis' : '' }}">
                             <td>{{ $inspeccion->anio }}</td>
-                            <td>{{ $inspeccion->persona?->nombres  }} {{ $inspeccion->persona?->apellidos }}</td>
+                            <td>{{ $inspeccion->persona?->nombres }} {{ $inspeccion->persona?->apellidos }}</td>
                             <td>{{ $inspeccion->persona?->ci }}</td>
                             <td>{{ $inspeccion->persona?->telefono }}</td>
                             <td>{{ $inspeccion->resultado }}</td>

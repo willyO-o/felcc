@@ -11,7 +11,7 @@
 
 <form id="vehiculoForm"
     action="@if (isset($vehiculo) && $vehiculo->id) {{ route('vehiculos.update', $vehiculo->id) }}@else{{ route('vehiculos.store') }} @endif"
-    method="POST">
+    method="POST" enctype="multipart/form-data">
     @csrf
     @if (isset($vehiculo) && $vehiculo->id)
         @method('PUT')
@@ -50,54 +50,6 @@
             <div id="error-caso_relacionado" class="invalid-feedback"></div>
         </div>
 
-        {{-- <h6 class="mb-3">Información Adicional</h6>
-
-        <div class="row">
-            <div class="col-md-6">
-                <div class="mb-3">
-                    <label for="bsisa" class="form-label">BSISA</label>
-                    <input type="text" class="form-control" id="bsisa" name="bsisa" placeholder="BSISA"
-                        @if (isset($vehiculo) && $vehiculo->id) value="{{ $vehiculo->bsisa }}" @endif>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="mb-3">
-                    <label for="ci_bsisa" class="form-label">CI BSISA</label>
-                    <input type="text" class="form-control" id="ci_bsisa" name="ci_bsisa" placeholder="CI del BSISA"
-                        @if (isset($vehiculo) && $vehiculo->id) value="{{ $vehiculo->ci_bsisa }}" @endif>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-md-4">
-                <div class="mb-3">
-                    <label for="ruat" class="form-label">RUAT</label>
-                    <input type="text" class="form-control" id="ruat" name="ruat" placeholder="RUAT"
-                        @if (isset($vehiculo) && $vehiculo->id) value="{{ $vehiculo->ruat }}" @endif>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="mb-3">
-                    <label for="anh" class="form-label">ANH</label>
-                    <input type="text" class="form-control" id="anh" name="anh" placeholder="ANH"
-                        @if (isset($vehiculo) && $vehiculo->id) value="{{ $vehiculo->anh }}" @endif>
-                </div>
-            </div>
-            <div class="col-md-4">
-                <div class="mb-3">
-                    <label for="itb" class="form-label">ITB</label>
-                    <input type="text" class="form-control" id="itb" name="itb" placeholder="ITB"
-                        @if (isset($vehiculo) && $vehiculo->id) value="{{ $vehiculo->itb }}" @endif>
-                </div>
-            </div>
-        </div>
-
-        <div class="mb-3">
-            <label for="soat" class="form-label">SOAT</label>
-            <input type="text" class="form-control" id="soat" name="soat" placeholder="SOAT"
-                @if (isset($vehiculo) && $vehiculo->id) value="{{ $vehiculo->soat }}" @endif>
-        </div>--}}
         <hr>
         <h6 class="mb-3">Personas Asociadas</h6>
 
@@ -161,6 +113,40 @@
             @endif
         </div>
         <input type="hidden" id="personas_asociadas" name="personas_asociadas" value="[]">
+
+        <hr>
+        <h6 class="mb-3">Fotos del Vehículo</h6>
+
+        <div class="mb-3">
+            <label for="fotosVehiculos" class="form-label">
+                Fotos
+                <small class="text-muted">(JPEG, PNG, WebP, JPG - máx 2MB por archivo)</small>
+            </label>
+            <input type="file" class="form-control" id="fotosVehiculos" name="fotosVehiculos[]" multiple
+                accept="image/jpeg,image/png,image/webp,image/jpg">
+            <small id="fotosVehiculosHelp" class="form-text text-muted">Puede cargar una o más fotografías</small>
+            <div class="invalid-feedback" id="error-fotosVehiculos"></div>
+
+            @if (isset($vehiculo) && $vehiculo->id && $vehiculo->multimedia->count() > 0)
+                <div class="mt-3">
+                    <label class="form-label">Fotos Actuales:</label>
+                    <div class="row g-2" id="fotosVehiculosActuales">
+                        @foreach ($vehiculo->multimedia as $foto)
+                            <div class="col-md-3" data-foto-id="{{ $foto->id }}">
+                                <div class="position-relative">
+                                    <img src="{{ url('storage/' . $foto->ruta) }}"
+                                        alt="Foto" class="img-fluid rounded" style="max-height: 100px;">
+                                    <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0"
+                                        onclick="eliminarFotoVehiculo({{ $foto->id }})" style="z-index: 10;">
+                                        <i class="ri-delete-bin-fill"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+        </div>
     </div>
 
     <div class="modal-footer">

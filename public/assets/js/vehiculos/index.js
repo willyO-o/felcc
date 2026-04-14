@@ -11,6 +11,16 @@
     let pageSize = 10;
     let searchTimeout = null;
     let totalPages = 0;
+    let filePondInstance = null;
+
+    // Registrar plugins de FilePond
+    FilePond.registerPlugin(
+        FilePondPluginFileEncode,
+        FilePondPluginFileValidateSize,
+        FilePondPluginImageExifOrientation,
+        FilePondPluginImagePreview,
+        FilePondPluginFileValidateType,
+    );
 
     const $listado = $("#listadoVehiculos");
     const $loading = $("#loadingVehiculos");
@@ -234,6 +244,8 @@
                 setTimeout(() => {
                     bindFormulario();
                 }, 100);
+
+                $("#modalVehiculo").on("hidden.bs.modal", limpiarFilePondVehiculos);
             })
             .fail(function (err) {
                 console.error("Error:", err);
@@ -314,6 +326,47 @@
     /**
      * Bindear eventos del formulario
      */
+    function inicializarFilePondVehiculos() {
+        const inputElement = document.querySelector('#fotosVehiculos');
+        if (!inputElement) return;
+
+        if (filePondInstance) {
+            FilePond.destroy(inputElement);
+        }
+
+        filePondInstance = FilePond.create(inputElement, {
+            storeAsFile: false,
+            allowMultiple: true,
+            labelIdle: 'Arrastra o sube fotos del vehículo<br><span class="filepond--label-action">Seleccionar</span>',
+            imagePreviewHeight: 140,
+            acceptedFileTypes: ['image/*'],
+            labelFileTypeNotAllowed: 'Archivo no válido. Solo se permiten imágenes.',
+            allowFileSizeValidation: true,
+            maxFiles: 10,
+            maxFileSize: '2MB',
+            labelMaxFileSize: 'Tamaño máximo de archivo es {filesize}',
+            labelMaxFileSizeExceeded: 'Archivo demasiado grande',
+            imageResizeTargetWidth: 400,
+            imageResizeTargetHeight: 300,
+            stylePanelLayout: 'compact stacked',
+            styleLoadIndicatorPosition: 'center bottom',
+            styleProgressIndicatorPosition: 'right bottom',
+            styleButtonRemoveItemPosition: 'left bottom',
+            styleButtonProcessItemPosition: 'right bottom',
+        });
+    }
+
+    function limpiarFilePondVehiculos() {
+        if (filePondInstance) {
+            FilePond.destroy(document.querySelector('#fotosVehiculos'));
+            filePondInstance = null;
+        }
+        $("#modalVehiculo").off("hidden.bs.modal", limpiarFilePondVehiculos);
+    }
+
+    /**
+     * Bindear eventos del formulario
+     */
     function bindFormulario() {
         const $form = $("#vehiculoForm");
         const $btnGuardar = $("#btnGuardarVehiculo");
@@ -321,6 +374,7 @@
         if ($form.length === 0 || $btnGuardar.length === 0) return;
 
         inicializarSelect2Personas();
+        inicializarFilePondVehiculos();
         actualizarCampoPersonas();
 
         $("#btnAgregarPersona").off("click").on("click", function () {
@@ -397,6 +451,12 @@
         const formData = new FormData($form[0]);
         const url = $form.attr("action");
         const $btnGuardar = $("#btnGuardarVehiculo");
+
+        // Agregar fotos de FilePond
+        if (filePondInstance) {
+            const files = filePondInstance.getFiles().map(fileItem => fileItem.file);
+            files.forEach((file) => formData.append('fotosVehiculos[]', file));
+        }
 
         $btnGuardar.prop("disabled", true);
         $btnGuardar.html('<i class="ri-loader-4-line align-middle me-1"></i> Guardando...');
@@ -477,6 +537,42 @@
                 processError(xhr);
             });
     });
+
+    /**
+     * Eliminar foto del vehículo
+     */
+    window.eliminarFotoVehiculo = function (fotoId) {
+        Swal.fire({
+            title: "¿Eliminar foto?",
+            text: "Esta acción no se puede deshacer",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: `/multimedia/${fotoId}`,
+                    type: "DELETE",
+                    dataType: "json",
+                    headers: {
+                        "X-CSRF-TOKEN": csrfToken,
+                        "X-Requested-With": "XMLHttpRequest",
+                        "Accept": "application/json",
+                    }
+                })
+                    .done(function (data) {
+                        if (data.success) {
+                            $(`[data-foto-id="${fotoId}"]`).remove();
+                            notification(data.success, "Éxito", 2000, "success", "top");
+                        }
+                    })
+                    .fail(function (xhr) {
+                        processError(xhr);
+                    });
+            }
+        });
+    };
 
     /**
      * Ver detalles del vehículo (click en botón ver)
@@ -710,6 +806,8 @@
                 setTimeout(() => {
                     bindFormulario();
                 }, 100);
+
+                $("#modalVehiculo").on("hidden.bs.modal", limpiarFilePondVehiculos);
             })
             .fail(function (err) {
                 console.error("Error:", err);

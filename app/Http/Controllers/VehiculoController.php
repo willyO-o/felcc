@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Vehiculo;
 use App\Models\VehiculoCaso;
-use App\Models\Persona;
+use App\Models\Multimedia;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -129,9 +129,23 @@ class VehiculoController extends Controller
                             'vehiculo_id' => $vehiculo->id,
                             'persona_id' => $persona['persona_id'],
                             'tipo' => $persona['tipo'],
-                            'caso' => $persona['caso'] ?? null,
+                            'numero_informacion' => $persona['caso'] ?? null,
                         ]);
                     }
+                }
+            }
+
+            if($request->hasFile('fotosVehiculos')) {
+                $fotos = $request->file('fotosVehiculos');
+                foreach ($fotos as $foto) {
+                    $nombreArchivo = $foto->getClientOriginalName();
+                    $path = $foto->storeAs('vehiculos', $nombreArchivo  , 'public');
+                    Multimedia::create([
+                        'id_vehiculo' => $vehiculo->id,
+                        'tipo' => 'foto_vehiculo',
+                        'ruta' => $path,
+                        'nombre_archivo' => $nombreArchivo
+                    ]);
                 }
             }
 
@@ -218,7 +232,7 @@ class VehiculoController extends Controller
                                 'tipo' => $persona['tipo'],
                             ],
                             [
-                                'caso' => $persona['caso'] ?? null,
+                                'numero_informacion' => $persona['caso'] ?? null,
                             ]
                         );
                         $nuevasPersonasIds[] = $caso->id;
@@ -234,6 +248,21 @@ class VehiculoController extends Controller
                 VehiculoCaso::where('vehiculo_id', $vehiculo->id)->delete();
             }
 
+            if($request->hasFile('fotosVehiculos')) {
+
+                $fotos = $request->file('fotosVehiculos');
+                foreach ($fotos as $foto) {
+                    $nombreArchivo = $foto->getClientOriginalName();
+                    $path = $foto->storeAs('vehiculos', $nombreArchivo, 'public');
+                    Multimedia::create([
+                        'id_vehiculo' => $vehiculo->id,
+                        'tipo' => 'foto_vehiculo',
+                        'ruta' => $path,
+                        'nombre_archivo' => $nombreArchivo
+                    ]);
+                }
+            }
+
             DB::commit();
 
             return response()->json([
@@ -242,7 +271,7 @@ class VehiculoController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Error al actualizar vehículo'], 500);
+            return response()->json(['error' => 'Error al actualizar vehículo'. $e->getMessage()], 500);
         }
     }
 
