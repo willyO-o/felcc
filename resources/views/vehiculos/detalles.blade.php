@@ -420,7 +420,7 @@
                                     {{-- calcular tiempo transcurrido desde el último carguio --}}
 
                                     <span class="badge bg-warning text-dark">Último Carguio</span>
-                                                                     <br>
+                                    <br>
                                     <span class="badge bg-soft-primary text-dark">
                                         {{ $cargio->fecha_venta?->diffForHumans() }}
                                     </span>
@@ -435,8 +435,9 @@
         </div>
 
         <!-- Sección ITV -->
-        <div class="seccion-itv d-none">
-            <h3>ITV</h3>
+        <div class="seccion-itv ">
+            <h3 class="text-center">ITV <span class="badge bg-primary"> {{ $vehiculo->inspecciones->count() }}</span>
+            </h3>
             <table class="tabla-itv">
                 <thead>
                     <tr>
@@ -444,63 +445,32 @@
                         <th>NOMBRE</th>
                         <th>C.I.</th>
                         <th>TELÉFONO</th>
+                        <th>DETALLE</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>2016</td>
-                        <td>NO REGISTRA</td>
-                        <td>-</td>
-                        <td>-</td>
-                    </tr>
-                    <tr>
-                        <td>2017</td>
-                        <td>NO REGISTRA</td>
-                        <td>-</td>
-                        <td>-</td>
-                    </tr>
-                    <tr>
-                        <td>2018</td>
-                        <td>NO REGISTRA</td>
-                        <td>-</td>
-                        <td>-</td>
-                    </tr>
-                    <tr>
-                        <td>2019</td>
-                        <td>NO REGISTRA</td>
-                        <td>-</td>
-                        <td>-</td>
-                    </tr>
-                    <tr>
-                        <td>2020</td>
-                        <td>NO REGISTRA</td>
-                        <td>-</td>
-                        <td>-</td>
-                    </tr>
-                    <tr>
-                        <td>2021</td>
-                        <td>NO REGISTRA</td>
-                        <td>-</td>
-                        <td>-</td>
-                    </tr>
-                    <tr>
-                        <td>2022</td>
-                        <td>MARIA ELISA MILLIET NUÑEZ</td>
-                        <td>8944278</td>
-                        <td>7875450</td>
-                    </tr>
-                    <tr>
-                        <td>2023</td>
-                        <td>NO REGISTRA</td>
-                        <td>-</td>
-                        <td>-</td>
-                    </tr>
-                    <tr>
-                        <td>2024</td>
-                        <td>-</td>
-                        <td>-</td>
-                        <td>-</td>
-                    </tr>
+
+                    @forelse ($vehiculo->inspecciones as $inspeccion)
+                        <tr class="{{ $loop->index == 0 ? 'enfasis' : '' }}">
+                            <td>{{ $inspeccion->anio }}</td>
+                            <td>{{ $inspeccion->persona?->nombres  }} {{ $inspeccion->persona?->apellidos }}</td>
+                            <td>{{ $inspeccion->persona?->ci }}</td>
+                            <td>{{ $inspeccion->persona?->telefono }}</td>
+                            <td>{{ $inspeccion->resultado }}</td>
+                        </tr>
+
+                    @empty
+                        <tr>
+                            <td colspan="100%">
+                                <div class="text-center p-3">
+                                    No hay inspecciones técnicas vinculadas a este vehículo.
+                                </div>
+                            </td>
+
+                        </tr>
+                    @endforelse
+
+
                 </tbody>
             </table>
         </div>

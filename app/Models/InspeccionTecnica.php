@@ -16,6 +16,7 @@ class InspeccionTecnica extends Model
         'dep',
         'resultado',
         'fecha_inspeccion',
+        'anio',
     ];
 
     protected $casts = [

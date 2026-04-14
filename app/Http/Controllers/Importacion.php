@@ -16,6 +16,7 @@ use App\Models\Vehiculo;
 use App\Models\VehiculoCaso;
 use App\Models\Cargio;
 use App\Models\EstacionServicio;
+use App\Models\InspeccionTecnica;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -473,7 +474,7 @@ class Importacion extends Controller
     private function convertirCabeceras($cells)
     {
         $cabecerasNormalizadas = array_map(function ($celda) {
-            return  str_replace([' ', '.'], ['_', ''], convertirMayusculas(eliminarEspaciosMultiples($celda)));
+            return  str_replace([' ', '.', 'Ñ'], ['_', '', 'N'], convertirMayusculas(eliminarEspaciosMultiples($celda)));
         }, $cells);
 
         return $cabecerasNormalizadas;
@@ -1016,7 +1017,7 @@ class Importacion extends Controller
 
         $path = $request->file('archivo')->storeAs(
             'csv_imports',
-            'vehiculos_' . $request->file('archivo')->getClientOriginalName(),
+            'carguios_' . $request->file('archivo')->getClientOriginalName(),
             'local'
         );
 
@@ -1164,8 +1165,177 @@ class Importacion extends Controller
                 $cargio = Cargio::create($datos);
 
                 $contador++;
+            }
+
+            DB::commit();
+
+            return $contador;
+        } catch (\Exception $e) {
+
+            DB::rollBack();
+            return ["error" => $e->getMessage()];
+        }
+    }
 
 
+    public function storeInspeccionesVehiculo(Request $request)
+    {
+
+
+        $request->validate([
+            'archivo' => 'required|file|extensions:csv,xlsx|max:10240',
+        ], [
+            'archivo.required' => 'El archivo es obligatorio',
+            'archivo.extensions' => 'El archivo debe ser CSV, XLSX',
+            'archivo.max' => 'El archivo no debe exceder 10MB',
+        ]);
+
+        $path = $request->file('archivo')->storeAs(
+            'csv_imports',
+            'carguios_' . $request->file('archivo')->getClientOriginalName(),
+            'local'
+        );
+
+        $extension = mb_strtolower($request->file('archivo')->getClientOriginalExtension());
+
+
+        $reader = ReaderEntityFactory::createReaderFromFile(Storage::disk('local')->path($path));
+
+        if ($extension == 'csv') {
+            $delimiter = $this->detectDelimiter(Storage::disk('local')->path($path));
+            $reader->setFieldDelimiter($delimiter);
+        }
+        $reader->open(Storage::disk('local')->path($path));
+
+        $data = [];
+        $cabeceras = [];
+        $filasVaciasConsecutivas = 0;
+        $umbralFilasVacias = 20; // Si encuentra 20 filas vacías seguidas, se detiene
+        $columnasRequeridas = ['ANO', 'NOMBRE', 'C.I.', 'DETALLE',  'PLACA'];
+
+        $resultado = ['error' => 'No se procesó el archivo.'];
+        $nroHojas   = 0;
+        $total = 0;
+
+        foreach ($reader->getSheetIterator() as $sheet) {
+
+            foreach ($sheet->getRowIterator() as $index => $row) {
+                $cells = $row->toArray();
+
+                if ($index === 1) {
+                    $cabeceras = $this->convertirCabeceras($cells);
+
+
+                    // /verificar si el archivo tiene las columnas necesarias la indispensable es el numero de celular
+                    $faltantes = array_diff($columnasRequeridas, $cabeceras);
+                    if (in_array(['ANO', 'PLACA'], $faltantes)) {
+                        return response()->json([
+                            'errors' => 'El archivo debe contener al menos la columna PLACA y AÑO. Columnas faltantes: ' . implode(', ', $faltantes),
+                            'message' => 'El archivo debe contener al menos la columna PLACA y AÑO. Columnas faltantes: ' . implode(', ', $faltantes)
+                        ], 422);
+                    }
+
+                    continue;
+                }
+
+                // Verificar si la fila está completamente vacía
+                $filaVacia = empty(array_filter($cells, function ($celda) {
+                    return $celda !== null && trim($celda) !== '';
+                }));
+
+                if ($filaVacia) {
+                    $filasVaciasConsecutivas++;
+
+                    // Si hay más de X filas vacías seguidas, detener
+                    if ($filasVaciasConsecutivas > $umbralFilasVacias) {
+                        break 2; // Rompe ambos foreach
+                    }
+
+                    continue; // Saltar fila vacía pero continuar leyendo
+                }
+
+                // Si encontramos datos, resetear el contador de filas vacías
+                $filasVaciasConsecutivas = 0;
+
+                $filaAsociativa = array_combine($cabeceras, $cells);
+                $data[] = $filaAsociativa;
+            }
+
+            $resultado = $this->registrarDatosInspeccionesVehiculos($data);
+            $total += is_numeric($resultado) ? $resultado : 0;
+
+            if ($extension == 'csv') {
+                break; // Solo la primera hoja para CSV
+            }
+            $nroHojas++;
+        }
+
+
+        if (!is_numeric($resultado)) {
+
+            return response()->json([
+                'error' => "No se pudieron importar las inspecciones. Error: { $resultado[error] }"
+            ], 500);
+        }
+
+        return response()->json([
+            'success' => 'Migración de inspecciones completada, Se importaron ' . $resultado . ' inspecciones',
+            'total' => $total,
+            'importadas' => $resultado,
+            'errores' => [],
+            'hoja' => $nroHojas
+        ], 200);
+
+        return $path;
+    }
+
+
+    private function registrarDatosInspeccionesVehiculos($data)
+    {
+
+
+        try {
+            DB::beginTransaction();
+
+            $contador = 0;
+
+            foreach ($data as $index => $fila) {
+
+                $placa = limpiarCI($fila['PLACA'] ?? null);
+
+                if (empty($placa)) {
+                    continue; // Saltar filas sin placa
+                }
+
+                $vehiculo = Vehiculo::firstOrCreate(['placa' => $placa], ['placa' => $placa]);
+
+                $personaId = null;
+
+                if (!empty($fila['CI'] ?? null) || !empty($fila['NOMBRE'] ?? null)) {
+                    $nombreCompleto = $this->separarNombreApellidos($fila['NOMBRE'] ?? '', true);
+                    $personaId = Persona::idPersonaDatos(['nombres' => $nombreCompleto['nombres'], 'apellidos' => $nombreCompleto['apellidos'], 'ci' => limpiarCI($fila['CI'] ?? null)]);
+
+                }
+
+                $datos = [
+                    'vehiculo_id' => $vehiculo->id,
+                    'persona_id' => $personaId,
+                    'resultado' => nuloSiVacio($fila['DETALLE'] ?? null),
+                    'anio' => campoDB($fila['ANO'] ?? null),
+                ];
+
+                //verificar si no existe un carguio similar para evitar duplicados exactos la fecha_venta viene en formato 2026/02/25 10:20
+                $existeInspeccion = InspeccionTecnica::where('vehiculo_id', $datos['vehiculo_id'])
+                    ->where('anio', $datos['anio'])
+                    ->first();
+
+                if ($existeInspeccion) {
+                    continue; // Saltar fila si ya existe
+                }
+
+                $inspeccion = InspeccionTecnica::create($datos);
+
+                $contador++;
             }
 
             DB::commit();

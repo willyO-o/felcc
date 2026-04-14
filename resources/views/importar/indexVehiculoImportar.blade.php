@@ -28,6 +28,11 @@
                                 <i class=" ri-gas-station-fill me-2"></i>Importar Carguios Vehículos
                             </a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-bs-toggle="tab" href="#inspeccionesTab" role="tab">
+                                <i class="ri-tools-fill me-2"></i>Importar Inspecciones Técnicas
+                            </a>
+                        </li>
                     </ul>
                 </div>
                 <div class="tab-content">
@@ -521,8 +526,239 @@
 
                     </div>
                 </div>
-            </div>
-        </div>
+
+
+                {{-- TAB INSPECCIONES TÉCNICAS --}}
+                <div class="tab-pane p-3 fade" id="inspeccionesTab" role="tabpanel">
+
+                    <div class="row">
+                        <div class="col-md-7">
+
+                            <div class="card">
+                                <div class="card-body">
+                                    {{-- Área de carga --}}
+                                    <div class="row mb-4">
+                                        <div class="col-12">
+                                            <div class="border-2 border-dashed rounded-3 p-5 text-center"
+                                                id="dropZone_inspecciones"
+                                                style="border-color: #dee2e6; cursor: pointer; transition: all 0.3s;">
+                                                <div id="uploadIcon_inspecciones">
+                                                    <div class="mb-3">
+                                                        <i class=" ri-tools-fill"
+                                                            style="font-size: 4rem; color: #0ab39c;"></i>
+                                                    </div>
+                                                    <p class="text-muted mt-3 mb-1"><strong>Importar Inspecciones Técnicas</strong>
+                                                    </p>
+                                                    <p class="text-muted mb-1">Arrastra tu archivo aquí o haz clic para
+                                                        seleccionar
+                                                    </p>
+                                                    <small class="text-muted">Formatos: CSV o XLSX (máx.
+                                                        10MB)</small>
+                                                </div>
+                                                <input type="file" id="archivoInput_inspecciones" accept=".csv,.xlsx"
+                                                    style="display: none;">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Info archivo --}}
+                                    <div id="infoArchivo_inspecciones" style="display: none;">
+                                        <div class="alert alert-info">
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <strong id="nombreArchivo_inspecciones"></strong>
+                                                    <small id="tamañoArchivo_inspecciones"
+                                                        class="d-block text-muted"></small>
+                                                </div>
+                                                <button type="button" class="btn btn-sm btn-secondary"
+                                                    onclick="limpiarArchivo('_inspecciones')">Cambiar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Botones de acción --}}
+                                    <div class="row gap-2">
+                                        <div class="col-12">
+                                            <button type="button" class="btn btn-primary w-100"
+                                                id="btnImportar_inspecciones" style="display: none;"
+                                                onclick="importarArchivo('_inspecciones', 'inspecciones')">
+                                                <i class="ri-download-line me-1"></i> Importar Inspecciones
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {{-- Barra de progreso --}}
+                                    <div id="progressContainer_inspecciones" style="display: none;" class="mt-3">
+                                        <div class="progress" style="height: 25px;">
+                                            <div class="progress-bar progress-bar-striped progress-bar-animated"
+                                                id="progressBar_inspecciones" role="progressbar" style="width: 0%"
+                                                aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                                <span id="progressText_inspecciones">0%</span>
+                                            </div>
+                                        </div>
+                                        <p class="text-muted small mt-2" id="progressInfo_inspecciones">Procesando...</p>
+                                    </div>
+
+                                    {{-- Resultados --}}
+                                    <div id="resultContainer_inspecciones" style="display: none;" class="mt-4">
+                                        <div class="alert" id="resultAlert_inspecciones"></div>
+
+                                        <div id="statsContent_inspecciones"></div>
+
+                                        <div id="erroresContent_inspecciones" style="display: none;">
+                                            <h6 class="mt-3 mb-2">Errores encontrados:</h6>
+                                            <div class="table-responsive">
+                                                <table class="table table-sm table-bordered"
+                                                    id="tablaErrores_inspecciones">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th>Fila</th>
+                                                            <th>Vehículo</th>
+                                                            <th>Error</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody></tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-3">
+                                            <a href="{{ route('vehiculos.index') }}" class="btn btn-primary">
+                                                <i class="ri-check-line me-1"></i> Ver Vehículos
+                                            </a>
+                                            <button type="button" class="btn btn-secondary"
+                                                onclick="limpiarResultados('_inspecciones')">
+                                                <i class="ri-refresh-line me-1"></i> Importar Otro
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title">Guía de Campos</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="accordion" id="accordionCamposInspecciones">
+                                        {{-- Encabezados requeridos --}}
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button" type="button"
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseRequiredInsp">
+                                                    <i class="ri-checkbox-circle-line me-2 text-success"></i> Campos
+                                                    Obligatorios
+                                                </button>
+                                            </h2>
+                                            <div id="collapseRequiredInsp" class="accordion-collapse collapse show"
+                                                data-bs-parent="#accordionCamposInspecciones">
+                                                <div class="accordion-body p-2">
+                                                    <ul class="list-unstyled small">
+                                                        <li class="mb-2">
+                                                            <strong>AÑO</strong><br>
+                                                            <small class="text-muted">Año de la inspección.</small>
+                                                        </li>
+                                                        <li class="mb-2">
+                                                            <strong>PLACA</strong><br>
+                                                            <small class="text-muted">Placa del vehículo.</small>
+                                                        </li>
+
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {{-- Campos opcionales básicos --}}
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button collapsed" type="button"
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseBasicInsp">
+                                                    <i class="ri-file-text-line me-2 text-info"></i> Datos Básicos
+                                                </button>
+                                            </h2>
+                                            <div id="collapseBasicInsp" class="accordion-collapse collapse"
+                                                data-bs-parent="#accordionCamposInspecciones">
+                                                <div class="accordion-body p-2">
+                                                    <ul class="list-unstyled small">
+                                                        <li>✓ AÑO </li>
+                                                        <li>✓ NOMBRE</li>
+                                                        <li>✓ C.I.</li>
+                                                        <li>✓ DETALLE</li>
+                                                        <li>✓ PLACA </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {{-- Validaciones --}}
+                                        <div class="accordion-item">
+                                            <h2 class="accordion-header">
+                                                <button class="accordion-button collapsed" type="button"
+                                                    data-bs-toggle="collapse" data-bs-target="#collapseValidationInsp">
+                                                    <i class="ri-error-warning-line me-2 text-danger"></i> Validaciones
+                                                </button>
+                                            </h2>
+                                            <div id="collapseValidationInsp" class="accordion-collapse collapse"
+                                                data-bs-parent="#accordionCamposInspecciones">
+                                                <div class="accordion-body p-2">
+                                                    <ul class="list-unstyled small">
+                                                        <li class="mb-2">✓ Se validan automáticamente los datos</li>
+                                                        <li class="mb-2">✓ El vehículo si no existe se crea automáticamente</li>
+                                                        <li class="mb-2">✓ La persona si no existe se crea automáticamente</li>
+                                                        <li class="mb-2">✓ El año de la inspección debe ser válido </li>
+                                                        <li class="mb-2">✓ Se puede subir en formato Excel o CSV</li>
+                                                        <li class="mb-2">✓ Los registros vacíos se ignoran</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {{-- Descargar plantilla --}}
+                                    <div class="mt-3">
+                                        <a href="{{ url('plantillas/plantilla-importacion-itv.xlsx') }}" download
+                                            class="btn btn-sm btn-outline-primary w-100">
+                                            <i class="ri-download-line me-1"></i> Descargar Plantilla
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Estadísticas --}}
+                            <div class="card mt-3">
+                                <div class="card-header">
+                                    <h5 class="card-title">Información</h5>
+                                </div>
+                                <div class="card-body small">
+                                    <div class="row g-2 mb-3">
+                                        <div class="col-6">
+                                            <div class="text-center p-2 bg-light rounded">
+                                                <div class="fw-bold">{{ \App\Models\Vehiculo::count() }}</div>
+                                                <small class="text-muted">Vehículos</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="text-center p-2 bg-light rounded">
+                                                <div class="fw-bold">{{ \App\Models\Persona::count() }}</div>
+                                                <small class="text-muted">Personas</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row g-2">
+                                        <div class="col-12">
+                                            <div class="text-center p-2 bg-warning bg-opacity-10 rounded">
+                                                <div class="fw-bold">Máx 10 MB</div>
+                                                <small class="text-muted">Tamaño Archivo</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
 
         {{-- Panel de referencia --}}
 
@@ -548,6 +784,7 @@
         // Variables para cada tipo de importación
         let archivoSeleccionado_tel = null;
         let archivoSeleccionado_carguios = null;
+        let archivoSeleccionado_inspecciones = null;
 
         // Inicializar drag and drop para Teléfonos
         const dropZone_tel = document.getElementById('dropZone_tel');
@@ -601,13 +838,41 @@
             }
         });
 
+        // Inicializar drag and drop para Inspecciones Técnicas
+        const dropZone_inspecciones = document.getElementById('dropZone_inspecciones');
+        const archivoInput_inspecciones = document.getElementById('archivoInput_inspecciones');
+
+        dropZone_inspecciones.addEventListener('click', () => archivoInput_inspecciones.click());
+        dropZone_inspecciones.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone_inspecciones.classList.add('dragover');
+        });
+        dropZone_inspecciones.addEventListener('dragleave', () => {
+            dropZone_inspecciones.classList.remove('dragover');
+        });
+        dropZone_inspecciones.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone_inspecciones.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                seleccionarArchivo(files[0], '_inspecciones');
+            }
+        });
+        archivoInput_inspecciones.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                seleccionarArchivo(e.target.files[0], '_inspecciones');
+            }
+        });
+
         // Seleccionar archivo
         function seleccionarArchivo(archivo, sufijo) {
             // Guardar referencia del archivo
             if (sufijo === '_tel') {
                 archivoSeleccionado_tel = archivo;
-            } else {
+            } else if (sufijo === '_carguios') {
                 archivoSeleccionado_carguios = archivo;
+            } else if (sufijo === '_inspecciones') {
+                archivoSeleccionado_inspecciones = archivo;
             }
 
             document.getElementById('uploadIcon' + sufijo).style.display = 'none';
@@ -623,10 +888,12 @@
         function limpiarArchivo(sufijo) {
             if (sufijo === '_tel') {
                 archivoSeleccionado_tel = null;
-            } else {
+            } else if (sufijo === '_carguios') {
                 archivoSeleccionado_carguios = null;
                 document.getElementById('btnImportar_carguios').disabled = false;
-
+            } else if (sufijo === '_inspecciones') {
+                archivoSeleccionado_inspecciones = null;
+                document.getElementById('btnImportar_inspecciones').disabled = false;
             }
 
             document.getElementById('archivoInput' + sufijo).value = '';
@@ -637,7 +904,9 @@
 
         // Importar archivo
         function importarArchivo(sufijo, tipo) {
-            const archivoSeleccionado = sufijo === '_tel' ? archivoSeleccionado_tel : archivoSeleccionado_carguios;
+            const archivoSeleccionado = sufijo === '_tel' ? archivoSeleccionado_tel :
+                                       sufijo === '_carguios' ? archivoSeleccionado_carguios :
+                                       archivoSeleccionado_inspecciones;
 
             if (!archivoSeleccionado) {
                 Swal.fire('Error', 'Selecciona un archivo', 'error');
@@ -662,7 +931,8 @@
 
             // Determinar la ruta según el tipo
             let ruta = tipo === 'vehiculos' ? '{{ route('vehiculos.importar.store') }}' :
-                '{{ route('vehiculos.carguios.importar.store') }}';
+                tipo === 'carguios' ? '{{ route('vehiculos.carguios.importar.store') }}' :
+                '{{ route('vehiculos.inspecciones.importar.store') }}';
 
             $.post(ruta, formData, {
                     processData: false,
@@ -712,6 +982,13 @@
                 // Estadísticas
                 statsContent.innerHTML = `
                     <div class="row g-3">
+                        ${data.hoja ? `<div class="col-md-4">
+                            <div class="text-center p-3 bg-success bg-opacity-10 rounded">
+                                <div class="h4 text-success mb-0">${data.hoja}</div>
+                                <small class="text-muted">Hojas Procesadas</small>
+                            </div>
+                        </div>` : ''
+                        }
                         <div class="col-md-4">
                             <div class="text-center p-3 bg-success bg-opacity-10 rounded">
                                 <div class="h4 text-success mb-0">${data.importadas}</div>
