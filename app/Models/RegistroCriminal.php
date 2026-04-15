@@ -41,6 +41,10 @@ class RegistroCriminal extends Model
         'fecha_registro' => 'date'
     ];
 
+    //forto frente y perfil
+    protected $appends = ['foto_frente', 'foto_perfil'];
+
+
 
 
 
@@ -109,7 +113,7 @@ class RegistroCriminal extends Model
             ->leftJoin('pais', 'persona.id_pais', '=', 'pais.id')
             ->addSelect(
                 [
-                    'persona' => DB::raw('persona.nombres, persona.apellidos, persona.ci, persona.genero, persona.fecha_nacimiento'),
+                    'persona' => DB::raw('persona.nombres, persona.apellidos, persona.ci, persona.genero, persona.fecha_nacimiento') ,
                     'division.division as division',
                     'pais.gentilicio as gentilicio',
                     'foto_frente' => FotosRegistro::select('ruta_archivo')
@@ -122,7 +126,41 @@ class RegistroCriminal extends Model
                         ->limit(1),
                     'imagenes' => DB::raw("(SELECT JSON_ARRAYAGG(ruta_archivo) FROM fotos_registro WHERE id_registro_criminal = registro_criminal.id) as imagenes")
                 ]
-            )->orderBy('registro_criminal.created_at', 'desc');
+            )->when(!empty($filters['filtro']) , function ($query) use ($filters) {
+
+                switch ($filters['filtro']) {
+                    case 'nombres':
+                        $query->whereRaw("CONCAT(persona.nombres, ' ', persona.apellidos) LIKE ?", ['%' . $filters['valor'] . '%']);
+                        break;
+                    case 'apellidos':
+                        $query->where('persona.apellidos', 'like', '%' . $filters['valor'] . '%');
+                        break;
+                    case 'alias':
+                        $query->where('registro_criminal.alias', 'like', '%' . $filters['valor'] . '%');
+                        break;
+                    case 'ci':
+                        $query->where('persona.ci', 'like', '%' . $filters['valor'] . '%');
+                        break;
+                    case 'celular':
+                        $query->where('registro_criminal.telefono', 'like', '%' . $filters['valor'] . '%');
+                        break;
+                    case 'cud':
+                        $query->where('registro_criminal.cud', 'like', '%' . $filters['valor'] . '%');
+                        break;
+                    case 'padre':
+                        $query->where('registro_criminal.nombre_conyuge', 'like', '%' . $filters['valor'] . '%');
+                        break;
+                    case 'nombre_supuesto':
+                        $query->where('registro_criminal.nombre_supuesto', 'like', '%' . $filters['valor'] . '%');
+                        break;
+                }
+
+
+
+            })
+
+
+            ->orderBy('registro_criminal.created_at', 'desc');
 
 
 

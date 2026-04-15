@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\RegistroCriminal;
 use App\Models\Persona;
+use App\Models\Telefono;
 use App\Models\FotosRegistro;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -26,13 +27,114 @@ class RegistroCriminalController extends Controller
         }
 
         if ($request->ajax()) {
-            $registros = RegistroCriminal::getRegistros($request->all())
+            // $registros = RegistroCriminal::getRegistros($request->all())
+            //     ->paginate($request->get('size', 10), ['*'], 'page', $request->get('page', 1));
+
+            // return response()->json([
+            //     'datos' => $registros->items(),
+            //     'total' => $registros->total(),
+            //     'page' => $registros->currentPage(),
+            // ]);
+
+            $query = RegistroCriminal::with(['persona', 'division', 'fotos', 'persona.pais'])
+                ->orderBy('registro_criminal.created_at', 'desc')
+                ->when($request->input('search') && empty($request->input('filtro')), function ($q) use ($request) {
+                    $search = $request->get('search');
+                    $search = str_replace(' ', '%', $search);
+
+                    $q->whereHas('persona', function ($q2) use ($search) {
+                        $q2->whereRaw("CONCAT(COALESCE(nombres, ''), ' ', COALESCE(apellidos, '')) LIKE ?", ['%' . $search . '%'])
+                            ->orWhere('ci', 'like', '%' . $search . '%')
+                            ->orWhere('alias', 'like', '%' . $search . '%')
+                            ->orWhere('telefono', 'like', '%' . $search . '%');
+                    })->orWhere('alias', 'like', '%' . $search . '%')
+                        ->orWhere('nombre_supuesto', 'like', '%' . $search . '%');
+                })
+                ->when($request->input('filtro') && $request->input('search'), function ($q) use ($request) {
+                    $search = $request->get('search');
+                    $search = str_replace(' ', '%', $search);
+                    $filtro = $request->get('filtro');
+
+                    switch ($filtro) {
+                        case 'nombres':
+                            $q->whereHas('persona', function ($q2) use ($search) {
+                                $q2->whereRaw("CONCAT(COALESCE(nombres, ''), ' ', COALESCE(apellidos, '')) LIKE ?", ['%' . $search . '%']);
+                            });
+                            break;
+                        case 'apellidos':
+                            $q->whereHas('persona', function ($q2) use ($search) {
+                                $q2->where('apellidos', 'like', '%' . $search . '%');
+                            });
+                            break;
+                        case 'alias':
+
+                            // tengo alias en registro criminal y en persona consultar a ambos
+                            $q->where('alias', 'like', '%' . $search . '%')
+                                ->orWhereHas('persona', function ($q2) use ($search) {
+                                    $q2->where('alias', 'like', '%' . $search . '%');
+                                });
+                            break;
+                        case 'ci':
+                            $q->whereHas('persona', function ($q2) use ($search) {
+                                $q2->where('ci', 'like', '%' . $search . '%');
+                            });
+                            break;
+                        case 'celular':
+                            //existe una relacion de personas con telefonos y el registro criminal tiene un campo telefono, consultar ambos
+                            $q->where('telefono', 'like', '%' . $search . '%')
+                                ->orWhereHas('persona.telefonos', function ($q2) use ($search) {
+                                    $q2->where('numero_celular', 'like', '%' . $search . '%');
+                                });
+                            break;
+                        case 'cud':
+                            $q->where('cud', 'like', '%' . $search . '%');
+                            break;
+                        case 'conyuge':
+                            $q->where('nombre_conyuge', 'like', '%' . $search . '%');
+                            break;
+                        case 'padre':
+                            $q->whereHas('persona', function ($q2) use ($search) {
+                                $q2->where('padre', 'like', '%' . $search . '%');
+                            });
+                            break;
+                        case 'madre':
+                            $q->whereHas('persona', function ($q2) use ($search) {
+                                $q2->where('madre', 'like', '%' . $search . '%');
+                            });
+                            break;
+                        case 'nombre_supuesto':
+                            $q->where('nombre_supuesto', 'like', '%' . $search . '%');
+                            break;
+                        case 'hijos':
+                            $q->where('hijos', 'like', '%' . $search . '%');
+                            break;
+                        case 'nacimiento':
+                            //nacimiento viene como 	01-02-2007 convierto a 2007-02-01 para comparar con fecha_nacimiento que es date si no viene en el formato esperado no aplico el filtro
+
+                            if (preg_match('/^\d{2}-\d{2}-\d{4}$/', $search)) {
+                                $fechaNacimiento = \Carbon\Carbon::createFromFormat('d-m-Y', $search)->format('Y-m-d');
+
+                                $q->whereHas('persona', function ($q2) use ($fechaNacimiento) {
+                                    $q2->where('fecha_nacimiento', 'like', '%' . $fechaNacimiento . '%');
+                                });
+                            } else {
+                                // Si el formato no es correcto, no aplicar ningún filtro y no devolver resultados
+                                $q->whereRaw('1 = 0'); // Esto hará que no se devuelvan resultados si el formato de fecha es incorrecto
+                            }
+
+                            break;
+
+                        default:
+                            // Si el filtro no coincide con ningún caso, no aplicar ningún filtro adicional
+                            break;
+                    }
+                })
                 ->paginate($request->get('size', 10), ['*'], 'page', $request->get('page', 1));
 
             return response()->json([
-                'datos' => $registros->items(),
-                'total' => $registros->total(),
-                'page' => $registros->currentPage(),
+                'datos' => $query->items(),
+                'total' => $query->total(),
+                'page' => $query->currentPage(),
             ]);
         }
 
@@ -90,7 +192,28 @@ class RegistroCriminalController extends Controller
                 ]));
             }
 
+            if ($request->telefono) {
+                $persona->telefono = trim($request->telefono);
+                $persona->save();
+
+                //verificar si el telefono ya existe en la tabla telefono sino crearlo y vincularlo a la persona
+                $telefono = Telefono::where('numero_celular', $persona->telefono)->first();
+                if (!$telefono) {
+                    $telefono = Telefono::create([
+                        'numero_celular' => $persona->telefono,
+                        'persona_id' => $persona->id,
+                    ]);
+                } else {
+                    if ($telefono->persona_id !== $persona->id) {
+                        $telefono->persona_id = $persona->id;
+                        $telefono->save();
+                    }
+                }
+            }
+
             $request->merge(['id_persona' => $persona->id]);
+
+
             $registro = RegistroCriminal::create($request->all());
 
 
@@ -184,6 +307,18 @@ class RegistroCriminalController extends Controller
                 'hijos',
 
             ]));
+
+            if (trim($request->telefono)) {
+                $telefono = Telefono::where('numero_celular', trim($request->telefono))->first();
+                if (!$telefono) {
+                    $telefono = Telefono::create([
+                        'numero_celular' => trim($request->telefono),
+                    ]);
+                }
+
+                $telefono->persona_id = $registro->persona->id;
+                $telefono->save();
+            }
 
             if ($request->hasFile('foto_frente')) {
                 // Eliminar foto frontal anterior si existe

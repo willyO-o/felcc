@@ -172,7 +172,7 @@
                                 <div class="mb-3">
                                     <label class="form-label" for="fecha_registro">Fecha de Registro</label>
                                     <input type="date" class="form-control" id="fecha_registro" name="fecha_registro"
-                                        value="{{ $registroCriminal->fecha_registro ?? now()->toDateString() }}" required
+                                        value="{{ $registroCriminal->fecha_registro?->toDateString() ?? now()->toDateString() }}" required
                                         max="{{ now()->toDateString() }}">
                                     <div class="invalid-feedback">Este campo es obligatorio.</div>
                                 </div>
