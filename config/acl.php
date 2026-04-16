@@ -44,6 +44,8 @@ return [
             'imeis_listar',
             'imeis_crear',
             'consulta_mandamientos',
+            'consulta_registro-criminal',
+
         ],
         'consultor_felcc' => [
             'consulta_mandamientos',
@@ -51,6 +53,7 @@ return [
         'consultor_daci' => [
             'consulta_mandamientos',
             'consulta_personas',
+
             'consulta_registro-criminal',
             'consulta_vehiculos',
             'consulta_telefonos',

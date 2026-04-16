@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\RegistroCriminal;
 use App\Models\Persona;
 use App\Models\Telefono;
+use App\Models\AuditarConsultas;
 use App\Models\FotosRegistro;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -253,7 +254,14 @@ class RegistroCriminalController extends Controller
      */
     public function show(string $id)
     {
+        if (!request()->user()->hasAnyPermission(['registro-criminal_all', 'registro-criminal_listar', 'consulta_registro-criminal'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
         $datos = RegistroCriminal::with(['persona', 'fotos'])->findOrFail($id);
+
+        if (in_array(request()->user()->role->nombre, ['tecnico_daci', 'tecnico_felcc', 'consultor_daci', 'consultor_felcc'])) {
+            AuditarConsultas::agregarIdsAccedidos(request()->get('identificador'), $id, get_class($datos));
+        }
         return view('registro-criminal.show', compact('datos'));
     }
 
@@ -374,7 +382,13 @@ class RegistroCriminalController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        if (!request()->user()->hasAnyPermission(['registro-criminal_all'])) {
+            abort(403, 'No tienes permiso para realizar esta acción.');
+        }
+
+        $registro = RegistroCriminal::findOrFail($id);
+        $registro->delete();
+        return response()->json(['success' => 'Registro eliminado exitosamente.']);
     }
 
 
@@ -398,5 +412,122 @@ class RegistroCriminalController extends Controller
         Storage::disk('public')->put($fullPath, $webpEncoded);
 
         return $fullPath;
+    }
+
+    public function consultarRegistroCriminal(Request $request)
+    {
+        if (!request()->user()->hasAnyPermission(['registro-criminal_all', 'registro-criminal_listar', 'consulta_registro-criminal'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
+        if ($request->ajax()) {
+            if (empty($request->input('filtro')) || strlen($request->input('search')) < 4) {
+                return response()->json(['datos' => []]);
+            }
+
+            $query = RegistroCriminal::with(['persona', 'division', 'fotos', 'persona.pais'])
+                ->orderBy('registro_criminal.created_at', 'desc')
+                ->when($request->input('filtro') && $request->input('search'), function ($q) use ($request) {
+                    $search = $request->get('search');
+                    $search = str_replace(' ', '%', $search);
+                    $filtro = $request->get('filtro');
+
+                    switch ($filtro) {
+                        case 'nombres':
+                            $q->whereHas('persona', function ($q2) use ($search) {
+                                $q2->whereRaw("CONCAT(COALESCE(nombres, ''), ' ', COALESCE(apellidos, '')) LIKE ?", ['%' . $search . '%']);
+                            });
+                            break;
+                        case 'apellidos':
+                            $q->whereHas('persona', function ($q2) use ($search) {
+                                $q2->where('apellidos', 'like', '%' . $search . '%');
+                            });
+                            break;
+                        case 'alias':
+
+                            // tengo alias en registro criminal y en persona consultar a ambos
+                            $q->where('alias', 'like', '%' . $search . '%')
+                                ->orWhereHas('persona', function ($q2) use ($search) {
+                                    $q2->where('alias', 'like', '%' . $search . '%');
+                                });
+                            break;
+                        case 'ci':
+                            $q->whereHas('persona', function ($q2) use ($search) {
+                                $q2->where('ci', 'like', '%' . $search . '%');
+                            });
+                            break;
+                        case 'celular':
+                            //existe una relacion de personas con telefonos y el registro criminal tiene un campo telefono, consultar ambos
+                            $q->where('telefono', 'like', '%' . $search . '%')
+                                ->orWhereHas('persona.telefonos', function ($q2) use ($search) {
+                                    $q2->where('numero_celular', 'like', '%' . $search . '%');
+                                });
+                            break;
+                        case 'cud':
+                            $q->where('cud', 'like', '%' . $search . '%');
+                            break;
+                        case 'conyuge':
+                            $q->where('nombre_conyuge', 'like', '%' . $search . '%');
+                            break;
+                        case 'padre':
+                            $q->whereHas('persona', function ($q2) use ($search) {
+                                $q2->where('padre', 'like', '%' . $search . '%');
+                            });
+                            break;
+                        case 'madre':
+                            $q->whereHas('persona', function ($q2) use ($search) {
+                                $q2->where('madre', 'like', '%' . $search . '%');
+                            });
+                            break;
+                        case 'nombre_supuesto':
+                            $q->where('nombre_supuesto', 'like', '%' . $search . '%');
+                            break;
+                        case 'hijos':
+                            $q->where('hijos', 'like', '%' . $search . '%');
+                            break;
+                        case 'nacimiento':
+                            //nacimiento viene como 	01-02-2007 convierto a 2007-02-01 para comparar con fecha_nacimiento que es date si no viene en el formato esperado no aplico el filtro
+
+                            if (preg_match('/^\d{2}-\d{2}-\d{4}$/', $search)) {
+                                $fechaNacimiento = \Carbon\Carbon::createFromFormat('d-m-Y', $search)->format('Y-m-d');
+
+                                $q->whereHas('persona', function ($q2) use ($fechaNacimiento) {
+                                    $q2->where('fecha_nacimiento', 'like', '%' . $fechaNacimiento . '%');
+                                });
+                            } else {
+                                // Si el formato no es correcto, no aplicar ningún filtro y no devolver resultados
+                                $q->whereRaw('1 = 0'); // Esto hará que no se devuelvan resultados si el formato de fecha es incorrecto
+                            }
+
+                            break;
+
+                        default:
+                            // Si el filtro no coincide con ningún caso, no aplicar ningún filtro adicional
+                            break;
+                    }
+                })
+                ->paginate($request->get('size', 10), ['*'], 'page', $request->get('page', 1));
+
+
+            $user = auth()->user();
+            if (in_array($user->role->nombre, ['tecnico_daci', 'tecnico_felcc', 'consultor_daci', 'consultor_felcc'])) {
+                if ($request->get('nuevo_filtro', false)) {
+                    $request->merge([
+                        'cantidad_resultados' => $query->total(),
+                    ]);
+                    AuditarConsultas::registrar($user, 'consulta_registros', $request);
+                }
+            }
+
+
+            return response()->json([
+                'datos' => $query->items(),
+                'total' => $query->total(),
+                'page' => $query->currentPage(),
+            ]);
+        }
+
+
+        return view('registro-criminal.consultas');
     }
 }

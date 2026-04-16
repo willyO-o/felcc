@@ -7,12 +7,10 @@
 (function () {
     'use strict';
 
-    const coloresEstados = {
-        "PENDIENTE": "info",
-        "EJECUTADO": "success",
-        "CANCELADO": "danger",
-
-    }
+    let criteriosConsulta = {
+        'tipo_filtro': '',
+        'search': '',
+    };
 
 
     $(document).on('click', '.image-popup-zoom', function (e) {
@@ -60,7 +58,7 @@
 
 
     let scrollPersonal = $('#listadoRegistros').scrollPagination({
-        'url': '/registro-criminal', // the url you are fetching the results
+        'url': '/consultas/registro-criminal', // the url you are fetching the results
         'method': 'get',
         'data': getDataFilter(),
         'dataTemplateCallback': rowHtml,
@@ -94,13 +92,7 @@
                                 <button type="button" value="${item.id}" class="btn btn-soft-secondary btn-sm shadow-none verDetalles" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Detalles">
                                     <i class="ri-eye-line"></i>
                                 </button>
-                                ${['superadmin', 'administrador'].includes(window.role) ? `<a  href="/registro-criminal/${item.id}/edit"  class="btn btn-soft-secondary btn-sm shadow-none " data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Registro">
-                                    <i class="ri-pencil-line"></i>
-                                </a>
-                                <button type="button" class="btn btn-soft-secondary btn-sm shadow-none btnDelete" value="${item.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Registro">
-                                    <i class="ri-delete-bin-2-line"></i>
-                                </button>
-                                ` : ''}
+
 
 
 
@@ -120,8 +112,8 @@
                                     <div class="flex-grow-1 ms-3">
                                         <a href="javascript:void(0);">
                                             <h5 class="fs-16 mb-1">${item.persona?.nombres} ${item.persona?.apellidos} - ${item.persona?.genero || ""}</h5>
+                                            <h6 class=" mb-1">C.I.: <strong>${item.persona?.ci || "-"} ${item.persona?.complemento ? " - " + item.persona.complemento : ""}</strong></h6>
                                         </a>
-                                        <h6 class=" mb-1">C.I.: <strong>${item.persona?.ci || "-"} ${item.persona?.complemento ? " - " + item.persona.complemento : ""}</strong></h6>
                                         <p class=" mb-1"> Alias: <strong>${item.alias || "-"}</strong></p>
                                         <p class=" mb-1">Nombre Sup: <strong>${item.nombre_supuesto || "-"}</strong></p>
                                         <div class="d-flex flex-wrap gap-2 align-items-center">Especialidad:<strong> ${item.especialidad}</strong></div>
@@ -148,9 +140,10 @@
                                         <div class="ms-lg-3 my-3 my-lg-0">
                                             <a href="javascript:void(0);">
                                                 <h5 class="fs-16 mb-1">${item.persona?.nombres} ${item.persona?.apellidos}</h5>
+                                                <h6 class="text-muted mb-1">Genero: <strong>${item.persona?.genero || "-"}</strong></h6>
+                                                <h6 class="text-muted mb-1">C.I.: <strong>${item.persona?.ci || "-"}</strong></h6>
+
                                             </a>
-                                            <h6 class="text-muted mb-1">Genero: <strong>${item.persona?.genero || "-"}</strong></h6>
-                                            <h6 class="text-muted mb-1">C.I.: <strong>${item.persona?.ci || "-"}</strong></h6>
                                             <p class="text-muted mb-1"> Alias: <strong>${item.alias || "-"}</strong></p>
                                             <p class="text-muted mb-1"> Edad: <strong>${item.persona?.fecha_nacimiento ? calcularEdad(item.persona.fecha_nacimiento) : " - "}</strong></p>
                                             <p class="text-muted mb-1"> Nacionalidad: <strong>${item.persona?.pais?.gentilicio || "-"}</strong></p>
@@ -186,23 +179,25 @@
         return html;
     }
 
-    let timerSearch;
 
-    $("#searchRegistros").on('input', function (e) {
+    $("#btnBuscar").on('click', function (e) {
         e.preventDefault();
-        clearTimeout(timerSearch);
-        if ($(this).val().trim() != '' && $(this).val().trim().length < 3) return;
-        timerSearch = setTimeout(function () {
+        if ($("#filtro").val().trim() == '' || $("#searchRegistros").val().trim().length < 4) return;
 
-            scrollPersonal.resetScrollPagination(getDataFilter());
-        }, 500);
+        if (criteriosConsulta.tipo_filtro != $("#filtro").val() || criteriosConsulta.search !== $("#searchRegistros").val()) {
+            criteriosConsulta.tipo_filtro = $("#filtro").val();
+            criteriosConsulta.search = $("#searchRegistros").val();
+            dataScroll.identificador = crypto.randomUUID();
 
-    });
+            dataScroll.nuevo_filtro = 1;
 
-    $("#filtroEstado").on('change', function (e) {
-        e.preventDefault();
+        }
         scrollPersonal.resetScrollPagination(getDataFilter());
+        dataScroll.nuevo_filtro = 0;
+
     });
+
+
     const btnGridView = document.getElementById('btn-grid-view');
     const btnListView = document.getElementById('btn-list-view');
     const candidateList = document.getElementById('listadoRegistros');
@@ -292,29 +287,6 @@
 
 
 
-    /**
-     * Mostrar alertas con SweetAlert2
-     */
-    function showAlert(message, type) {
-        const config = {
-            title: type === 'success' ? '¡Éxito!' : '¡Error!',
-            text: message,
-            icon: type,
-            confirmButtonText: 'Aceptar',
-            confirmButtonClass: 'btn btn-primary w-xs mt-2',
-            buttonsStyling: false,
-            showCloseButton: true
-        };
-
-        Swal.fire(config);
-    }
-
-
-
-    $(document).on('change', 'input[name="estado"]', function () {
-
-        ($(this).val() === 'EJECUTADO' || $(this).val() === 'CANCELADO') ? $('#fecha_ejecucion').closest('.caja').removeClass('d-none') : $('#fecha_ejecucion').closest('.caja').addClass('d-none');
-    });
 
     $(document)
         .on('click', '.verDetalles', function (e) {
@@ -325,7 +297,7 @@
             $("#modalDetalles").modal('show');
             $("#modalDetalles .modal-body").html('<div class="text-center"><span class="loaderHttp"></span><span class="text-muted">Cargando detalles...</span></div>');
 
-            $.get(`/registro-criminal/${id}`)
+            $.get(`/registro-criminal/${id}?identificador=${dataScroll.identificador}`)
                 .done(function (response) {
                     $("#modalDetalles .modal-body").html(response);
                 })
@@ -334,47 +306,6 @@
                     $("#modalDetalles .modal-body").html('<p class="text-danger">Error al cargar los detalles del registro.</p>');
                 });
         })
-        .on('click', '.btnDelete', async function (e) {
-            e.preventDefault();
-            const id = $(this).val();
-
-            const btn = $(this);
-            const hrLabel = $(this).closest('.card').find('.hr-label').text();
-
-            const confirmacion = await confirmarEnvio("Si, Eliminar", `¿Estás seguro de eliminar este registro? <br> <strong>${hrLabel}</strong>`, "¡Sí, eliminar!", "Cancelar", "warning");
-
-            if (confirmacion) {
-
-                $.ajax({
-                    url: `/registro-criminal/${id}`,
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                }).done(function (response) {
-                    notification(response.success, "Registro Eliminado");
-
-                    // Eliminar la tarjeta del DOM
-                    btn.closest('div[data-id="' + id + '"]').fadeOut(500, function () {
-                        $(this).remove();
-                    });
-
-                }).fail(function (xhr) {
-                    processError(xhr);
-
-                })
-
-            }
-
-        });
-
-    /* cargar datos parametricos tipo mandamiento */
-
-
-
-
-
-
 
 
 })();

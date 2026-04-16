@@ -35,7 +35,7 @@ Route::group(['middleware' => ['auth']], function () {
 
 
     Route::get('consultas/mandamientos', [App\Http\Controllers\MandamientoController::class, 'consultarMandamientos'])->name('consultas.mandamientos');
-    // Route::get('consultas/registro-criminal', [App\Http\Controllers\RegistroCriminalController::class, 'consultarRegistroCriminal'])->name('consultas.registro-criminal');
+    Route::get('consultas/registro-criminal', [App\Http\Controllers\RegistroCriminalController::class, 'consultarRegistroCriminal'])->name('consultas.registro-criminal');
 
 
     // Rutas de importación de personast

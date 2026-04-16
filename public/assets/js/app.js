@@ -890,73 +890,105 @@ File: Main Js File
 
 	// two-column sidebar active js
 	function initActiveMenu() {
-		// var currentPath = origin.pathname == "/" ? "/" : location.pathname.substring(1);
-		// currentPath = (currentPath == "/") ? "/" : currentPath.substring(currentPath.lastIndexOf("/") + 1);
+		/**
+		 * Obtiene la ruta actual del navegador, funciona con o sin dominio
+		 * Soporta URLs como: /ruta, http://dominio.com/ruta
+		 */
+		var currentPath = location.pathname;
+		if (currentPath === "/") {
+			currentPath = "/";
+		} else {
+			currentPath = currentPath.substring(1); // Remover el / inicial
+		}
 
-		var currentPath =origin.pathname == "/" ? "/" : location.pathname.substring(1);
+		// Función auxiliar para activar el menú recursivamente
+		function activateMenuHierarchy(element) {
+			if (!element) return false;
 
-		if (currentPath) {
-			// navbar-nav
-			var a = document.getElementById("navbar-nav").querySelector('[href="/' + currentPath + '"]');
-			if (a) {
-				a.classList.add("active");
-				var parentCollapseDiv = a.closest(".collapse.menu-dropdown");
-				if (parentCollapseDiv) {
-					parentCollapseDiv.classList.add("show");
-					parentCollapseDiv.parentElement.children[0].classList.add("active");
-					parentCollapseDiv.parentElement.children[0].setAttribute("aria-expanded", "true");
-					if (parentCollapseDiv.parentElement.closest(".collapse.menu-dropdown")) {
-						parentCollapseDiv.parentElement.closest(".collapse").classList.add("show");
-						if (parentCollapseDiv.parentElement.closest(".collapse").previousElementSibling)
-							parentCollapseDiv.parentElement.closest(".collapse").previousElementSibling.classList.add("active");
+			element.classList.add("active");
+			var parentCollapseDiv = element.closest(".collapse.menu-dropdown");
 
-						if (parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.closest(".collapse.menu-dropdown")) {
-							parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.closest(".collapse").classList.add("show");
-							if (parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.closest(".collapse").previousElementSibling) {
+			if (parentCollapseDiv) {
+				parentCollapseDiv.classList.add("show");
+				parentCollapseDiv.parentElement.children[0].classList.add("active");
+				parentCollapseDiv.parentElement.children[0].setAttribute("aria-expanded", "true");
 
-								parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.closest(".collapse").previousElementSibling.classList.add("active");
-								if((document.documentElement.getAttribute("data-layout") == "horizontal") && parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.closest(".collapse")){
-									parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.closest(".collapse").previousElementSibling.classList.add("active")
-								}
+				if (parentCollapseDiv.parentElement.closest(".collapse.menu-dropdown")) {
+					parentCollapseDiv.parentElement.closest(".collapse").classList.add("show");
+					if (parentCollapseDiv.parentElement.closest(".collapse").previousElementSibling)
+						parentCollapseDiv.parentElement.closest(".collapse").previousElementSibling.classList.add("active");
+
+					if (parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.closest(".collapse.menu-dropdown")) {
+						parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.closest(".collapse").classList.add("show");
+						if (parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.closest(".collapse").previousElementSibling) {
+							parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.closest(".collapse").previousElementSibling.classList.add("active");
+
+							if ((document.documentElement.getAttribute("data-layout") == "horizontal") && parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.closest(".collapse")) {
+								parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.closest(".collapse").previousElementSibling.classList.add("active");
 							}
 						}
 					}
 				}
 			}
+			return true;
+		}
+
+		// Estrategia de búsqueda múltiple para encontrar el enlace activo
+		var navbarNav = document.getElementById("navbar-nav");
+		if (!navbarNav) return;
+
+		var foundLink = null;
+
+		// 1. Intentar con ruta absoluta: /ruta
+		if (currentPath === "/") {
+			foundLink = navbarNav.querySelector('[href="/"]');
 		} else {
-            try {
-                currentPath = location.href;
-                a = document.getElementById("navbar-nav").querySelector('[href="' + currentPath + '"]');
-                if (a) {
-                    a.classList.add("active");
-                    var parentCollapseDiv = a.closest(".collapse.menu-dropdown");
-                    if (parentCollapseDiv) {
-                        parentCollapseDiv.classList.add("show");
-                        parentCollapseDiv.parentElement.children[0].classList.add("active");
-                        parentCollapseDiv.parentElement.children[0].setAttribute("aria-expanded", "true");
-                        if (parentCollapseDiv.parentElement.closest(".collapse.menu-dropdown")) {
-                            parentCollapseDiv.parentElement.closest(".collapse").classList.add("show");
-                            if (parentCollapseDiv.parentElement.closest(".collapse").previousElementSibling)
-                                parentCollapseDiv.parentElement.closest(".collapse").previousElementSibling.classList.add("active");
+			foundLink = navbarNav.querySelector('[href="/' + currentPath + '"]');
+		}
 
-                            if (parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.closest(".collapse.menu-dropdown")) {
-                                parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.closest(".collapse").classList.add("show");
-                                if (parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.closest(".collapse").previousElementSibling) {
+		// 2. Si no encuentra, intentar sin el / inicial
+		if (!foundLink && currentPath !== "/") {
+			foundLink = navbarNav.querySelector('[href="' + currentPath + '"]');
+		}
 
-                                    parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.closest(".collapse").previousElementSibling.classList.add("active");
-                                    if ((document.documentElement.getAttribute("data-layout") == "horizontal") && parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.closest(".collapse")) {
-                                        parentCollapseDiv.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.parentElement.closest(".collapse").previousElementSibling.classList.add("active")
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            } catch (e) {
+		// 3. Si no encuentra, intentar con la ruta completa (para dominios)
+		if (!foundLink) {
+			var fullPath = location.pathname;
+			if (fullPath !== "/") {
+				foundLink = navbarNav.querySelector('[href="' + fullPath + '"]');
+			}
+		}
 
-            }
+		// 4. Si aún no encuentra, buscar por coincidencia parcial del pathname
+		if (!foundLink) {
+			var allLinks = navbarNav.querySelectorAll("a[href]");
+			for (var i = 0; i < allLinks.length; i++) {
+				var href = allLinks[i].getAttribute("href");
+				var linkPath = href;
 
-        }
+				// Normalizar la ruta del enlace para comparación
+				if (href.includes("://")) {
+					// Es una URL completa, extraer solo el pathname
+					try {
+						var urlObj = new URL(href);
+						linkPath = urlObj.pathname;
+					} catch (e) {
+						continue;
+					}
+				}
+
+				// Comparar rutas normalizadas
+				if (linkPath === location.pathname || linkPath === "/" + currentPath) {
+					foundLink = allLinks[i];
+					break;
+				}
+			}
+		}
+
+		// Si encontró el enlace, activarlo y sus padres
+		if (foundLink) {
+			activateMenuHierarchy(foundLink);
+		}
 	}
 
 	function elementInViewport(el) {

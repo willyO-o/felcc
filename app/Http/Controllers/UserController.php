@@ -126,7 +126,7 @@ class UserController extends Controller
     public function edit(string $id)
     {
         $user = User::with('role')->findOrFail($id);
-        $roles = Role::all();
+        $roles = Role::whereNotIn('nombre', ['superadmin'])->get();
         return view('usuarios.formulario', compact('user', 'roles'));
     }
 

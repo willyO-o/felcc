@@ -62,18 +62,18 @@
                 <li class="menu-title"><span data-key="t-menu">Consultas</span></li>
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="{{ route('consultas.mandamientos') }}">
-                        <i class="mdi mdi-magnify"></i> <span>Consultar Mandamientos</span>
+                        <i class="mdi mdi-clipboard-text-search-outline"></i> <span>Consultar Mandamientos</span>
                     </a>
                 </li>
-                @canany(['superadmin', 'administrador', 'tecnico_daci'])
-                    <li class="nav-item d-none">
-                        <a class="nav-link menu-link" href="{{ route('consultas.mandamientos') }}">
-                            <i class="mdi mdi-criminal"></i> <span>Consultar Registro Criminal</span>
+                @canany(['superadmin', 'administrador', 'tecnico_daci','consultor_daci'])
+                    <li class="nav-item ">
+                        <a class="nav-link menu-link " href="{{ route('consultas.registro-criminal') }}">
+                            <i class="mdi mdi-account-search-outline"></i> <span>Consultar Registro Criminal</span>
                         </a>
                     </li>
                 @endcanany
 
-                @canany(['superadmin', 'administrador', 'tecnico_daci'])
+                @canany(['superadmin', 'administrador', 'tecnico_daci', ])
                     <li class="menu-title"><span data-key="t-menu">EREBOR</span></li>
                     <li class="nav-item">
                         <a class="nav-link menu-link" href="{{ route('registro-criminal.index') }}">

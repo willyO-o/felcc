@@ -189,10 +189,6 @@
 
 
 @section('css')
-    <!-- DataTables CSS -->
-    <link href="{{ url('/assets/libs/datatables/dataTables.bootstrap5.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ url('/assets/libs/datatables/responsive.bootstrap5.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ url('/assets/libs/datatables/buttons.bootstrap5.css') }}" rel="stylesheet" type="text/css" />
 
     <!-- Select2 CSS -->
     <link href="{{ url('/assets/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
@@ -203,12 +199,13 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
 @endsection
 
-@section('page-title', 'Lista de Mandamientos')
+@section('page-title', 'Consultas de Mandamientos')
 
 @section('breadcrumb')
     <div class="page-title-right">
         <ol class="breadcrumb m-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item">Consultas</li>
             <li class="breadcrumb-item active">Mandamientos</li>
         </ol>
     </div>

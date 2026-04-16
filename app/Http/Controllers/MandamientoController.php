@@ -133,10 +133,12 @@ class MandamientoController extends Controller
             abort(403, 'No tienes permiso para acceder a esta sección.');
         }
 
-        if (in_array(request()->user()->role->nombre, ['tecnico_daci', 'tecnico_felcc', 'consultor_daci', 'consultor_felcc'])) {
-            AuditarConsultas::agregarIdsAccedidos(request()->get('identificador'), $id, 'mandamiento');
-        }
+
         $mandamiento = Mandamiento::getMandamientos([], $id)->first();
+
+        if (in_array(request()->user()->role->nombre, ['tecnico_daci', 'tecnico_felcc', 'consultor_daci', 'consultor_felcc'])) {
+            AuditarConsultas::agregarIdsAccedidos(request()->get('identificador'), $id, get_class($mandamiento));
+        }
 
         if (!$mandamiento) {
             return response()->json(['error' => 'Mandamiento no encontrado'], 404);
