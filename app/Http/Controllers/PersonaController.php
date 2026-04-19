@@ -167,8 +167,11 @@ class PersonaController extends Controller
      */
     public function show(string $id)
     {
-        $datos = Persona::with('multimedia')->findOrFail($id);
-        return view('personas.show', compact('datos'));
+        $datos = Persona::with(['multimedia', 'registroCriminal', 'mandamientos', 'vehiculos', 'telefonos'])->findOrFail($id);
+        return view('personas.show', [
+            'datos' => $datos,
+            'isAjax' => true,
+        ]);
     }
 
     /**

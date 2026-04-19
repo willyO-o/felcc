@@ -77,6 +77,19 @@ class Persona extends Model
         return $this->belongsTo(Pais::class, 'id_pais');
     }
 
+    public function usuario()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function vehiculos()
+    {
+        return $this->belongsToMany(Vehiculo::class, 'vehiculo_caso', 'persona_id', 'vehiculo_id')
+            ->withPivot('registro_criminal_id', 'tipo', 'numero_informacion')
+            ->withTimestamps();
+
+    }
+
 
 
     static $rules = [
@@ -122,8 +135,5 @@ class Persona extends Model
         });
     }
 
-    public function usuario()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
+
 }

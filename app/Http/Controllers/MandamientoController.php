@@ -129,6 +129,10 @@ class MandamientoController extends Controller
      */
     public function show(string $id)
     {
+        if(!request()->ajax()){
+             abort(404);
+        }
+
         if (!request()->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_listar', 'consulta_mandamientos'])) {
             abort(403, 'No tienes permiso para acceder a esta sección.');
         }
@@ -137,14 +141,19 @@ class MandamientoController extends Controller
         $mandamiento = Mandamiento::getMandamientos([], $id)->first();
 
         if (in_array(request()->user()->role->nombre, ['tecnico_daci', 'tecnico_felcc', 'consultor_daci', 'consultor_felcc'])) {
-            AuditarConsultas::agregarIdsAccedidos(request()->get('identificador'), $id, get_class($mandamiento));
+            $identificador = request()->get('identificador', null);
+            AuditarConsultas::agregarIdsAccedidos($identificador, $id, get_class($mandamiento));
         }
 
         if (!$mandamiento) {
             return response()->json(['error' => 'Mandamiento no encontrado'], 404);
         }
 
-        return view('mandamientos.show', compact('mandamiento'));
+        return view('mandamientos.partials._datos', [
+            'mandamiento' => $mandamiento,
+            'identificador' => isset($identificador) ? $identificador : null,
+            'isAjax' => true,
+        ]);
     }
 
     /**
@@ -306,5 +315,25 @@ class MandamientoController extends Controller
 
 
         return view('mandamientos.consultas');
+    }
+
+    public function showByCodigo(string $codigo)
+    {
+        if (!request()->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_listar', 'consulta_mandamientos'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
+
+        $mandamiento = Mandamiento::getMandamientos([], $codigo, true)->first();
+
+        if (in_array(request()->user()->role->nombre, ['tecnico_daci', 'tecnico_felcc', 'consultor_daci', 'consultor_felcc'])) {
+            AuditarConsultas::agregarIdsAccedidos(request()->get('identificador'), $mandamiento->id, get_class($mandamiento));
+        }
+
+        if (!$mandamiento) {
+            return response()->json(['error' => 'Mandamiento no encontrado'], 404);
+        }
+
+        return view('mandamientos.show', compact('mandamiento'));
     }
 }

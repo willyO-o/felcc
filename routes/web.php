@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\Importacion;
+use App\Http\Controllers\RegistroCriminalController;
+use App\Http\Controllers\MandamientoController;
 
 
 Route::get('/', function () {
@@ -29,13 +31,14 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('mandamientos/importar', [Importacion::class, 'indexMandamientoImportar'])->name('importar.mandamientos.index');
     Route::post('mandamientos/importar', [Importacion::class, 'importarMandamientos'])->name('importar.mandamientos.importar');
-    Route::resource('mandamientos', App\Http\Controllers\MandamientoController::class);
+    Route::resource('mandamientos', MandamientoController::class);
+    Route::get('/mandamiento/{codigo}', [MandamientoController::class, 'showByCodigo'])->name('mandamientos.showByCodigo');
     Route::resource('tipos-mandamientos', App\Http\Controllers\TipoMandamientoController::class);
     Route::delete('/multimedia/{id}', [App\Http\Controllers\MultimediaController::class, 'destroy'])->name('multimedia.destroy');
 
 
-    Route::get('consultas/mandamientos', [App\Http\Controllers\MandamientoController::class, 'consultarMandamientos'])->name('consultas.mandamientos');
-    Route::get('consultas/registro-criminal', [App\Http\Controllers\RegistroCriminalController::class, 'consultarRegistroCriminal'])->name('consultas.registro-criminal');
+    Route::get('consultas/mandamientos', [MandamientoController::class, 'consultarMandamientos'])->name('consultas.mandamientos');
+    Route::get('consultas/registro-criminal', [RegistroCriminalController::class, 'consultarRegistroCriminal'])->name('consultas.registro-criminal');
 
 
     // Rutas de importación de personast
@@ -76,7 +79,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/personas-search', [PersonaController::class, 'search'])->name('personas.search');
 
 
-    Route::resource('registro-criminal', App\Http\Controllers\RegistroCriminalController::class);
+    Route::resource('registro-criminal', RegistroCriminalController::class);
+    Route::get('/registro/{codigo}', [RegistroCriminalController::class, 'showByCodigo'])->name('registro-criminal.showByCodigo');
 
     // Usuarios
     Route::resource('usuarios', App\Http\Controllers\UserController::class);

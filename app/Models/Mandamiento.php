@@ -112,7 +112,7 @@ class Mandamiento extends Model
 
 
 
-    static function getMandamientos($filtros = [], $idMandamiento = null)
+    static function getMandamientos($filtros = [], $idMandamiento = null , $md5Id = false)
     {
 
         $search = $filtros['search'] ?? null;
@@ -234,7 +234,11 @@ class Mandamiento extends Model
         }
 
         if ($idMandamiento) {
-            $query->where('mandamiento.id', $idMandamiento);
+            if ($md5Id) {
+                $query->whereRaw('MD5(mandamiento.id) = ?', [$idMandamiento]);
+            } else {
+                $query->where('mandamiento.id', $idMandamiento);
+            }
         }
 
         return $query;

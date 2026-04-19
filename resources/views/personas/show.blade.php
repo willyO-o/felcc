@@ -114,12 +114,16 @@
                                 @php
                                     $otrosRegistros = $datos->registroCriminal;
                                     $mandamientos = $datos->mandamientos;
+                                    $vehiculos = $datos->vehiculos;
+                                    $telefonos = $datos->telefonos;
                                 @endphp
 
 
                                 @include('personas.partials._tab-adicional', [
                                     'otrosRegistros' => $otrosRegistros,
                                     'mandamientos' => $mandamientos,
+                                    'vehiculos' => $vehiculos,
+                                    'telefonos' => $telefonos,
                                 ])
                             </div>
 

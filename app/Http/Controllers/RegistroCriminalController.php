@@ -254,15 +254,25 @@ class RegistroCriminalController extends Controller
      */
     public function show(string $id)
     {
+        if(!request()->ajax()){
+            abort(404);
+        }
+
         if (!request()->user()->hasAnyPermission(['registro-criminal_all', 'registro-criminal_listar', 'consulta_registro-criminal'])) {
             abort(403, 'No tienes permiso para acceder a esta sección.');
         }
-        $datos = RegistroCriminal::with(['persona', 'fotos'])->findOrFail($id);
+        $datos = RegistroCriminal::with(['persona', 'fotos', 'persona.vehiculos', 'persona.telefonos'])->findOrFail($id);
 
         if (in_array(request()->user()->role->nombre, ['tecnico_daci', 'tecnico_felcc', 'consultor_daci', 'consultor_felcc'])) {
-            AuditarConsultas::agregarIdsAccedidos(request()->get('identificador'), $id, get_class($datos));
+            $identificador = request()->get('identificador');
+            AuditarConsultas::agregarIdsAccedidos($identificador, $id, get_class($datos));
+
         }
-        return view('registro-criminal.show', compact('datos'));
+        return view('registro-criminal.partials._datos', [
+            'datos' => $datos,
+            'identificador' => isset($identificador) ? $identificador : null,
+            'isAjax' => true,
+        ]);
     }
 
     /**
@@ -529,5 +539,26 @@ class RegistroCriminalController extends Controller
 
 
         return view('registro-criminal.consultas');
+    }
+
+
+    public function showByCodigo(string $codigo)
+    {
+
+        if (!request()->user()->hasAnyPermission(['registro-criminal_all', 'registro-criminal_listar', 'consulta_registro-criminal'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
+        $datos = RegistroCriminal::with(['persona', 'fotos', 'persona.vehiculos', 'persona.telefonos'])->whereRaw('MD5(id) = ?', [$codigo])->firstOrFail();
+
+        if (in_array(request()->user()->role->nombre, ['tecnico_daci', 'tecnico_felcc', 'consultor_daci', 'consultor_felcc'])) {
+            $identificador = request()->get('identificador');
+            AuditarConsultas::agregarIdsAccedidos($identificador, $datos->id, get_class($datos));
+        }
+
+        return view('registro-criminal.show', [
+            'datos' => $datos,
+            'identificador' => isset($identificador) ? $identificador : null,
+        ]);
     }
 }
