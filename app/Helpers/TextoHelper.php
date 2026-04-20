@@ -125,6 +125,6 @@ if (!function_exists('utf8Decode')) {
         if (!$cadena) {
             return nuloSiVacio($cadena);
         }
-        return mb_convert_encoding($cadena, 'ISO-8859-1', 'UTF-8');
+        return iconv('UTF-8', 'ISO-8859-1//TRANSLIT', $cadena);
     }
 }
