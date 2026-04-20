@@ -117,3 +117,14 @@ if (!function_exists('limpiarCI')) {
         return $cadena;
     }
 }
+
+if (!function_exists('utf8Decode')) {
+    function utf8Decode($cadena)
+    {
+
+        if (!$cadena) {
+            return nuloSiVacio($cadena);
+        }
+        return mb_convert_encoding($cadena, 'ISO-8859-1', 'UTF-8');
+    }
+}

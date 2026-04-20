@@ -89,4 +89,7 @@ Route::group(['middleware' => ['auth']], function () {
     // Perfil
     Route::get('/perfil', [App\Http\Controllers\ProfileController::class, 'index'])->name('perfil');
     Route::post('/perfil/password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('perfil.password');
+
+
+    Route::get('pdf', [App\Http\Controllers\ReporteController::class, 'index'])->name('pdf');
 });
