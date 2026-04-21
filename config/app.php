@@ -127,7 +127,7 @@ return [
     'aplicacion' => [
         'nombre' => 'Sistema de Mandamientos Judiciales',
         'sigla' => 'SMJ-DACI',
-        'version' => '1.1.0',
+        'version' => '1.1.1',
         'empresa' => 'Felcc',
         'autor' => 'Willy Chana',
     ],

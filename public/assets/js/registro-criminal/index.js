@@ -94,9 +94,9 @@
                                 <button type="button" value="${item.id}" class="btn btn-soft-secondary btn-sm shadow-none verDetalles" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Detalles">
                                     <i class="ri-eye-line"></i>
                                 </button>
-                                <button type="button" value="${item.id}" class="btn btn-soft-secondary btn-sm shadow-none vistaPrevia" data-bs-toggle="tooltip" data-bs-placement="top" title="Imprimir Ficha de Registro">
+                                ${['superadmin', 'administrador','tecnico_daci'].includes(window.role) ? `<button type="button" value="${item.id}" class="btn btn-soft-secondary btn-sm shadow-none vistaPrevia" data-bs-toggle="tooltip" data-bs-placement="top" title="Imprimir Ficha de Registro">
                                     <i class="ri-file-pdf-line"></i>
-                                </button>
+                                </button>` : ''}
                                 ${['superadmin', 'administrador'].includes(window.role) ? `<a  href="/registro-criminal/${item.id}/edit"  class="btn btn-soft-secondary btn-sm shadow-none " data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Registro">
                                     <i class="ri-pencil-line"></i>
                                 </a>
