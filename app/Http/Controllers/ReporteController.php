@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 
 use App\Lib\ReportesPdf;
-
+use App\Models\FichaRegistro;
 class ReporteController extends Controller
 {
     //
@@ -22,5 +22,13 @@ class ReporteController extends Controller
 
         $this->reportesPdf->imprimir();
         exit;
+    }
+    public function pdfFicha($codigo)
+    {
+        $fichaRegistro = FichaRegistro::whereRaw('MD5(id) = ?', [$codigo])->firstOrFail();
+
+        $this->reportesPdf->fichaRegistro($fichaRegistro);
+        exit;
+
     }
 }

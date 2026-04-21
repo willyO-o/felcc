@@ -94,6 +94,9 @@
                                 <button type="button" value="${item.id}" class="btn btn-soft-secondary btn-sm shadow-none verDetalles" data-bs-toggle="tooltip" data-bs-placement="top" title="Ver Detalles">
                                     <i class="ri-eye-line"></i>
                                 </button>
+                                <button type="button" value="${item.id}" class="btn btn-soft-secondary btn-sm shadow-none vistaPrevia" data-bs-toggle="tooltip" data-bs-placement="top" title="Imprimir Ficha de Registro">
+                                    <i class="ri-file-pdf-line"></i>
+                                </button>
                                 ${['superadmin', 'administrador'].includes(window.role) ? `<a  href="/registro-criminal/${item.id}/edit"  class="btn btn-soft-secondary btn-sm shadow-none " data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Registro">
                                     <i class="ri-pencil-line"></i>
                                 </a>
@@ -101,7 +104,6 @@
                                     <i class="ri-delete-bin-2-line"></i>
                                 </button>
                                 ` : ''}
-
 
 
                             </div>
@@ -334,6 +336,23 @@
                     $("#modalDetalles .modal-body").html('<p class="text-danger">Error al cargar los detalles del registro.</p>');
                 });
         })
+        .on('click', '.vistaPrevia', function (e) {
+            e.preventDefault();
+            const id = $(this).val();
+            // Aquí puedes agregar la lógica para mostrar los detalles del mandamiento con el ID proporcionado
+            console.log('Ver detalles del registro con ID:', id);
+            $("#modalDetalles").modal('show');
+            $("#modalDetalles .modal-body").html('<div class="text-center"><span class="loaderHttp"></span><span class="text-muted">Cargando detalles...</span></div>');
+
+            $.get(`/registro-vista-previa/${id}`)
+                .done(function (response) {
+                    $("#modalDetalles .modal-body").html(response);
+                })
+                .fail(function (error) {
+                    console.error('Error al cargar los detalles del registro:', error);
+                    $("#modalDetalles .modal-body").html('<p class="text-danger">Error al cargar los detalles del registro.</p>');
+                });
+        })
         .on('click', '.btnDelete', async function (e) {
             e.preventDefault();
             const id = $(this).val();
@@ -371,7 +390,56 @@
     /* cargar datos parametricos tipo mandamiento */
 
 
+    $(document).on('click', '#generarPdf', function (e) {
+        e.preventDefault();
 
+        $('#generarPdf').attr('disabled', true).html('<i class="mdi mdi-loading mdi-spin fs-20 align-middle me-2"></i> Generando PDF...');
+        const editableFields = $('.document-container [data-field]');
+
+        const dataToSave = {};
+
+        editableFields.each(function () {
+            const fieldName = $(this).data('field');
+            const fieldValue = $(this).html(); // Usamos html() para conservar el formato
+            dataToSave[fieldName] = fieldValue;
+        });
+
+        const registroCriminalId = $('#registro_criminal_id').val();
+
+        dataToSave.registro_criminal_id = registroCriminalId;
+        dataToSave._token = $('meta[name="csrf-token"]').attr('content');
+        dataToSave.codigo = $('#codigo').val();
+
+        $.post('/ficha-registro', dataToSave)
+            .done(function (response) {
+                $('#pdfViewer').attr('src', response.data.url);
+                $('#codigo').val(response.data.codigo);
+                $('#pdfContainer').removeClass('d-none');
+                $('#documentContent').addClass('d-none');
+                $("#editarPdf").removeClass('d-none');
+                $("#generarPdf").addClass('d-none')
+            })
+            .fail(function (error) {
+                console.error('Error al guardar la ficha de registro:', error);
+                $('#generarPdf').attr('disabled', false).html('<i class="mdi mdi-file-powerpoint text-danger"></i> Generar PDF');
+
+            });
+
+
+
+
+
+    });
+
+    $(document).on('click', '#editarPdf', function (e) {
+        e.preventDefault();
+
+        $(this).addClass('d-none');
+        $('#pdfViewer').attr('src', '');
+        $('#pdfContainer').addClass('d-none');
+        $('#documentContent').removeClass('d-none');
+        $("#generarPdf").removeClass('d-none').attr('disabled', false).html('<i class="mdi mdi-file-powerpoint text-danger"></i> Generar PDF');
+    });
 
 
 

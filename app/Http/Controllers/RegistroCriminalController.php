@@ -8,12 +8,15 @@ use App\Models\Persona;
 use App\Models\Telefono;
 use App\Models\AuditarConsultas;
 use App\Models\FotosRegistro;
+use App\Models\FichaRegistroPlantilla;
+use App\Models\FichaRegistro;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 use Illuminate\Support\Str;
 use App\Http\Requests\GuardarRegistroCriminalRequest;
+use Illuminate\Support\Carbon;
 
 class RegistroCriminalController extends Controller
 {
@@ -254,7 +257,7 @@ class RegistroCriminalController extends Controller
      */
     public function show(string $id)
     {
-        if(!request()->ajax()){
+        if (!request()->ajax()) {
             abort(404);
         }
 
@@ -266,7 +269,6 @@ class RegistroCriminalController extends Controller
         if (in_array(request()->user()->role->nombre, ['tecnico_daci', 'tecnico_felcc', 'consultor_daci', 'consultor_felcc'])) {
             $identificador = request()->get('identificador');
             AuditarConsultas::agregarIdsAccedidos($identificador, $id, get_class($datos));
-
         }
         return view('registro-criminal.partials._datos', [
             'datos' => $datos,
@@ -560,5 +562,29 @@ class RegistroCriminalController extends Controller
             'datos' => $datos,
             'identificador' => isset($identificador) ? $identificador : null,
         ]);
+    }
+
+
+    public function vistaPrevia(string  $id)
+    {
+        $registro = RegistroCriminal::with(['persona', 'division'])->findOrFail($id);
+
+        $plantilla = FichaRegistroPlantilla::where('estado', 'ACTIVO')->first();
+
+        // ultimo  del año actual  y numero maximo
+        $ultomaFicha = FichaRegistro::whereYear('created_at', Carbon::now()->year)->max('numero_ficha');
+        $nro = str_pad($ultomaFicha + 1, 3, '0', STR_PAD_LEFT);
+
+        $nroFicha = $nro.'/'.Carbon::now()->year;
+
+        $fechaHoraActual = Carbon::now()->isoFormat('dddd DD [de] MMMM [de] YYYY, [a horas] hh:mm a');
+        $plantilla->introduccion = Str::replace('{fecha_hora_actual}', $fechaHoraActual, $plantilla->introduccion);
+        $fechaActual = Carbon::now()->isoFormat('DD [de] MMMM [de] YYYY');
+        $plantilla->persona = Str::replace(['{nombre_persona}', '{ci_persona}'], [$registro->persona->nombres . ' ' . $registro->persona->apellidos, $registro->persona->ci], $plantilla->persona);
+        $plantilla->resultado_busqueda = Str::replace(['{division}', '{fecha_aprehension}', '{delito}'], [$registro->division->nombre, $registro->fecha_registro->isoFormat('DD/MM/YYYY'), $registro->especialidad], $plantilla->resultado_busqueda);
+
+        $registrCriminalId = $registro->id;
+
+        return view('registro-criminal.partials._previewPrint',compact('plantilla', 'fechaActual', 'nroFicha', 'registrCriminalId'));
     }
 }

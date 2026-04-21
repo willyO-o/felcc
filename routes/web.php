@@ -91,5 +91,8 @@ Route::group(['middleware' => ['auth']], function () {
     Route::post('/perfil/password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('perfil.password');
 
 
-    Route::get('pdf', [App\Http\Controllers\ReporteController::class, 'index'])->name('pdf');
+    Route::get('/registro-vista-previa/{id}', [RegistroCriminalController::class, 'vistaPrevia'])->name('registro.vista-previa');
+    Route::get('/ficha-registro/pdf/{codigo}', [App\Http\Controllers\ReporteController::class, 'pdfFicha'])->name('ficha-registro.pdf');
+    Route::post('/ficha-registro', [App\Http\Controllers\FichaRegistroController::class, 'store'])->name('ficha-registro.store');
+
 });
