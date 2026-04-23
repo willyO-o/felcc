@@ -9,6 +9,7 @@
         "php": "^8.2",
         "box/spout": "^3.3",
         "intervention/image": "^3.11",
+        "jenssegers/agent": "^2.6",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
         "laravel/ui": "^4.6",
@@ -16,6 +17,7 @@
         "openspout/openspout": "^4.28",
         "setasign/fpdf": "^1.8",
         "setasign/fpdi": "^2.6",
+        "stevebauman/location": "^7.6",
         "yajra/laravel-datatables-oracle": "^12.6"
     },
     "require-dev": {

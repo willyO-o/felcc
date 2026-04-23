@@ -148,6 +148,12 @@
                             <i class="mdi mdi-account-group-outline"></i> <span>Usuarios</span>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('auditar-consultas.index') }}">
+                            <i class="mdi mdi-history"></i> <span>Auditoría de Consultas</span>
+                        </a>
+                    </li>
                 @endcanany
 
             </ul>

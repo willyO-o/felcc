@@ -5,6 +5,7 @@ use App\Http\Controllers\PersonaController;
 use App\Http\Controllers\Importacion;
 use App\Http\Controllers\RegistroCriminalController;
 use App\Http\Controllers\MandamientoController;
+use App\Http\Controllers\AuditarConsultasController;
 
 
 Route::get('/', function () {
@@ -89,6 +90,11 @@ Route::group(['middleware' => ['auth']], function () {
     // Perfil
     Route::get('/perfil', [App\Http\Controllers\ProfileController::class, 'index'])->name('perfil');
     Route::post('/perfil/password', [App\Http\Controllers\ProfileController::class, 'updatePassword'])->name('perfil.password');
+
+    // Auditar Consultas
+    Route::resource('auditar-consultas', AuditarConsultasController::class, ['only' => ['index', 'show']]);
+    Route::get('/auditar-consultas/filtros/modulos', [AuditarConsultasController::class, 'obtenerModulos'])->name('auditar-consultas.modulos');
+    Route::get('/auditar-consultas/filtros/roles', [AuditarConsultasController::class, 'obtenerRoles'])->name('auditar-consultas.roles');
 
 
     Route::get('/registro-vista-previa/{id}', [RegistroCriminalController::class, 'vistaPrevia'])->name('registro.vista-previa');

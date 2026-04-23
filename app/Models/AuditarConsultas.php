@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Stevebauman\Location\Facades\Location;
+use Jenssegers\Agent\Agent;
 class AuditarConsultas extends Model
 {
-    //
+    use SoftDeletes;
 
     protected $table = 'auditar_consultas';
 
@@ -25,11 +27,32 @@ class AuditarConsultas extends Model
     protected $casts = [
         'criterios_consulta' => 'array',
         'ids_accedidos' => 'array',
+        'user_agent' => 'array',
     ];
+
+    //adicionar columna
+
+    /**
+     * Relación con el modelo User
+     */
+    public function usuario()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
+    /**
+     * Accesor para obtener información de ubicación basada en la IP
+     */
+    public function getLocationInfo()
+    {
+        return Location::get($this->ip_usuario);
+    }
 
 
     static  function registrar($user, $modulo, $request)
     {
+
+        $agent = new Agent();
         self::create([
             'user_id' => $user->id,
             'rol_usuario' => $user->role ? $user->role->nombre : 'desconocido',
@@ -42,7 +65,11 @@ class AuditarConsultas extends Model
             ],
             'cantidad_resultados' => $request->get('cantidad_resultados', 0),
             'ip_usuario' => request()->ip(),
-            'user_agent' => request()->header('User-Agent'),
+            'user_agent' => [
+                'browser' => $agent->browser(),
+                'platform' => $agent->platform(),
+                'device' => $agent->device(),
+            ],
             'identificador' => $request->get('identificador', null),
         ]);
     }
