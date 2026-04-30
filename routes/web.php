@@ -101,4 +101,6 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/ficha-registro/pdf/{codigo}', [App\Http\Controllers\ReporteController::class, 'pdfFicha'])->name('ficha-registro.pdf');
     Route::post('/ficha-registro', [App\Http\Controllers\FichaRegistroController::class, 'store'])->name('ficha-registro.store');
 
+
+    Route::get('/eliminar-duplicados', [App\Http\Controllers\EliminarDuplicados::class, 'index'])->name('eliminar-duplicados.index');
 });

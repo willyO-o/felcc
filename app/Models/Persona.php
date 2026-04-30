@@ -41,6 +41,8 @@ class Persona extends Model
         'fecha_nacimiento' => 'date'
     ];
 
+
+
     /**
      * Obtener el nombre completo de la persona
      */
