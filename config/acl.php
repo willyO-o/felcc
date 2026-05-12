@@ -12,6 +12,7 @@ return [
             'importar_all',
             'consulta_all',
             'registro-criminal_all',
+            'reporte_all',
         ],
         'administrador' => [
             'users_all',
@@ -23,6 +24,7 @@ return [
             'importar_all',
             'consulta_all',
             'registro-criminal_all',
+            'reporte_all',
         ],
         'tecnico_felcc' => [
             'consulta_mandamientos',

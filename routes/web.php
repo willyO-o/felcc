@@ -103,4 +103,9 @@ Route::group(['middleware' => ['auth']], function () {
 
 
     Route::get('/eliminar-duplicados', [App\Http\Controllers\EliminarDuplicados::class, 'index'])->name('eliminar-duplicados.index');
+
+    // Reportes y Exportación
+    Route::get('/reportes', [App\Http\Controllers\ReporteController::class, 'index'])->name('reportes.index');
+    Route::get('/reportes/formulario/{tipo}', [App\Http\Controllers\ReporteController::class, 'formulario'])->name('reportes.formulario');
+    Route::get('/reportes/exportar', [App\Http\Controllers\ReporteController::class, 'exportar'])->name('reportes.exportar');
 });

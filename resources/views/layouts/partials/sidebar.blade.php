@@ -65,7 +65,7 @@
                         <i class="mdi mdi-clipboard-text-search-outline"></i> <span>Consultar Mandamientos</span>
                     </a>
                 </li>
-                @canany(['superadmin', 'administrador', 'tecnico_daci','consultor_daci'])
+                @canany(['superadmin', 'administrador', 'tecnico_daci', 'consultor_daci'])
                     <li class="nav-item ">
                         <a class="nav-link menu-link " href="{{ route('consultas.registro-criminal') }}">
                             <i class="mdi mdi-account-search-outline"></i> <span>Consultar Registro Criminal</span>
@@ -73,7 +73,7 @@
                     </li>
                 @endcanany
 
-                @canany(['superadmin', 'administrador', 'tecnico_daci', ])
+                @canany(['superadmin', 'administrador', 'tecnico_daci'])
                     <li class="menu-title"><span data-key="t-menu">EREBOR</span></li>
                     <li class="nav-item">
                         <a class="nav-link menu-link" href="{{ route('registro-criminal.index') }}">
@@ -141,6 +141,13 @@
                 @endcanany
 
                 @canany(['superadmin', 'administrador'])
+                    <li class="menu-title"><span data-key="t-menu">Reportes</span></li>
+
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('reportes.index') }}">
+                            <i class="mdi mdi-account-group-outline"></i> <span>Reportes</span>
+                        </a>
+                    </li>
                     <li class="menu-title"><span data-key="t-menu">Seguridad</span></li>
 
                     <li class="nav-item">
