@@ -52,7 +52,7 @@
 
                                         <div class="vr"></div>
                                         <div class="text-muted">REGISTRADO POR:
-                                            {{ $datos->usuario->name }}
+                                            {{ $datos->usuario?->name }}
                                         </div>
                                     </div>
                                 </div>

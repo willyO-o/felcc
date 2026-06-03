@@ -287,44 +287,6 @@ class Importacion extends Controller
         // Datos SEGIP (valores completos)
         $datos['datos_segip'] = $fila['DATOS_SEGIP'] ?? null;
 
-        // Parsear datos del SEGIP
-        $datosSEGIP = $fila['DATOS_SEGIP'] ?? '';
-
-        // Aplicar datos parseados
-        if (!empty($datosSEGIP['fecha_nacimiento']) && empty($datos['fecha_nacimiento'])) {
-            $datos['fecha_nacimiento'] = $datosSEGIP['fecha_nacimiento'];
-        }
-        if (!empty($datosSEGIP['domicilio']) && empty($datos['domicilio'])) {
-            $datos['domicilio'] = $datosSEGIP['domicilio'];
-        }
-        if (!empty($datosSEGIP['telefono']) && empty($datos['telefono'])) {
-            $datos['telefono'] = $datosSEGIP['telefono'];
-        }
-        if (!empty($datosSEGIP['lugar_nacimiento']) && empty($datos['lugar_nacimiento'])) {
-            $datos['lugar_nacimiento'] = $datosSEGIP['lugar_nacimiento'];
-        }
-        if (!empty($datosSEGIP['genero']) && empty($datos['genero'])) {
-            $datos['genero'] = $datosSEGIP['genero'];
-        }
-        if (!empty($datosSEGIP['estado_civil']) && empty($datos['estado_civil'])) {
-            $datos['estado_civil'] = $datosSEGIP['estado_civil'];
-        }
-        if (!empty($datosSEGIP['nombre_conyuge']) && empty($datos['nombre_conyuge'])) {
-            $datos['nombre_conyuge'] = $datosSEGIP['nombre_conyuge'];
-        }
-        if (!empty($datosSEGIP['ocupacion']) && empty($datos['ocupacion'])) {
-            $datos['ocupacion'] = $datosSEGIP['ocupacion'];
-        }
-        if (!empty($datosSEGIP['pais']) && empty($datos['id_pais'])) {
-            // Buscar país en caché o BD
-            if (!isset($paisesCache[$datosSEGIP['pais']])) {
-                $pais = Pais::where('pais', 'LIKE', "%{$datosSEGIP['pais']}%")->first();
-                $paisesCache[$datosSEGIP['pais']] = $pais?->id;
-            }
-            if ($paisesCache[$datosSEGIP['pais']]) {
-                $datos['id_pais'] = $paisesCache[$datosSEGIP['pais']];
-            }
-        }
 
         // Estado investigación
         $datos['estado_investigacion'] = $fila['ESTADO'] ?? null;

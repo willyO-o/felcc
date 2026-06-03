@@ -103,10 +103,12 @@
                 @endcanany
 
 
-                @canany(['superadmin', 'administrador'])
+                @canany(['superadmin', 'administrador', 'tecnico_daci'])
                     <!-- Usuarios -->
                     <li class="menu-title"><span data-key="t-menu">Importar</span></li>
+                @endcanany
 
+                @canany(['superadmin', 'administrador', 'tecnico_daci', 'tecnico_felcc'])
                     <li class="nav-item">
                         <a class="nav-link menu-link" href="#sidebarImportar" data-bs-toggle="collapse" role="button"
                             aria-expanded="false" aria-controls="sidebarImportar">
@@ -118,22 +120,23 @@
                                     <a href="{{ route('personas.importar.index') }}" class="nav-link">Importar Personas</a>
                                 </li>
 
-
                                 <li class="nav-item">
                                     <a href="{{ route('importar.mandamientos.index') }}" class="nav-link">Importar
                                         Mandamientos</a>
                                 </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('telefonos.importar.index') }}" class="nav-link">Importar
-                                        Telefonos</a>
-                                </li>
-                                <li class="nav-item">
-                                    <a href="{{ route('vehiculos.importar.index') }}" class="nav-link">Importar
-                                        Vehículos</a>
-                                </li>
-                                <li class="nav-item d-none">
-                                    <a href="{{ route('usuarios.index') }}" class="nav-link">Importar Registro</a>
-                                </li>
+                                @canany(['superadmin', 'administrador', 'tecnico_daci'])
+                                    <li class="nav-item">
+                                        <a href="{{ route('telefonos.importar.index') }}" class="nav-link">Importar
+                                            Telefonos</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('vehiculos.importar.index') }}" class="nav-link">Importar
+                                            Vehículos</a>
+                                    </li>
+                                    <li class="nav-item d-none">
+                                        <a href="{{ route('usuarios.index') }}" class="nav-link">Importar Registro</a>
+                                    </li>
+                                @endcanany
 
                             </ul>
                         </div>

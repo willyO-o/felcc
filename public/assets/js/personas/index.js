@@ -172,15 +172,19 @@
                                 <i class="ri-eye-fill align-bottom"></i>
                             </button>
 
-                            ${['superadmin', 'administrador'].includes(window.role) ?
+                            ${['superadmin', 'administrador','tecnico_daci'].includes(window.role) ?
                     /*html*/`
                             <button class="btn btn-sm btn-soft-warning btn-editar" value="${persona.id}" title="Editar">
                                 <i class="ri-pencil-fill align-bottom"></i>
                             </button>
+                            ` : ""
+                            }
+                            ${['superadmin', 'administrador'].includes(window.role) ?
+                    /*html*/`
                             <button class="btn btn-sm btn-soft-danger btn-eliminar" value="${persona.id}" title="Eliminar">
                                 <i class="ri-delete-bin-fill align-bottom"></i>
                             </button>` : ""
-                }
+                            }
                         </div>
                     </td>
                 </tr>
