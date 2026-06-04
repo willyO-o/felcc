@@ -21,6 +21,7 @@
     const $searchInput = $("#searchPersonas");
     const $filtroGenero = $("#filtroGenero");
     const $filtroEstadoCivil = $("#filtroEstadoCivil");
+    const $filtroVisible = $("#filtroVisible");
     const $btnNuevo = $("#btnNuevaPersona");
 
     FilePond.registerPlugin(
@@ -53,8 +54,11 @@
         if ($filtroEstadoCivil.val()) {
             params.estado_civil = $filtroEstadoCivil.val();
         }
-        if ($('#filtros').val()) {
-            params.filtro = $('#filtros').val();
+        if ($filtroVisible.val()) {
+            params.visible = $filtroVisible.val();
+        }
+        if ($("#filtros").val()) {
+            params.filtro = $("#filtros").val();
         }
 
         $.ajax({
@@ -64,8 +68,8 @@
             data: params,
             headers: {
                 "X-Requested-With": "XMLHttpRequest",
-                "Accept": "application/json",
-            }
+                Accept: "application/json",
+            },
         })
             .done(function (data) {
                 $loading.hide();
@@ -82,7 +86,9 @@
 
                 const desde = (currentPage - 1) * pageSize + 1;
                 const hasta = Math.min(currentPage * pageSize, data.total);
-                $detallesPagina.text(`Mostrando ${desde} a ${hasta} de ${data.total} personas`);
+                $detallesPagina.text(
+                    `Mostrando ${desde} a ${hasta} de ${data.total} personas`,
+                );
             })
             .fail(function (err) {
                 $loading.hide();
@@ -96,18 +102,27 @@
         personas.forEach((persona, index) => {
             const nombreCompleto = getNombreCompleto(persona);
             const genero = persona.genero ? formatGenero(persona.genero) : "—";
-            const estadoCivil = persona.estado_civil ? formatEstadoCivil(persona.estado_civil) : "—";
+            const estadoCivil = persona.estado_civil
+                ? formatEstadoCivil(persona.estado_civil)
+                : "—";
             const telefono = persona.telefono || "—";
             const fecha = persona.created_at
                 ? new Date(persona.created_at).toLocaleDateString("es-BO", {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                })
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                  })
                 : "—";
 
-            const iniciales = nombreCompleto.split(" ").map(word => word.charAt(0).toUpperCase()).join("").substring(0, 2);
-            const primeraImagen = persona.multimedia && persona.multimedia.length > 0 ? persona.multimedia[0].ruta : null;
+            const iniciales = nombreCompleto
+                .split(" ")
+                .map((word) => word.charAt(0).toUpperCase())
+                .join("")
+                .substring(0, 2);
+            const primeraImagen =
+                persona.multimedia && persona.multimedia.length > 0
+                    ? persona.multimedia[0].ruta
+                    : null;
 
             // Lógica para el botón de documento
             let documentoHtml = "";
@@ -129,17 +144,18 @@
                 `;
             }
 
-            html += /*html */`
-                <tr>
+            html += /*html */ `
+                <tr class="${persona.deleted_at ? "table-danger" : ""}">
                     <td>${(currentPage - 1) * pageSize + index + 1}</td>
                     <td>
                         <div class="d-flex align-items-center gap-2 cursor-pointer" data-persona-id="${persona.id}">
                             <div class="avatar-sm flex-shrink-0">
                                 <div class="avatar-title bg-soft-primary text-primary rounded-circle fs-13">
-                                    ${primeraImagen ?
-                    `<img src="/storage/${primeraImagen}" alt="Foto de ${escapeHtml(nombreCompleto)}" class="avatar-sm rounded-circle">` :
-                    escapeHtml(iniciales)
-                }
+                                    ${
+                                        primeraImagen
+                                            ? `<img src="/storage/${primeraImagen}" alt="Foto de ${escapeHtml(nombreCompleto)}" class="avatar-sm rounded-circle">`
+                                            : escapeHtml(iniciales)
+                                    }
                                 </div>
                             </div>
                             <div class="flex-grow-1">
@@ -167,23 +183,43 @@
                     </td>
                     <td class="text-center">
                         <div class="d-flex gap-2 justify-content-center">
+
                             <button class="btn btn-sm btn-soft-info btn-ver" value="${persona.id}"
                                 title="Ver detalles">
                                 <i class="ri-eye-fill align-bottom"></i>
                             </button>
 
-                            ${['superadmin', 'administrador','tecnico_daci'].includes(window.role) ?
-                    /*html*/`
-                            <button class="btn btn-sm btn-soft-warning btn-editar" value="${persona.id}" title="Editar">
+                            ${
+                                [
+                                    "superadmin",
+                                    "administrador",
+                                    "tecnico_daci",
+                                ].includes(window.role)
+                                    ? /*html*/ `
+                            <button class="${persona.deleted_at ? "d-none" : ""} btn btn-sm btn-soft-warning btn-editar" value="${persona.id}" title="Editar">
                                 <i class="ri-pencil-fill align-bottom"></i>
                             </button>
-                            ` : ""
+                            `
+                                    : ""
                             }
-                            ${['superadmin', 'administrador'].includes(window.role) ?
-                    /*html*/`
-                            <button class="btn btn-sm btn-soft-danger btn-eliminar" value="${persona.id}" title="Eliminar">
+                            ${
+                                ["superadmin", "administrador"].includes(
+                                    window.role,
+                                )
+                                    ? /*html*/ `
+                            <button class="${persona.deleted_at ? "d-none" : ""} btn btn-sm btn-soft-danger btn-eliminar" value="${persona.id}" title="Eliminar">
                                 <i class="ri-delete-bin-fill align-bottom"></i>
-                            </button>` : ""
+                            </button>
+                            ${
+                                persona.deleted_at
+                                    ? /*html*/ `
+                            <button class="btn btn-sm btn-soft-info btn-recuperar" value="${persona.id}" title="Recuperar">
+                                <i class="ri-refresh-line align-bottom"></i>
+                            </button>
+                            `
+                                    : ""
+                            }`
+                                    : ""
                             }
                         </div>
                     </td>
@@ -204,38 +240,30 @@
         abrirModalEditar($(this).val());
     });
 
-    $(document).on("click", ".btn-eliminar", async function (e) {
+    $(document).on("click", ".btn-eliminar", function (e) {
         e.preventDefault();
 
         const personaId = $(this).val();
 
-        const confirmacion = await confirmarEnvio("Si, Eliminar", "¿Estás seguro de eliminar esta persona? Esta acción no se puede deshacer.");
-
-        if (!confirmacion) {
-            return;
-        }
-
-        const btn = $(this);
-
+        // Cargar datos del modal
         $.ajax({
-            url: `/personas/${personaId}`,
-            type: "DELETE",
-            dataType: "json",
+            url: `/personas/${personaId}/delete-modal`,
+            type: "GET",
+            // dataType: "json",
             headers: {
-                "X-CSRF-TOKEN": csrfToken,
                 "X-Requested-With": "XMLHttpRequest",
-                "Accept": "application/json",
+                // Accept: "application/json",
+            },
+        }).done(function (response) {
+            $("#modalPersonaContent").html(response);
+            const modal = new bootstrap.Modal(
+                document.getElementById("modalPersona"),
+            );
+            modal.show();
+            if (!$("#personaMigrar").data("select2")) {
+                inicializarSelectPersona();
             }
-        }).done(function (body) {
-
-            notification(body.success);
-
-            btn.closest("tr").remove();
-        })
-            .fail(function (xhr) {
-                processError(xhr);
-
-            });
+        });
     });
 
     /**
@@ -245,7 +273,7 @@
         e.preventDefault();
         const url = $(this).data("url");
         if (url && url.trim()) {
-            window.open(url, '_blank');
+            window.open(url, "_blank");
         } else {
             Swal.fire("Error", "No hay URL válida para el documento", "error");
         }
@@ -311,17 +339,21 @@
             new URL(urlDocumento);
         } catch (_) {
             $("#urlDocumento").addClass("is-invalid");
-            $("#error-url_documento").text("Ingresa una URL válida (ej: https://drive.google.com/...)");
+            $("#error-url_documento").text(
+                "Ingresa una URL válida (ej: https://drive.google.com/...)",
+            );
             return;
         }
 
         const $btnVincular = $("#btnVincularDocumento");
         $btnVincular.prop("disabled", true);
-        $btnVincular.html('<i class="ri-loader-4-line align-middle me-1"></i> Guardando...');
+        $btnVincular.html(
+            '<i class="ri-loader-4-line align-middle me-1"></i> Guardando...',
+        );
 
         const data = {
             url_documento: urlDocumento,
-            _token: csrfToken
+            _token: csrfToken,
         };
 
         $.ajax({
@@ -332,12 +364,14 @@
             headers: {
                 "X-CSRF-TOKEN": csrfToken,
                 "X-Requested-With": "XMLHttpRequest",
-                "Accept": "application/json",
-            }
+                Accept: "application/json",
+            },
         })
             .done(function (body) {
                 $btnVincular.prop("disabled", false);
-                $btnVincular.html('<i class="ri-link align-middle me-1"></i> Vincular');
+                $btnVincular.html(
+                    '<i class="ri-link align-middle me-1"></i> Vincular',
+                );
 
                 Swal.fire({
                     icon: "success",
@@ -349,12 +383,16 @@
 
                 cargarPersonas(currentPage);
 
-                const modal = bootstrap.Modal.getInstance(document.getElementById("modalVincularDocumento"));
+                const modal = bootstrap.Modal.getInstance(
+                    document.getElementById("modalVincularDocumento"),
+                );
                 if (modal) modal.hide();
             })
             .fail(function (xhr) {
                 $btnVincular.prop("disabled", false);
-                $btnVincular.html('<i class="ri-link align-middle me-1"></i> Vincular');
+                $btnVincular.html(
+                    '<i class="ri-link align-middle me-1"></i> Vincular',
+                );
 
                 const body = xhr.responseJSON;
 
@@ -380,8 +418,8 @@
      */
     function formatGenero(genero) {
         const generos = {
-            "MASCULINO": "Masculino",
-            "FEMENINO": "Femenino"
+            MASCULINO: "Masculino",
+            FEMENINO: "Femenino",
         };
         return generos[genero] || genero;
     }
@@ -391,11 +429,11 @@
      */
     function formatEstadoCivil(estado) {
         const estados = {
-            "SOLTERO": "Soltero/a",
-            "CASADO": "Casado/a",
-            "DIVORCIADO": "Divorciado/a",
-            "VIUDO": "Viudo/a",
-            "CONYUGUE": "Cónyuge"
+            SOLTERO: "Soltero/a",
+            CASADO: "Casado/a",
+            DIVORCIADO: "Divorciado/a",
+            VIUDO: "Viudo/a",
+            CONYUGUE: "Cónyuge",
         };
         return estados[estado] || estado;
     }
@@ -413,7 +451,8 @@
 
         if (start > 1) {
             html += `<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`;
-            if (start > 2) html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            if (start > 2)
+                html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
         }
 
         for (let i = start; i <= end; i++) {
@@ -423,7 +462,8 @@
         }
 
         if (end < totalPages) {
-            if (end < totalPages - 1) html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+            if (end < totalPages - 1)
+                html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
             html += `<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">${totalPages}</a></li>`;
         }
 
@@ -438,11 +478,13 @@
         $.ajax({
             url: "/personas/create",
             type: "GET",
-            headers: { "X-Requested-With": "XMLHttpRequest" }
+            headers: { "X-Requested-With": "XMLHttpRequest" },
         })
             .done(function (html) {
                 $("#modalPersonaContent").html(html);
-                const modal = new bootstrap.Modal(document.getElementById("modalPersona"));
+                const modal = new bootstrap.Modal(
+                    document.getElementById("modalPersona"),
+                );
                 modal.show();
 
                 setTimeout(() => {
@@ -457,9 +499,12 @@
                     });
 
                     const $paisSelect = $("#id_pais");
-                    const paisBolivia = $paisSelect.find("option").filter(function () {
-                        return $(this).text().trim() === "boliviano/a";
-                    }).first();
+                    const paisBolivia = $paisSelect
+                        .find("option")
+                        .filter(function () {
+                            return $(this).text().trim() === "boliviano/a";
+                        })
+                        .first();
                     if (paisBolivia.length) {
                         $paisSelect.val(paisBolivia.val()).trigger("change");
                     }
@@ -478,11 +523,13 @@
         $.ajax({
             url: `/personas/${id}/edit`,
             type: "GET",
-            headers: { "X-Requested-With": "XMLHttpRequest" }
+            headers: { "X-Requested-With": "XMLHttpRequest" },
         })
             .done(function (html) {
                 $("#modalPersonaContent").html(html);
-                const modal = new bootstrap.Modal(document.getElementById("modalPersona"));
+                const modal = new bootstrap.Modal(
+                    document.getElementById("modalPersona"),
+                );
                 modal.show();
 
                 setTimeout(() => {
@@ -509,19 +556,23 @@
         $.ajax({
             url: `/personas/${id}`,
             type: "GET",
-
-        }).done(function (data) {
-
-            $("#modalDetallesContent").html(data);
-            const modal = new bootstrap.Modal(document.getElementById("modalDetalles"));
-            modal.show();
-        }).fail(function (err) {
+        })
+            .done(function (data) {
+                $("#modalDetallesContent").html(data);
+                const modal = new bootstrap.Modal(
+                    document.getElementById("modalDetalles"),
+                );
+                modal.show();
+            })
+            .fail(function (err) {
                 console.error("Error:", err);
-                Swal.fire("Error", "No se pudieron cargar los detalles", "error");
+                Swal.fire(
+                    "Error",
+                    "No se pudieron cargar los detalles",
+                    "error",
+                );
             });
     };
-
-
 
     function bindFormulario() {
         const $form = $("#personaForm");
@@ -560,14 +611,20 @@
 
         if (resetForm) {
             $btnGuardarReset.prop("disabled", true);
-            $btnGuardarReset.html('<i class="ri-loader-4-line align-middle me-1"></i> Guardando...');
+            $btnGuardarReset.html(
+                '<i class="ri-loader-4-line align-middle me-1"></i> Guardando...',
+            );
         }
         $btnGuardar.prop("disabled", true);
-        $btnGuardar.html('<i class="ri-loader-4-line align-middle me-1"></i> Guardando...');
+        $btnGuardar.html(
+            '<i class="ri-loader-4-line align-middle me-1"></i> Guardando...',
+        );
 
         if (filePondInstance) {
-            const files = filePondInstance.getFiles().map(fileItem => fileItem.file);
-            files.forEach((file) => formData.append('fotos[]', file));
+            const files = filePondInstance
+                .getFiles()
+                .map((fileItem) => fileItem.file);
+            files.forEach((file) => formData.append("fotos[]", file));
         }
 
         $.ajax({
@@ -580,15 +637,14 @@
             headers: {
                 "X-CSRF-TOKEN": csrfToken,
                 "X-Requested-With": "XMLHttpRequest",
-                "Accept": "application/json",
-            }
+                Accept: "application/json",
+            },
         })
             .done(function (body) {
                 $btnGuardar.prop("disabled", false);
-                $btnGuardar.html('<i class="ri-save-3-line align-middle me-1"></i> Guardar');
-
-
-
+                $btnGuardar.html(
+                    '<i class="ri-save-3-line align-middle me-1"></i> Guardar',
+                );
 
                 Swal.fire({
                     icon: "success",
@@ -601,16 +657,22 @@
 
                 if (resetForm) {
                     $btnGuardarReset.prop("disabled", false);
-                    $btnGuardarReset.html('<i class="ri-save-3-line align-middle me-1"></i> Guardar y Registrar Nuevo');
+                    $btnGuardarReset.html(
+                        '<i class="ri-save-3-line align-middle me-1"></i> Guardar y Registrar Nuevo',
+                    );
                     resetearFormulario();
                     return;
                 }
-                const modal = bootstrap.Modal.getInstance(document.getElementById("modalPersona"));
+                const modal = bootstrap.Modal.getInstance(
+                    document.getElementById("modalPersona"),
+                );
                 if (modal) modal.hide();
             })
             .fail(function (xhr) {
                 $btnGuardar.prop("disabled", false);
-                $btnGuardar.html('<i class="ri-save-3-line align-middle me-1"></i> Guardar');
+                $btnGuardar.html(
+                    '<i class="ri-save-3-line align-middle me-1"></i> Guardar',
+                );
 
                 const body = xhr.responseJSON;
 
@@ -619,16 +681,19 @@
                         const $input = $form.find(`[name="${field}"]`);
                         const $errorDiv = $form.find(`#error-${field}`);
                         if ($input.length) $input.addClass("is-invalid");
-                        if ($errorDiv.length) $errorDiv.text(body.errors[field][0]);
+                        if ($errorDiv.length)
+                            $errorDiv.text(body.errors[field][0]);
                     });
                     return;
                 }
 
-                Swal.fire("Error", body.error || "Ocurrió un error inesperado.", "error");
+                Swal.fire(
+                    "Error",
+                    body.error || "Ocurrió un error inesperado.",
+                    "error",
+                );
             });
     }
-
-
 
     window.eliminarFoto = function (fotoId) {
         Swal.fire({
@@ -637,7 +702,7 @@
             icon: "warning",
             showCancelButton: true,
             confirmButtonText: "Sí, eliminar",
-            cancelButtonText: "Cancelar"
+            cancelButtonText: "Cancelar",
         }).then((result) => {
             if (result.isConfirmed) {
                 $.ajax({
@@ -647,21 +712,20 @@
                     headers: {
                         "X-CSRF-TOKEN": csrfToken,
                         "X-Requested-With": "XMLHttpRequest",
-                        "Accept": "application/json",
+                        Accept: "application/json",
+                    },
+                }).done(function (data) {
+                    if (data.success) {
+                        $(`[data-foto-id="${fotoId}"]`).remove();
+                        Swal.fire({
+                            icon: "success",
+                            title: "Eliminada",
+                            text: "Foto eliminada correctamente",
+                            timer: 1500,
+                            showConfirmButton: false,
+                        });
                     }
-                })
-                    .done(function (data) {
-                        if (data.success) {
-                            $(`[data-foto-id="${fotoId}"]`).remove();
-                            Swal.fire({
-                                icon: "success",
-                                title: "Eliminada",
-                                text: "Foto eliminada correctamente",
-                                timer: 1500,
-                                showConfirmButton: false
-                            });
-                        }
-                    });
+                });
             }
         });
     };
@@ -672,7 +736,7 @@
     }
 
     function inicializarFilePond() {
-        const inputElement = document.querySelector('#fotos');
+        const inputElement = document.querySelector("#fotos");
         if (!inputElement) return;
 
         if (filePondInstance) {
@@ -682,46 +746,104 @@
         filePondInstance = FilePond.create(inputElement, {
             storeAsFile: false,
             allowMultiple: true,
-            labelIdle: 'Arrastra o sube fotos <br><span class="filepond--label-action">Seleccionar</span>',
+            labelIdle:
+                'Arrastra o sube fotos <br><span class="filepond--label-action">Seleccionar</span>',
             imagePreviewHeight: 140,
-            acceptedFileTypes: ['image/*'],
-            labelFileTypeNotAllowed: 'Archivo no válido',
-            labelIdle: 'Arrastra o sube hasta 4 fotos (opcional)<br><span class="filepond--label-action">Seleccionar</span>',
+            acceptedFileTypes: ["image/*"],
+            labelFileTypeNotAllowed: "Archivo no válido",
+            labelIdle:
+                'Arrastra o sube hasta 4 fotos (opcional)<br><span class="filepond--label-action">Seleccionar</span>',
             allowFileSizeValidation: true,
             maxFiles: 4,
-            maxFileSize: '2MB',
-            labelMaxFileSize: 'Tamaño máximo de archivo es {filesize}',
-            labelMaxFileSizeExceeded: 'Archivo demasiado grande',
+            maxFileSize: "2MB",
+            labelMaxFileSize: "Tamaño máximo de archivo es {filesize}",
+            labelMaxFileSizeExceeded: "Archivo demasiado grande",
             imageResizeTargetWidth: 200,
             imageResizeTargetHeight: 200,
-            stylePanelLayout: 'compact stacked',
-            styleLoadIndicatorPosition: 'center bottom',
-            styleProgressIndicatorPosition: 'right bottom',
-            styleButtonRemoveItemPosition: 'left bottom',
-            styleButtonProcessItemPosition: 'right bottom',
-            acceptedFileTypes: ['image/*'],
-            labelFileTypeNotAllowed: 'Archivo no válido. Solo se permiten imágenes.',
+            stylePanelLayout: "compact stacked",
+            styleLoadIndicatorPosition: "center bottom",
+            styleProgressIndicatorPosition: "right bottom",
+            styleButtonRemoveItemPosition: "left bottom",
+            styleButtonProcessItemPosition: "right bottom",
+            acceptedFileTypes: ["image/*"],
+            labelFileTypeNotAllowed:
+                "Archivo no válido. Solo se permiten imágenes.",
         });
     }
 
     function limpiarFilePond() {
         if (filePondInstance) {
-            FilePond.destroy(document.querySelector('#fotos'));
+            FilePond.destroy(document.querySelector("#fotos"));
             filePondInstance = null;
         }
         $("#modalPersona").off("hidden.bs.modal", limpiarFilePond);
     }
 
     /**
+     * Manejar envío del formulario de migración y eliminación
+     */
+    $(document).on("submit", "#formMigrarEliminar", async function (e) {
+        e.preventDefault();
+
+        const $form = $(this);
+
+        const url = $form.attr("action");
+
+        const confirmacion = await confirmarEnvio(
+            "Si, Eliminar",
+            `¿Estás seguro de eliminar este registro?`,
+            "¡Sí, eliminar!",
+            "Cancelar",
+            "warning",
+        );
+
+        if (!confirmacion) return;
+
+        const $btnConfirmar = $("#btnConfirmarMigrarEliminar");
+        $btnConfirmar.prop("disabled", true);
+        $btnConfirmar.html(
+            '<i class="ri-loader-4-line align-middle me-1"></i> Procesando...',
+        );
+        $.ajax({
+            url: url,
+            type: "POST",
+            // dataType: "json",
+            data: $form.serializeArray(),
+        })
+            .done(function (response) {
+                const modal = bootstrap.Modal.getInstance(
+                    document.getElementById("modalPersona"),
+                );
+                if (modal) modal.hide();
+
+                notification(response.success, "Mandamiento Eliminado");
+                cargarPersonas(currentPage);
+            })
+            .fail(function (xhr) {
+                processError(xhr);
+            })
+            .always(function () {
+                $btnConfirmar.prop("disabled", false);
+                $btnConfirmar.html(
+                    '<i class="ri-delete-bin-fill align-middle me-1"></i> Confirmar Eliminación',
+                );
+            });
+    });
+
+    /**
      * Paginación - Solo se registra una vez
      */
-    $(document).on("click", "#paginacionPersonas .page-link[data-page]", function (e) {
-        e.preventDefault();
-        const p = parseInt($(this).data("page"));
-        if (p >= 1 && p <= totalPages) {
-            cargarPersonas(p);
-        }
-    });
+    $(document).on(
+        "click",
+        "#paginacionPersonas .page-link[data-page]",
+        function (e) {
+            e.preventDefault();
+            const p = parseInt($(this).data("page"));
+            if (p >= 1 && p <= totalPages) {
+                cargarPersonas(p);
+            }
+        },
+    );
 
     $(document).ready(function () {
         cargarPersonas();
@@ -748,10 +870,102 @@
                 cargarPersonas(1);
             });
         }
+        if ($filtroVisible.length) {
+            $filtroVisible.on("change", function () {
+                cargarPersonas(1);
+            });
+        }
 
         const $btnConfirmarEliminar = $("#btnConfirmarEliminar");
         if ($btnConfirmarEliminar.length) {
             $btnConfirmarEliminar.on("click", eliminarPersona);
         }
     });
+
+    $(document).on("input", "#ci, #complemento", function () {
+        if ($("#ci").val().trim().length < 4) {
+            return;
+        }
+
+        const data = {
+            ci: $("#ci").val().trim(),
+            complemento: $("#complemento").val().trim(),
+        };
+
+        $.get("/personas-check-ci", data).done(function (response) {
+            if (response.data) {
+                $("#ci").addClass("is-invalid");
+                $("#error-ci").text(
+                    "Ya existe una persona con este CI y complemento",
+                ).show();
+            } else {
+                $("#ci").removeClass("is-invalid");
+                $("#error-ci").hide();
+            }
+        });
+    });
+
+    $(document).on("click", ".btn-recuperar", async function (e) {
+        e.preventDefault();
+
+        const personaId = $(this).val();
+
+        const confirmacion = await confirmarEnvio(
+            "Sí, recuperar",
+            "¿Estás seguro de recuperar este registro?",
+            "¡Sí, recuperar!",
+            "Cancelar",
+            "question",
+        );
+
+        if (!confirmacion) return;
+
+        $.post(`/personas-restore/${personaId}`, { _token: csrfToken })
+            .done(function (response) {
+                notification(response.success, "Persona Recuperada");
+                cargarPersonas(currentPage);
+            })
+            .fail(function (xhr) {
+                processError(xhr);
+            });
+
+
+
+    });
+
+    function inicializarSelectPersona() {
+        $("#personaMigrar").select2({
+            dropdownParent: $("#modalPersonaContent"),
+            placeholder: "Seleccione una persona",
+            allowClear: true,
+            language: {
+                noResults: function () {
+                    return "No se encontraron personas";
+                },
+            },
+            ajax: {
+                url: "/personas-search",
+                dataType: "json",
+                delay: 250,
+                data: function (params) {
+                    return {
+                        q: params.term, // término de búsqueda
+                        id: $("#persona_id").val(), // ID de la persona actual para excluirla de los resultados
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.map(function (persona) {
+                            return {
+                                id: persona.id,
+                                text: `${persona.nombres} ${persona.apellidos || ""} - CI: ${persona.ci || ""}`,
+                            };
+                        }),
+                    };
+                },
+                cache: true,
+            },
+            minimumInputLength: 2,
+        });
+    }
 })();

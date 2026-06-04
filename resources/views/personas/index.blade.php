@@ -66,6 +66,15 @@
                                 <option value="CONYUGUE">Cónyuge</option>
                             </select>
                         </div>
+                        @canany(['superadmin', 'administrador'])
+                            <div class="col-md-2">
+                                <select name="filtroVisible" id="filtroVisible" class="form-select">
+                                    <option value="todos">Todos los registros</option>
+                                    <option value="activos">Solo Activos</option>
+                                    <option value="eliminados">Solo Eliminados</option>
+                                </select>
+                            </div>
+                        @endcanany
                     </div>
                     <div class="d-flex justify-content-between align-items-center mt-2">
                         <span id="detalles-pagina" class="text-muted small"></span>
@@ -121,7 +130,7 @@
     </div>
 
     {{-- Modal Crear/Editar Persona --}}
-    <div class="modal fade" id="modalPersona" tabindex="-1" aria-labelledby="modalPersonaLabel" aria-hidden="true"
+    <div class="modal fade" id="modalPersona" tabindex="-1" aria-labelledby="modalPersonaLabel" data-bs-focus="false" aria-hidden="true"
         data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-xl">
             <div class="modal-content" id="modalPersonaContent">
@@ -144,8 +153,8 @@
     </div>
 
     {{-- Modal Vincular Documento --}}
-    <div class="modal fade" id="modalVincularDocumento" tabindex="-1" aria-labelledby="modalVincularDocumentoLabel" aria-hidden="true"
-        data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal fade" id="modalVincularDocumento" tabindex="-1" aria-labelledby="modalVincularDocumentoLabel"
+        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
@@ -157,7 +166,8 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="urlDocumento" class="form-label">URL del Documento *</label>
-                            <input type="text" class="form-control" id="urlDocumento" placeholder="https://drive.google.com/..." required>
+                            <input type="text" class="form-control" id="urlDocumento"
+                                placeholder="https://drive.google.com/..." required>
                             <small class="text-muted d-block mt-2">
                                 Puedes vincular documentos desde Google Drive, OneDrive, Dropbox o cualquier otra fuente.
                             </small>

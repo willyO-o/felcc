@@ -78,7 +78,9 @@ Route::group(['middleware' => ['auth']], function () {
     Route::delete('/vehiculos/{vehiculo}/desvincular-persona/{persona}', [App\Http\Controllers\VehiculoController::class, 'desvincularPersona'])->name('vehiculos.desvincular-persona');
 
     Route::get('/personas-search', [PersonaController::class, 'search'])->name('personas.search');
-
+    Route::get('/personas/{id}/delete-modal', [PersonaController::class, 'showDeleteModal'])->name('personas.showDeleteModal');
+    Route::get('/personas-check-ci', [PersonaController::class, 'checkCI'])->name('personas.check-ci');
+    Route::post('/personas-restore/{id}', [PersonaController::class, 'restore'])->name('personas.restore');
 
     Route::resource('registro-criminal', RegistroCriminalController::class);
     Route::get('/registro/{codigo}', [RegistroCriminalController::class, 'showByCodigo'])->name('registro-criminal.showByCodigo');

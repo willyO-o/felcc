@@ -32,7 +32,7 @@
             <div class="col-md-4">
                 <label for="ci" class="form-label">Cédula de Identidad</label>
                 <input type="text" class="form-control txtMayuscula" id="ci" name="ci" maxlength="20"
-                    value="{{ old('ci', $persona->ci ?? '') }}" placeholder="Ej: 1234567 LP">
+                    value="{{ old('ci', $persona->ci ?? '') }}" placeholder="Ej: 1234567">
                 <div class="invalid-feedback" id="error-ci"></div>
             </div>
 

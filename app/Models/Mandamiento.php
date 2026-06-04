@@ -150,7 +150,9 @@ class Mandamiento extends Model
                                             ORDER BY m1.created_at DESC
                                             LIMIT 1) as acta_ejecucion")
             ])
-            ->orderBy('mandamiento.id', 'desc');
+            ->orderBy('mandamiento.id', 'desc')
+            ->whereNull('persona.deleted_at')
+            ->whereNull('mandamiento.deleted_at'); // Excluir mandamientos eliminados
 
         if ($search && empty($tipoFiltro)) {
             $search= str_replace(' ', '%', $search); // Reemplazar espacios por comodines para mejorar la búsqueda

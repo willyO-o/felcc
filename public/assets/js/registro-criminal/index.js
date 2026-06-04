@@ -75,6 +75,8 @@
 
 
     function rowHtml(item, opacity = 0) {
+
+        if(!item.persona) return '';
         // Obtener el modo de vista desde localStorage
         const savedView = localStorage.getItem('registroCriminalViewMode') || 'grid';
 

@@ -67,6 +67,19 @@ class PersonaController extends Controller
                 }
             }
 
+            if ($request->filled('visible')) {
+                switch ($request->input('visible', 'activos')) {
+                    case 'todos':
+                        $query->withTrashed();
+                        break;
+                    case 'activos':
+                        break;
+                    case 'eliminados':
+                        $query->onlyTrashed();
+                        break;
+                }
+            }
+
             $personas = $query->paginate($request->get('size', 10), ['*'], 'page', $request->get('page', 1));
 
             return response()->json([
@@ -106,7 +119,7 @@ class PersonaController extends Controller
         $reglas = [
             'nombres' => 'required|string|max:255',
             'apellidos' => 'nullable|string|max:255',
-            'ci' => 'nullable|string|max:20|unique:persona,ci',
+            'ci' => 'nullable|string|max:25',
             'fecha_nacimiento' => 'nullable|date|before:today',
             'domicilio' => 'nullable|string|max:500',
             'telefono' => 'nullable|string|max:25',
@@ -167,7 +180,7 @@ class PersonaController extends Controller
      */
     public function show(string $id)
     {
-        $datos = Persona::with(['multimedia', 'registroCriminal', 'mandamientos', 'vehiculos', 'telefonos'])->findOrFail($id);
+        $datos = Persona::withTrashed()->with(['multimedia', 'registroCriminal', 'mandamientos', 'vehiculos', 'telefonos'])->findOrFail($id);
         return view('personas.show', [
             'datos' => $datos,
             'isAjax' => true,
@@ -214,7 +227,7 @@ class PersonaController extends Controller
         $reglas = [
             'nombres' => 'required|string|max:255',
             'apellidos' => 'nullable|string|max:255',
-            'ci' => 'nullable|string|max:20|unique:persona,ci,' . $id,
+            'ci' => 'nullable|string|max:25',
             'fecha_nacimiento' => 'nullable|date|before:today',
             'domicilio' => 'nullable|string|max:500',
             'telefono' => 'nullable|string|max:25',
@@ -277,24 +290,42 @@ class PersonaController extends Controller
      */
     public function destroy(string $id)
     {
+
+        // return request()->all();
         try {
+            DB::beginTransaction();
             $persona = Persona::findOrFail($id);
 
-            // Eliminar multimedia asociada
-            $multimedia = Multimedia::where('id_persona', $id)->get();
-            foreach ($multimedia as $file) {
-                if (Storage::disk('public')->exists($file->ruta)) {
-                    Storage::disk('public')->delete($file->ruta);
-                }
-                $file->delete();
+            $request = request();
+
+            if ($request->input('persona_migrar_id')) {
+
+                $personaMigracion = Persona::findOrFail($request->input('persona_migrar_id'));
+
+                $persona->migrateRelationsTo($personaMigracion);
             }
 
-            $persona->delete();
+            if ($request->input('eliminar_completo')) {
 
+                $multimedia = Multimedia::where('id_persona', $id)->get();
+                foreach ($multimedia as $file) {
+                    if (Storage::disk('public')->exists($file->ruta)) {
+                        Storage::disk('public')->delete($file->ruta);
+                    }
+                    $file->delete();
+                }
+
+                $persona->deleteRelationsData();
+                $persona->forceDelete();
+            } else {
+                $persona->delete();
+            }
+            DB::commit();
             return response()->json([
                 'success' => 'Persona eliminada correctamente.',
             ], 200);
         } catch (\Exception $e) {
+            DB::rollBack();
             return response()->json([
                 'error' => 'Error al eliminar la persona: ' . $e->getMessage(),
             ], 500);
@@ -306,14 +337,76 @@ class PersonaController extends Controller
         $query = $request->input('q', $request->input('query', ''));
         $query = str_replace('%', ' ', $query);
 
-        $personas = Persona::where('nombres', 'LIKE', "%{$query}%")
-            ->orWhere('apellidos', 'LIKE', "%{$query}%")
-            ->orWhere('ci', 'LIKE', "%{$query}%")
-            ->orWhereRaw("CONCAT(COALESCE(nombres, ''), ' ', COALESCE(apellidos, ''),' - ', COALESCE(ci, '')) LIKE ?", ["%{$query}%"])
-            ->orWhereRaw("CONCAT(COALESCE(apellidos, ''), ' ', COALESCE(nombres, ''),' - ', COALESCE(ci, '')) LIKE ?", ["%{$query}%"])
-            ->orWhereRaw("CONCAT(COALESCE(ci, ''), ' - ', COALESCE(apellidos, ''), ' ', COALESCE(nombres, '')) LIKE ?", ["%{$query}%"])
-            ->get();
+        $builder = Persona::where(function ($q) use ($query) {
+            $q->where('nombres', 'LIKE', "%{$query}%")
+                ->orWhere('apellidos', 'LIKE', "%{$query}%")
+                ->orWhere('ci', 'LIKE', "%{$query}%")
+                ->orWhereRaw("CONCAT(COALESCE(nombres, ''), ' ', COALESCE(apellidos, ''),' - ', COALESCE(ci, '')) LIKE ?", ["%{$query}%"])
+                ->orWhereRaw("CONCAT(COALESCE(apellidos, ''), ' ', COALESCE(nombres, ''),' - ', COALESCE(ci, '')) LIKE ?", ["%{$query}%"])
+                ->orWhereRaw("CONCAT(COALESCE(ci, ''), ' - ', COALESCE(apellidos, ''), ' ', COALESCE(nombres, '')) LIKE ?", ["%{$query}%"]);
+        });
+
+        $builder->when($request->input('id'), function ($q) use ($request) {
+            return $q->where('id', '!=', $request->input('id'));
+        });
+
+        $personas = $builder->limit(20)->get();
 
         return response()->json($personas);
+    }
+
+    /**
+     * Mostrar modal para migrar y eliminar una persona
+     */
+    public function showDeleteModal(Request $request, string $id)
+    {
+        if (!request()->user()->hasAnyPermission(['personas_all', 'personas_eliminar'])) {
+            return response()->json([
+                'error' => 'No tienes permiso para eliminar personas.'
+            ], 403);
+        }
+
+        $persona = Persona::findOrFail($id);
+        // Obtener el resumen de datos relacionados
+        $resumen = $persona->getResumenDatosRelacionados();
+
+        return  view('personas.partials._frm-eliminar', compact('persona', 'resumen'));
+    }
+
+    /**
+     * Migrar datos relacionados y eliminar persona
+     */
+    public function restore( string $id)
+    {
+        $persona = Persona::withTrashed()->findOrFail($id);
+
+        $persona->restore();
+        return response()->json([
+            'success' => 'Persona restaurada correctamente.',
+            'datos' => $persona,
+        ], 200);
+
+
+    }
+
+    public function checkCI(Request $request)
+    {
+        $ci = $request->input('ci');
+        $complemento = $request->input('complemento');
+
+        $persona = Persona::where('ci', $ci)
+            ->where(function ($q) use ($complemento) {
+                if ($complemento) {
+                    $q->where('complemento', $complemento);
+                } else {
+                    $q->whereNull('complemento');
+                }
+            })
+            ->first();
+
+        return response()->json([
+            'data' => $persona,
+        ]);
+
     }
 }

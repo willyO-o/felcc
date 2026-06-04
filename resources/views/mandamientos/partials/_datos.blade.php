@@ -6,6 +6,7 @@
     ];
 @endphp
 
+@if($mandamiento->persona)
 <div class="row">
     <div class="col-lg-12">
         <div class="card">
@@ -705,3 +706,13 @@
     </div>
     <!-- end col -->
 </div>
+
+@else
+<div class="alert alert-warning">
+    <i class="ri-alert-line align-middle me-2"></i>
+    No se encontró información de persona relacionada con este mandamiento. <br>
+
+    <h3>La persona fue eliminada, consulte con el administrador </h3>
+
+</div>
+@endif
