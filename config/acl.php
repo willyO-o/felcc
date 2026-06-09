@@ -13,6 +13,7 @@ return [
             'consulta_all',
             'registro-criminal_all',
             'reporte_all',
+            'ciudadanos_all',
         ],
         'administrador' => [
             'users_all',
@@ -25,11 +26,14 @@ return [
             'consulta_all',
             'registro-criminal_all',
             'reporte_all',
+            'ciudadanos_all',
         ],
         'tecnico_felcc' => [
             'consulta_mandamientos',
             'personas_crear',
             'mandamientos_crear',
+            'ciudadanos_all',
+
         ],
         'tecnico_daci' => [
             'registro-criminal_crear',

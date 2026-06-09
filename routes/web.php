@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PersonaController;
+use App\Http\Controllers\CiudadanoController;
 use App\Http\Controllers\Importacion;
 use App\Http\Controllers\RegistroCriminalController;
 use App\Http\Controllers\MandamientoController;
@@ -60,6 +61,11 @@ Route::group(['middleware' => ['auth']], function () {
 
 
     Route::resource('personas', PersonaController::class);
+
+    Route::resource('ciudadanos', CiudadanoController::class);
+    Route::get('/ciudadanos-search', [CiudadanoController::class, 'search'])->name('ciudadanos.search');
+    Route::get('/ciudadanos/{id}/delete-modal', [CiudadanoController::class, 'showDeleteModal'])->name('ciudadanos.showDeleteModal');
+    Route::post('/ciudadanos-restore/{id}', [CiudadanoController::class, 'restore'])->name('ciudadanos.restore');
 
     Route::resource('juzgados', App\Http\Controllers\JuzgadoController::class);
     Route::resource('delitos', App\Http\Controllers\DelitoController::class);
