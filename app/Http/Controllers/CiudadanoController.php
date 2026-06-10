@@ -42,28 +42,54 @@ class CiudadanoController extends Controller
             }
 
             // Búsqueda
+            // if ($request->filled('search')) {
+            //     $search = $request->search;
+            //     $search = str_replace('%', ' ', $search);
+            //     $searchType = $request->get('search_type', '');
+
+            //     $query->where(function ($q) use ($search, $searchType) {
+            //         if ($searchType === 'nombre_completo') {
+            //             $q->whereRaw("CONCAT(COALESCE(nombres, ''), ' ', COALESCE(ap_pat, ''), ' ', COALESCE(ap_mat, '')) LIKE ?", ["%{$search}%"]);
+            //         } elseif ($searchType === 'cedula') {
+            //             $q->whereRaw('cedula_act LIKE ?', ["%{$search}%"]);
+            //         } elseif ($searchType === 'ap_paterno') {
+            //             $q->whereRaw('ap_pat LIKE ?', ["%{$search}%"]);
+            //         } elseif ($searchType === 'ap_esposo') {
+            //             $q->whereRaw('ap_esp LIKE ?', ["%{$search}%"]);
+            //         } else {
+            //             // Búsqueda en todos los campos (valor por defecto)
+            //             $q->whereRaw('nombres LIKE ?', ["%{$search}%"])
+            //                 ->orWhereRaw('ap_pat LIKE ?', ["%{$search}%"])
+            //                 ->orWhereRaw('ap_mat LIKE ?', ["%{$search}%"])
+            //                 ->orWhereRaw('cedula_act LIKE ?', ["%{$search}%"])
+            //                 ->orWhereRaw('ciudadano LIKE ?', ["%{$search}%"])
+            //                 ->orWhereRaw("CONCAT(COALESCE(nombres, ''), ' ', COALESCE(ap_pat, ''), ' ', COALESCE(ap_mat, '')) LIKE ?", ["%{$search}%"]);
+            //         }
+            //     });
+            // }
+
+            // Búsqueda Optimizada para 1 Millón de Registros
             if ($request->filled('search')) {
                 $search = $request->search;
                 $search = str_replace('%', ' ', $search);
                 $searchType = $request->get('search_type', '');
 
-                $query->where(function ($q) use ($search, $searchType) {
+                // Array de columnas que creamos en el índice FULLTEXT
+                $allColumns = ['nombres', 'ap_pat', 'ap_mat', 'ap_esp', 'cedula_act', 'ciudadano'];
+
+                $query->where(function ($q) use ($search, $searchType, $allColumns) {
                     if ($searchType === 'nombre_completo') {
-                        $q->whereRaw("CONCAT(COALESCE(nombres, ''), ' ', COALESCE(ap_pat, ''), ' ', COALESCE(ap_mat, '')) LIKE ?", ["%{$search}%"]);
+                        // Buscamos el nombre en las columnas correspondientes usando FullText
+                        $q->whereFullText(['nombres', 'ap_pat', 'ap_mat'], $search);
                     } elseif ($searchType === 'cedula') {
-                        $q->whereRaw('cedula_act LIKE ?', ["%{$search}%"]);
+                        $q->whereFullText('cedula_act', $search);
                     } elseif ($searchType === 'ap_paterno') {
-                        $q->whereRaw('ap_pat LIKE ?', ["%{$search}%"]);
+                        $q->whereFullText('ap_pat', $search);
                     } elseif ($searchType === 'ap_esposo') {
-                        $q->whereRaw('ap_esp LIKE ?', ["%{$search}%"]);
+                        $q->whereFullText('ap_esp', $search);
                     } else {
-                        // Búsqueda en todos los campos (valor por defecto)
-                        $q->whereRaw('nombres LIKE ?', ["%{$search}%"])
-                            ->orWhereRaw('ap_pat LIKE ?', ["%{$search}%"])
-                            ->orWhereRaw('ap_mat LIKE ?', ["%{$search}%"])
-                            ->orWhereRaw('cedula_act LIKE ?', ["%{$search}%"])
-                            ->orWhereRaw('ciudadano LIKE ?', ["%{$search}%"])
-                            ->orWhereRaw("CONCAT(COALESCE(nombres, ''), ' ', COALESCE(ap_pat, ''), ' ', COALESCE(ap_mat, '')) LIKE ?", ["%{$search}%"]);
+                        // Búsqueda global instantánea en todo el índice estructurado
+                        $q->whereFullText($allColumns, $search);
                     }
                 });
             }
@@ -299,6 +325,4 @@ class CiudadanoController extends Controller
 
         return view('ciudadanos.partials._frm-eliminar', compact('ciudadano'));
     }
-
-
 }

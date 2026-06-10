@@ -52,7 +52,7 @@
                                 @endforeach
                             </select>
                             <select name="filtroSexo" id="filtroSexo" class="form-select" style="min-width: 150px;">
-                                <option value="">Todos los Sexos</option>
+                                <option value="">Todos los Generos</option>
                                 <option value="M">Masculino</option>
                                 <option value="F">Femenino</option>
                             </select>
@@ -71,7 +71,7 @@
                                     <th scope="col">#</th>
                                     <th scope="col">Nombre Completo</th>
                                     <th scope="col">Cédula</th>
-                                    <th scope="col">Sexo</th>
+                                    <th scope="col">Genero</th>
                                     <th scope="col">Estado Civil</th>
                                     <th scope="col">Ocupación</th>
                                     <th scope="col">Departamento</th>
