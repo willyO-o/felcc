@@ -41,6 +41,8 @@ Route::group(['middleware' => ['auth']], function () {
 
     Route::get('consultas/mandamientos', [MandamientoController::class, 'consultarMandamientos'])->name('consultas.mandamientos');
     Route::get('consultas/registro-criminal', [RegistroCriminalController::class, 'consultarRegistroCriminal'])->name('consultas.registro-criminal');
+    Route::get('consultas/vehiculos-padron', [App\Http\Controllers\VehiculoPadronController::class, 'index'])->name('consultas.vehiculos-padron.index');
+    Route::get('consultas/vehiculos-padron/{id}', [App\Http\Controllers\VehiculoPadronController::class, 'show'])->name('consultas.vehiculos-padron.show');
 
 
     // Rutas de importación de personast

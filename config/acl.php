@@ -14,6 +14,7 @@ return [
             'registro-criminal_all',
             'reporte_all',
             'ciudadanos_all',
+            'vehiculos_padron_all',
         ],
         'administrador' => [
             'users_all',

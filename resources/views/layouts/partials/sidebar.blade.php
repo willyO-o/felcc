@@ -76,6 +76,11 @@
                             <i class="mdi mdi-account-outline"></i> <span>Busqueda de Ciudadanos</span>
                         </a>
                     </li>
+                    <li class="nav-item ">
+                        <a class="nav-link menu-link" href="{{ route('consultas.vehiculos-padron.index') }}">
+                            <i class="mdi mdi-car"></i> <span>Busqueda de Vehículos</span>
+                        </a>
+                    </li>
                     <li class="nav-item d-none">
                         <a class="nav-link menu-link " href="{{ route('consultas.registro-criminal') }}">
                             <i class="mdi mdi-account-search-outline"></i> <span>Consultar Registro Criminal</span>
