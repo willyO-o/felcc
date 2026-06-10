@@ -46,6 +46,42 @@ class VehiculoPadronController extends Controller
                 });
             }
 
+            // Búsqueda avanzada por campo individual (LIKE)
+            $advSimpleFields = [
+                'adv_propietario'  => 'propietario',
+                'adv_docidentidad' => 'docidentidad',
+                'adv_nochasis'     => 'nochasis',
+                'adv_nomotor'      => 'nomotor',
+                'adv_marca'        => 'marca',
+                'adv_modelo'       => 'modelo',
+                'adv_clase'        => 'clase',
+                'adv_color'        => 'color',
+                'adv_tipo'         => 'tipo',
+                'adv_servicio'     => 'servicio',
+            ];
+
+            foreach ($advSimpleFields as $param => $column) {
+                if ($request->filled($param)) {
+                    $val = str_replace('%', ' ', $request->input($param));
+                    $query->whereRaw("{$column} LIKE ?", ["%{$val}%"]);
+                }
+            }
+
+            // Placa: busca en placa y placaantigua
+            if ($request->filled('adv_placa')) {
+                $val = str_replace('%', ' ', $request->input('adv_placa'));
+                $query->where(function ($q) use ($val) {
+                    $q->whereRaw('placa LIKE ?', ["%{$val}%"])
+                      ->orWhereRaw('placaantigua LIKE ?', ["%{$val}%"]);
+                });
+            }
+
+            // Dirección del propietario
+            if ($request->filled('adv_dom')) {
+                $val = str_replace('%', ' ', $request->input('adv_dom'));
+                $query->whereRaw('dompropietario LIKE ?', ["%{$val}%"]);
+            }
+
             if ($request->filled('clase')) {
                 $query->where('clase', $request->clase);
             }

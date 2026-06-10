@@ -20,6 +20,15 @@
     const $searchType      = $("#searchType");
     const $btnBuscar       = $("#btnBuscarVehiculos");
 
+    // Referencias búsqueda avanzada
+    const $accordionCollapse = $("#collapseBusquedaVehiculos");
+    const $badgeFiltros      = $("#badgeFiltrosVehiculos");
+    const advFieldIds = [
+        "adv_placa", "adv_propietario", "adv_docidentidad",
+        "adv_nochasis", "adv_nomotor", "adv_marca", "adv_modelo",
+        "adv_clase", "adv_color", "adv_tipo", "adv_servicio", "adv_dom"
+    ];
+
     // ─── Cargar vehículos ──────────────────────────────────────────────────────
     function cargarVehiculos(page = 1) {
 
@@ -38,6 +47,23 @@
 
         if ($searchType.val()) {
             params.search_type = $searchType.val();
+        }
+
+        // Parámetros de búsqueda avanzada por campo
+        let activeAdvCount = 0;
+        advFieldIds.forEach(function (fieldId) {
+            const val = $("#" + fieldId).val();
+            if (val && val.trim() !== "") {
+                params[fieldId] = val.trim();
+                activeAdvCount++;
+            }
+        });
+
+        // Actualizar badge de filtros activos
+        if (activeAdvCount > 0) {
+            $badgeFiltros.text(activeAdvCount + (activeAdvCount === 1 ? " filtro" : " filtros")).show();
+        } else {
+            $badgeFiltros.hide();
         }
 
         $.ajax({
@@ -68,7 +94,12 @@
                     $sinResultados.show();
                     $detallesPagina.text("Sin resultados");
                 }
-            })
+                // Colapsar acordeón tras búsqueda exitosa
+                if ($accordionCollapse.hasClass("show")) {
+                    const bsCollapse = bootstrap.Collapse.getInstance($accordionCollapse[0])
+                        || new bootstrap.Collapse($accordionCollapse[0], { toggle: false });
+                    bsCollapse.hide();
+                }            })
             .fail(function (err) {
                 $loading.hide();
                 $sinResultados.show();
@@ -186,6 +217,30 @@
                 e.preventDefault();
                 cargarVehiculos(1);
             }
+        });
+
+        // Búsqueda avanzada — botón buscar
+        $("#btnBuscarAvanzado").on("click", function () {
+            cargarVehiculos(1);
+        });
+
+        // Búsqueda avanzada — Enter en cualquier campo
+        $("#formBusquedaVehiculos").on("keypress", function (e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                cargarVehiculos(1);
+            }
+        });
+
+        // Limpiar búsqueda avanzada
+        $("#btnLimpiarAvanzado").on("click", function () {
+            $("#formBusquedaVehiculos")[0].reset();
+            $badgeFiltros.hide();
+            $listado.empty();
+            $paginacion.empty();
+            $sinResultados.hide();
+            $estadoInicial.show();
+            $detallesPagina.text("");
         });
 
         // Limpiar resultados cuando se borra el input

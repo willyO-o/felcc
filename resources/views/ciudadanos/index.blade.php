@@ -22,6 +22,93 @@
         </div>
     </div>
 
+    {{-- Acordeón de Búsqueda Avanzada --}}
+    <div class="row mb-2">
+        <div class="col-12">
+            <div class="accordion" id="accordionBusquedaAvanzada">
+                <div class="accordion-item border-0 shadow-sm">
+                    <h2 class="accordion-header" id="headingBusquedaCiudadanos">
+                        <button class="accordion-button py-2" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#collapseBusquedaCiudadanos"
+                            aria-expanded="true" aria-controls="collapseBusquedaCiudadanos">
+                            <i class="ri-filter-3-line me-2 text-primary"></i>
+                            <strong>Búsqueda Avanzada por Campo</strong>
+                            <span class="badge bg-primary ms-2 small" id="badgeFiltrosActivos" style="display:none;">0 filtros</span>
+                        </button>
+                    </h2>
+                    <div id="collapseBusquedaCiudadanos" class="accordion-collapse collapse show"
+                        aria-labelledby="headingBusquedaCiudadanos">
+                        <div class="accordion-body pb-3">
+                            <form id="formBusquedaAvanzada" autocomplete="off">
+                                <div class="row g-2">
+                                    <div class="col-md-3 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Nombres</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_nombres" name="adv_nombres" placeholder="Buscar por nombres...">
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Apellido Paterno</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_ap_pat" name="adv_ap_pat" placeholder="Apellido paterno...">
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Apellido Materno</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_ap_mat" name="adv_ap_mat" placeholder="Apellido materno...">
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Apellido Esposo/a</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_ap_esp" name="adv_ap_esp" placeholder="Apellido esposo/a...">
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Cédula de Identidad</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_cedula" name="adv_cedula" placeholder="Nro. de cédula...">
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Ocupación</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_ocupacion" name="adv_ocupacion" placeholder="Ocupación...">
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Dirección</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_dom" name="adv_dom" placeholder="Dirección o domicilio...">
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Municipio</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_mun" name="adv_mun" placeholder="Municipio...">
+                                    </div>
+                                    <div class="col-md-2 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Provincia</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_prov" name="adv_prov" placeholder="Provincia...">
+                                    </div>
+                                    <div class="col-md-2 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">País Nacimiento</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_pais" name="adv_pais" placeholder="País...">
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2 mt-3 align-items-center">
+                                    <button type="button" class="btn btn-primary btn-sm" id="btnBuscarAvanzado">
+                                        <i class="ri-search-line me-1"></i> Buscar
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="btnLimpiarAvanzado">
+                                        <i class="ri-refresh-line me-1"></i> Limpiar
+                                    </button>
+                                    <span class="text-muted small ms-2">Ingrese uno o más campos para filtrar. Se aplica LIKE en cada campo.</span>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-lg-12">
             <div class="card">

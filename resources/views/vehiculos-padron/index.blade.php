@@ -12,6 +12,103 @@
 @endsection
 
 @section('content')
+    {{-- Acordeón de Búsqueda Avanzada --}}
+    <div class="row mb-2">
+        <div class="col-12">
+            <div class="accordion" id="accordionBusquedaVehiculos">
+                <div class="accordion-item border-0 shadow-sm">
+                    <h2 class="accordion-header" id="headingBusquedaVehiculos">
+                        <button class="accordion-button py-2" type="button"
+                            data-bs-toggle="collapse" data-bs-target="#collapseBusquedaVehiculos"
+                            aria-expanded="true" aria-controls="collapseBusquedaVehiculos">
+                            <i class="ri-filter-3-line me-2 text-primary"></i>
+                            <strong>Búsqueda Avanzada por Campo</strong>
+                            <span class="badge bg-primary ms-2 small" id="badgeFiltrosVehiculos" style="display:none;">0 filtros</span>
+                        </button>
+                    </h2>
+                    <div id="collapseBusquedaVehiculos" class="accordion-collapse collapse show"
+                        aria-labelledby="headingBusquedaVehiculos">
+                        <div class="accordion-body pb-3">
+                            <form id="formBusquedaVehiculos" autocomplete="off">
+                                <div class="row g-2">
+                                    <div class="col-md-2 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Placa</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_placa" name="adv_placa" placeholder="Placa o placa antigua...">
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Propietario</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_propietario" name="adv_propietario" placeholder="Nombre del propietario...">
+                                    </div>
+                                    <div class="col-md-2 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Doc. Identidad</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_docidentidad" name="adv_docidentidad" placeholder="CI / pasaporte...">
+                                    </div>
+                                    <div class="col-md-2 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">N° Chasis</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_nochasis" name="adv_nochasis" placeholder="N° de chasis...">
+                                    </div>
+                                    <div class="col-md-2 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">N° Motor</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_nomotor" name="adv_nomotor" placeholder="N° de motor...">
+                                    </div>
+                                    <div class="col-md-2 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Marca</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_marca" name="adv_marca" placeholder="Marca...">
+                                    </div>
+                                    <div class="col-md-2 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Modelo</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_modelo" name="adv_modelo" placeholder="Modelo...">
+                                    </div>
+                                    <div class="col-md-2 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Clase</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_clase" name="adv_clase" placeholder="Clase...">
+                                    </div>
+                                    <div class="col-md-2 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Color</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_color" name="adv_color" placeholder="Color...">
+                                    </div>
+                                    <div class="col-md-2 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Tipo</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_tipo" name="adv_tipo" placeholder="Tipo...">
+                                    </div>
+                                    <div class="col-md-2 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Servicio</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_servicio" name="adv_servicio" placeholder="Servicio...">
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Dirección Propietario</label>
+                                        <input type="text" class="form-control form-control-sm adv-field"
+                                            id="adv_dom" name="adv_dom" placeholder="Dirección...">
+                                    </div>
+                                </div>
+                                <div class="d-flex gap-2 mt-3 align-items-center">
+                                    <button type="button" class="btn btn-primary btn-sm" id="btnBuscarAvanzado">
+                                        <i class="ri-search-line me-1"></i> Buscar
+                                    </button>
+                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="btnLimpiarAvanzado">
+                                        <i class="ri-refresh-line me-1"></i> Limpiar
+                                    </button>
+                                    <span class="text-muted small ms-2">Ingrese uno o más campos para filtrar. Se aplica LIKE en cada campo.</span>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row">
         <div class="col-lg-12">
             <div class="card">

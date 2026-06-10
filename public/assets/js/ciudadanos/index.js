@@ -27,6 +27,14 @@
     const $filtroVisible = $("#filtroVisible");
     const $btnNuevo = $("#btnNuevoCiudadano");
 
+    // Referencias búsqueda avanzada
+    const $accordionCollapse = $("#collapseBusquedaCiudadanos");
+    const $badgeFiltros = $("#badgeFiltrosActivos");
+    const advFieldIds = [
+        "adv_nombres", "adv_ap_pat", "adv_ap_mat", "adv_ap_esp",
+        "adv_cedula", "adv_ocupacion", "adv_dom", "adv_mun", "adv_prov", "adv_pais"
+    ];
+
     /**
      * Cargar ciudadanos con filtros
      */
@@ -69,6 +77,23 @@
             params.visible = $filtroVisible.val();
         }
 
+        // Parámetros de búsqueda avanzada por campo
+        let activeAdvCount = 0;
+        advFieldIds.forEach(function (fieldId) {
+            const val = $("#" + fieldId).val();
+            if (val && val.trim() !== "") {
+                params[fieldId] = val.trim();
+                activeAdvCount++;
+            }
+        });
+
+        // Actualizar badge de filtros activos
+        if (activeAdvCount > 0) {
+            $badgeFiltros.text(activeAdvCount + (activeAdvCount === 1 ? " filtro" : " filtros")).show();
+        } else {
+            $badgeFiltros.hide();
+        }
+
         $.ajax({
             url: "/ciudadanos",
             type: "GET",
@@ -96,6 +121,13 @@
                 const inicio = (data.page - 1) * pageSize + 1;
                 const fin = Math.min(data.page * pageSize, data.total);
                 $detallesPagina.text(`Mostrando ${inicio}-${fin} de ${data.total} registros`);
+
+                // Colapsar acordeón tras búsqueda exitosa
+                if ($accordionCollapse.hasClass("show")) {
+                    const bsCollapse = bootstrap.Collapse.getInstance($accordionCollapse[0])
+                        || new bootstrap.Collapse($accordionCollapse[0], { toggle: false });
+                    bsCollapse.hide();
+                }
             })
             .fail(function (err) {
                 $loading.hide();
@@ -594,6 +626,26 @@
                 }
             });
         }
+
+        // Búsqueda avanzada — botón buscar
+        $("#btnBuscarAvanzado").on("click", function () {
+            cargarCiudadanos(1);
+        });
+
+        // Búsqueda avanzada — Enter en cualquier campo
+        $("#formBusquedaAvanzada").on("keypress", function (e) {
+            if (e.which === 13) {
+                e.preventDefault();
+                cargarCiudadanos(1);
+            }
+        });
+
+        // Limpiar búsqueda avanzada
+        $("#btnLimpiarAvanzado").on("click", function () {
+            $("#formBusquedaAvanzada")[0].reset();
+            $badgeFiltros.hide();
+            cargarCiudadanos(1);
+        });
 
         // if ($filtroSexo.length) {
         //     $filtroSexo.on("change", function () {

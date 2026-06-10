@@ -41,59 +41,61 @@ class CiudadanoController extends Controller
                 $query->where('estado_registro', $request->estado_registro);
             }
 
-            // Búsqueda
-            // if ($request->filled('search')) {
-            //     $search = $request->search;
-            //     $search = str_replace('%', ' ', $search);
-            //     $searchType = $request->get('search_type', '');
-
-            //     $query->where(function ($q) use ($search, $searchType) {
-            //         if ($searchType === 'nombre_completo') {
-            //             $q->whereRaw("CONCAT(COALESCE(nombres, ''), ' ', COALESCE(ap_pat, ''), ' ', COALESCE(ap_mat, '')) LIKE ?", ["%{$search}%"]);
-            //         } elseif ($searchType === 'cedula') {
-            //             $q->whereRaw('cedula_act LIKE ?', ["%{$search}%"]);
-            //         } elseif ($searchType === 'ap_paterno') {
-            //             $q->whereRaw('ap_pat LIKE ?', ["%{$search}%"]);
-            //         } elseif ($searchType === 'ap_esposo') {
-            //             $q->whereRaw('ap_esp LIKE ?', ["%{$search}%"]);
-            //         } else {
-            //             // Búsqueda en todos los campos (valor por defecto)
-            //             $q->whereRaw('nombres LIKE ?', ["%{$search}%"])
-            //                 ->orWhereRaw('ap_pat LIKE ?', ["%{$search}%"])
-            //                 ->orWhereRaw('ap_mat LIKE ?', ["%{$search}%"])
-            //                 ->orWhereRaw('cedula_act LIKE ?', ["%{$search}%"])
-            //                 ->orWhereRaw('ciudadano LIKE ?', ["%{$search}%"])
-            //                 ->orWhereRaw("CONCAT(COALESCE(nombres, ''), ' ', COALESCE(ap_pat, ''), ' ', COALESCE(ap_mat, '')) LIKE ?", ["%{$search}%"]);
-            //         }
-            //     });
-            // }
-
-            // Búsqueda Optimizada para 1 Millón de Registros
+            // Búsqueda simple (global)
             if ($request->filled('search')) {
                 $search = $request->search;
                 $search = str_replace('%', ' ', $search);
                 $searchType = $request->get('search_type', '');
 
-                // Array de columnas que creamos en el índice FULLTEXT
-                $allColumns = ['nombres', 'ap_pat', 'ap_mat', 'ap_esp', 'cedula_act', 'ciudadano'];
-
-                $query->where(function ($q) use ($search, $searchType, $allColumns) {
+                $query->where(function ($q) use ($search, $searchType) {
                     if ($searchType === 'nombre_completo') {
-                        // Buscamos el nombre en las columnas correspondientes usando FullText
-                        $q->whereFullText(['nombres', 'ap_pat', 'ap_mat'], $search);
+                        $q->whereRaw("CONCAT(COALESCE(nombres, ''), ' ', COALESCE(ap_pat, ''), ' ', COALESCE(ap_mat, '')) LIKE ?", ["%{$search}%"]);
                     } elseif ($searchType === 'cedula') {
-                        $q->whereFullText('cedula_act', $search);
+                        $q->whereRaw('cedula_act LIKE ?', ["%{$search}%"]);
                     } elseif ($searchType === 'ap_paterno') {
-                        $q->whereFullText('ap_pat', $search);
+                        $q->whereRaw('ap_pat LIKE ?', ["%{$search}%"]);
                     } elseif ($searchType === 'ap_esposo') {
-                        $q->whereFullText('ap_esp', $search);
+                        $q->whereRaw('ap_esp LIKE ?', ["%{$search}%"]);
                     } else {
-                        // Búsqueda global instantánea en todo el índice estructurado
-                        $q->whereFullText($allColumns, $search);
+                        // Búsqueda en todos los campos (valor por defecto)
+                        $q->whereRaw('nombres LIKE ?', ["%{$search}%"])
+                            ->orWhereRaw('ap_pat LIKE ?', ["%{$search}%"])
+                            ->orWhereRaw('ap_mat LIKE ?', ["%{$search}%"])
+                            ->orWhereRaw('cedula_act LIKE ?', ["%{$search}%"])
+                            ->orWhereRaw('ciudadano LIKE ?', ["%{$search}%"])
+                            ->orWhereRaw("CONCAT(COALESCE(nombres, ''), ' ', COALESCE(ap_pat, ''), ' ', COALESCE(ap_mat, '')) LIKE ?", ["%{$search}%"]);
                     }
                 });
             }
 
+            // Búsqueda avanzada por campo individual (LIKE)
+            $advSimpleFields = [
+                'adv_nombres'   => 'nombres',
+                'adv_ap_pat'    => 'ap_pat',
+                'adv_ap_mat'    => 'ap_mat',
+                'adv_ap_esp'    => 'ap_esp',
+                'adv_cedula'    => 'cedula_act',
+                'adv_ocupacion' => 'ocupacion',
+                'adv_mun'       => 'nom_mun',
+                'adv_prov'      => 'nom_prov',
+                'adv_pais'      => 'pais_nac',
+            ];
+
+            foreach ($advSimpleFields as $param => $column) {
+                if ($request->filled($param)) {
+                    $val = str_replace('%', ' ', $request->input($param));
+                    $query->whereRaw("{$column} LIKE ?", ["%{$val}%"]);
+                }
+            }
+
+            // Dirección: busca en dom_1 y dom_2
+            if ($request->filled('adv_dom')) {
+                $val = str_replace('%', ' ', $request->input('adv_dom'));
+                $query->where(function ($q) use ($val) {
+                    $q->whereRaw('dom_1 LIKE ?', ["%{$val}%"])
+                      ->orWhereRaw('dom_2 LIKE ?', ["%{$val}%"]);
+                });
+            }
 
             $query->orderBy('id', 'desc');
 
