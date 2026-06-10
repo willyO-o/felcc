@@ -18,6 +18,9 @@
     const $paginacion = $("#paginacionCiudadanos");
     const $detallesPagina = $("#detalles-pagina");
     const $searchInput = $("#searchCiudadanos");
+    const $btnBuscar = $("#btnBuscarCiudadanos");
+    const $searchType = $("#searchType");
+    const $filtroDepartamento = $("#filtroDepartamento");
     const $filtroSexo = $("#filtroSexo");
     const $filtroEstadoCivil = $("#filtroEstadoCivil");
     const $filtroEstadoRegistro = $("#filtroEstadoRegistro");
@@ -32,6 +35,7 @@
         $loading.show();
         $sinResultados.hide();
         $listado.empty();
+        $paginacion.empty();
 
         const params = {
             page: currentPage,
@@ -40,6 +44,13 @@
 
         if ($searchInput.val().trim()) {
             params.search = $searchInput.val().trim();
+            if ($searchType.val()) {
+                params.search_type = $searchType.val();
+            }
+        }
+
+        if ($filtroDepartamento.val()) {
+            params.id_departamento = $filtroDepartamento.val();
         }
 
         if ($filtroSexo.val()) {
@@ -106,31 +117,24 @@
             const sexo = formatSexo(ciudadano.sexo);
             const estadoCivil = formatEstadoCivil(ciudadano.estado_civil);
             const ocupacion = ciudadano.ocupacion || "N/A";
+            const departamento = ciudadano.departamento?.departamento || ciudadano.nom_dep || "N/A";
             const ubicacion = getUbicacion(ciudadano);
-            const estadoRegistro = ciudadano.estado_registro == 1 ? "Activo" : "Inactivo";
-            const badgeClass = ciudadano.estado_registro == 1 ? "success" : "danger";
+            const estadoRegistro = ciudadano.estado_registro ?? "N/A";
 
             let acciones = '';
 
-            if (!ciudadano.deleted_at) {
                 acciones = `
                     <button class="btn btn-sm btn-info me-1" title="Ver" onclick="mostrarDetalles('${ciudadano.id}')">
                         <i class="ri-eye-line"></i>
                     </button>
-                    <button class="btn btn-sm btn-warning me-1" title="Editar" onclick="abrirModalEditar('${ciudadano.id}')">
+                    <button class="btn btn-sm btn-warning me-1 d-none" title="Editar" onclick="abrirModalEditar('${ciudadano.id}')">
                         <i class="ri-edit-line"></i>
                     </button>
-                    <button class="btn btn-sm btn-danger" title="Eliminar" onclick="mostrarModalEliminar('${ciudadano.id}')">
+                    <button class="btn btn-sm btn-danger d-none" title="Eliminar" onclick="mostrarModalEliminar('${ciudadano.id}')">
                         <i class="ri-delete-bin-line"></i>
                     </button>
                 `;
-            } else {
-                acciones = `
-                    <button class="btn btn-sm btn-success" title="Restaurar" onclick="restaurarCiudadano('${ciudadano.id}')">
-                        <i class="ri-restart-line"></i>
-                    </button>
-                `;
-            }
+
 
             html += `
                 <tr>
@@ -146,9 +150,10 @@
                     <td>${sexo}</td>
                     <td>${estadoCivil}</td>
                     <td>${escapeHtml(ocupacion)}</td>
+                    <td>${escapeHtml(departamento)}</td>
                     <td class="text-muted small">${escapeHtml(ubicacion)}</td>
                     <td>
-                        <span class="badge bg-${badgeClass}">${estadoRegistro}</span>
+                        <span >${estadoRegistro}</span>
                     </td>
                     <td class="text-center">
                         <div class="btn-group" role="group">
@@ -573,37 +578,36 @@
             $btnNuevo.on("click", abrirModalCrear);
         }
 
+        // Búsqueda manual al hacer click en el botón
+        if ($btnBuscar.length) {
+            $btnBuscar.on("click", function () {
+                cargarCiudadanos(1);
+            });
+        }
+
+        // Búsqueda manual al presionar Enter
         if ($searchInput.length) {
-            $searchInput.on("input", function () {
-                clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
+            $searchInput.on("keypress", function (e) {
+                if (e.which === 13) { // Enter key
+                    e.preventDefault();
                     cargarCiudadanos(1);
-                }, 500);
+                }
             });
         }
 
-        if ($filtroSexo.length) {
-            $filtroSexo.on("change", function () {
-                cargarCiudadanos(1);
-            });
-        }
+        // if ($filtroSexo.length) {
+        //     $filtroSexo.on("change", function () {
+        //         cargarCiudadanos(1);
+        //     });
+        // }
 
-        if ($filtroEstadoCivil.length) {
-            $filtroEstadoCivil.on("change", function () {
-                cargarCiudadanos(1);
-            });
-        }
+        // if ($filtroDepartamento.length) {
+        //     $filtroDepartamento.on("change", function () {
+        //         cargarCiudadanos(1);
+        //     });
+        // }
 
-        if ($filtroEstadoRegistro.length) {
-            $filtroEstadoRegistro.on("change", function () {
-                cargarCiudadanos(1);
-            });
-        }
 
-        if ($filtroVisible.length) {
-            $filtroVisible.on("change", function () {
-                cargarCiudadanos(1);
-            });
-        }
+
     });
 })();

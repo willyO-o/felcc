@@ -27,48 +27,36 @@
             <div class="card">
                 <div class="card-header">
                     <div class="d-flex flex-column-reverse flex-md-row justify-content-between align-items-center gap-2">
-                        <div class="col-md-4 mt-2 mt-md-0">
-                            <div class="input-group">
-                                <span class="input-group-text btn btn-primary"><i class="ri-search-line"></i></span>
+                        <div class="d-flex gap-2 flex-grow-1">
+                            <div class="input-group flex-grow-1" style="max-width: 400px;">
+                                <button type="button" class="input-group-text btn btn-primary" id="btnBuscarCiudadanos" title="Buscar">
+                                    <i class="ri-search-line"></i>
+                                    Buscar
+                                </button>
                                 <input type="search" id="searchCiudadanos" class="form-control"
-                                    placeholder="Buscar (Nombre, apellido, Cédula)...">
+                                    placeholder="Ingrese el término de búsqueda...">
                             </div>
+                            <select name="searchType" id="searchType" class="form-select" style="max-width: 200px;">
+                                <option value="">Buscar en: Todos</option>
+                                <option value="nombre_completo">Nombre Completo</option>
+                                <option value="cedula">Cédula de Identidad</option>
+                                <option value="ap_paterno">Apellido Paterno</option>
+                                <option value="ap_esposo">Esposo/a</option>
+                            </select>
                         </div>
-                        <div class="col-md-2">
-                            <select name="filtroSexo" id="filtroSexo" class="form-select">
+                        <div class="d-flex gap-2">
+                            <select name="filtroDepartamento" id="filtroDepartamento" class="form-select" style="min-width: 200px;">
+                                <option value="">Todos los Departamentos</option>
+                                @foreach($departamentos as $departamento)
+                                    <option value="{{ $departamento->id }}">{{ $departamento->departamento }}</option>
+                                @endforeach
+                            </select>
+                            <select name="filtroSexo" id="filtroSexo" class="form-select" style="min-width: 150px;">
                                 <option value="">Todos los Sexos</option>
                                 <option value="M">Masculino</option>
                                 <option value="F">Femenino</option>
                             </select>
                         </div>
-                        <div class="col-md-2">
-                            <select name="filtroEstadoCivil" id="filtroEstadoCivil" class="form-select">
-                                <option value="">Todos los Estados</option>
-                                <option value="SOLTERO">Soltero</option>
-                                <option value="CASADO">Casado</option>
-                                <option value="DIVORCIADO">Divorciado</option>
-                                <option value="VIUDO">Viudo</option>
-                                <option value="UNION_LIBRE">Unión Libre</option>
-                                <option value="CONYUGUE">Cónyuge</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <select name="filtroEstadoRegistro" id="filtroEstadoRegistro" class="form-select">
-                                <option value="">Todos los Estados</option>
-                                <option value="1">Activos</option>
-                                <option value="0">Inactivos</option>
-                            </select>
-                        </div>
-                        @canany(['superadmin', 'administrador'])
-                            <div class="col-md-2">
-                                <select name="filtroVisible" id="filtroVisible" class="form-select">
-                                    <option value="activos">Solo Activos</option>
-                                    <option value="todos">Todos los registros</option>
-                                    <option value="inactivos">Solo Inactivos</option>
-                                    <option value="eliminados">Solo Eliminados</option>
-                                </select>
-                            </div>
-                        @endcanany
                     </div>
                     <div class="d-flex justify-content-between align-items-center mt-2">
                         <span id="detalles-pagina" class="text-muted small"></span>
@@ -86,6 +74,7 @@
                                     <th scope="col">Sexo</th>
                                     <th scope="col">Estado Civil</th>
                                     <th scope="col">Ocupación</th>
+                                    <th scope="col">Departamento</th>
                                     <th scope="col">Ubicación</th>
                                     <th scope="col">Estado</th>
                                     <th scope="col" class="text-center">Acciones</th>
@@ -111,9 +100,9 @@
                     </div>
 
                     {{-- Paginación --}}
-                    <div class="d-flex justify-content-end mt-3">
+                    <div class="d-flex justify-content-center mt-3">
                         <nav>
-                            <ul class="pagination pagination-sm mb-0" id="paginacionCiudadanos">
+                            <ul class="pagination  mb-0" id="paginacionCiudadanos">
                             </ul>
                         </nav>
                     </div>

@@ -3,11 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Ciudadano extends Model
 {
-    use SoftDeletes;
+    // use SoftDeletes;
 
     protected $table = 'ciudadano';
     public $timestamps = false;
@@ -42,6 +42,17 @@ class Ciudadano extends Model
         'fecha_nac' => 'date',
         'fecha_ins' => 'datetime',
     ];
+
+
+    public function localidad()
+    {
+        return $this->belongsTo(Localidad::class, 'id_loc');
+    }
+
+    public function departamento()
+    {
+        return $this->belongsTo(Departamento::class, 'id_departamento');
+    }
 
     /**
      * Obtener el nombre completo del ciudadano

@@ -19,7 +19,12 @@ class CiudadanoController extends Controller
         }
 
         if ($request->ajax()) {
-            $query = Ciudadano::query();
+            $query = Ciudadano::with('departamento');
+
+            // Filtro por departamento
+            if ($request->filled('id_departamento')) {
+                $query->where('id_departamento', $request->id_departamento);
+            }
 
             // Filtro por sexo
             if ($request->filled('sexo')) {
@@ -40,37 +45,29 @@ class CiudadanoController extends Controller
             if ($request->filled('search')) {
                 $search = $request->search;
                 $search = str_replace('%', ' ', $search);
-                $query->where(function ($q) use ($search) {
-                    $q->whereRaw('nombres LIKE ?', ["%{$search}%"])
-                        ->orWhereRaw('ap_pat LIKE ?', ["%{$search}%"])
-                        ->orWhereRaw('ap_mat LIKE ?', ["%{$search}%"])
-                        ->orWhereRaw('cedula_act LIKE ?', ["%{$search}%"])
-                        ->orWhereRaw('ciudadano LIKE ?', ["%{$search}%"])
-                        ->orWhereRaw("CONCAT(COALESCE(nombres, ''), ' ', COALESCE(ap_pat, ''), ' ', COALESCE(ap_mat, '')) LIKE ?", ["%{$search}%"]);
+                $searchType = $request->get('search_type', '');
+
+                $query->where(function ($q) use ($search, $searchType) {
+                    if ($searchType === 'nombre_completo') {
+                        $q->whereRaw("CONCAT(COALESCE(nombres, ''), ' ', COALESCE(ap_pat, ''), ' ', COALESCE(ap_mat, '')) LIKE ?", ["%{$search}%"]);
+                    } elseif ($searchType === 'cedula') {
+                        $q->whereRaw('cedula_act LIKE ?', ["%{$search}%"]);
+                    } elseif ($searchType === 'ap_paterno') {
+                        $q->whereRaw('ap_pat LIKE ?', ["%{$search}%"]);
+                    } elseif ($searchType === 'ap_esposo') {
+                        $q->whereRaw('ap_esp LIKE ?', ["%{$search}%"]);
+                    } else {
+                        // Búsqueda en todos los campos (valor por defecto)
+                        $q->whereRaw('nombres LIKE ?', ["%{$search}%"])
+                            ->orWhereRaw('ap_pat LIKE ?', ["%{$search}%"])
+                            ->orWhereRaw('ap_mat LIKE ?', ["%{$search}%"])
+                            ->orWhereRaw('cedula_act LIKE ?', ["%{$search}%"])
+                            ->orWhereRaw('ciudadano LIKE ?', ["%{$search}%"])
+                            ->orWhereRaw("CONCAT(COALESCE(nombres, ''), ' ', COALESCE(ap_pat, ''), ' ', COALESCE(ap_mat, '')) LIKE ?", ["%{$search}%"]);
+                    }
                 });
             }
 
-            // Filtro por visibilidad
-            if ($request->filled('visible')) {
-                switch ($request->input('visible', 'activos')) {
-                    case 'todos':
-                        $query->withTrashed();
-                        break;
-                    case 'activos':
-                        // Solo registros activos (estado_registro = 1)
-                        $query->where('estado_registro', 1);
-                        break;
-                    case 'inactivos':
-                        // Solo registros inactivos (estado_registro = 0)
-                        $query->where('estado_registro', 0);
-                        break;
-                    case 'eliminados':
-                        $query->onlyTrashed();
-                        break;
-                }
-            } else {
-                $query->where('estado_registro', 1);
-            }
 
             $query->orderBy('id', 'desc');
 
@@ -83,7 +80,10 @@ class CiudadanoController extends Controller
             ]);
         }
 
-        return view('ciudadanos.index');
+        // Obtener departamentos para el filtro
+        $departamentos = \App\Models\Departamento::orderBy('departamento', 'asc')->get();
+
+        return view('ciudadanos.index', compact('departamentos'));
     }
 
     /**
@@ -163,7 +163,8 @@ class CiudadanoController extends Controller
      */
     public function show(string $id)
     {
-        $datos = Ciudadano::withTrashed()->findOrFail($id);
+        $datos = Ciudadano::findOrFail($id);
+
         return view('ciudadanos.show', [
             'datos' => $datos,
             'isAjax' => true,
@@ -242,14 +243,7 @@ class CiudadanoController extends Controller
             DB::beginTransaction();
 
             $ciudadano = Ciudadano::findOrFail($id);
-
-            $request = request();
-
-            if ($request->input('eliminar_completo')) {
-                $ciudadano->forceDelete();
-            } else {
-                $ciudadano->delete();
-            }
+            $ciudadano->delete();
 
             DB::commit();
 
@@ -306,18 +300,5 @@ class CiudadanoController extends Controller
         return view('ciudadanos.partials._frm-eliminar', compact('ciudadano'));
     }
 
-    /**
-     * Restaurar un ciudadano eliminado
-     */
-    public function restore(string $id)
-    {
-        $ciudadano = Ciudadano::withTrashed()->findOrFail($id);
 
-        $ciudadano->restore();
-
-        return response()->json([
-            'success' => 'Ciudadano restaurado correctamente.',
-            'datos' => $ciudadano,
-        ], 200);
-    }
 }
