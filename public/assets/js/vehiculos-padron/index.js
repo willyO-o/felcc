@@ -6,32 +6,41 @@
     "use strict";
 
     let currentPage = 1;
-    let pageSize    = 15;
-    let totalPages  = 0;
+    let pageSize = 15;
+    let totalPages = 0;
     let hasSearched = false;
 
-    const $listado         = $("#listadoVehiculos");
-    const $loading         = $("#loadingVehiculos");
-    const $sinResultados   = $("#sinResultados");
-    const $estadoInicial   = $("#estadoInicial");
-    const $paginacion      = $("#paginacionVehiculos");
-    const $detallesPagina  = $("#detalles-pagina");
-    const $searchInput     = $("#searchVehiculos");
-    const $searchType      = $("#searchType");
-    const $btnBuscar       = $("#btnBuscarVehiculos");
+    const $listado = $("#listadoVehiculos");
+    const $loading = $("#loadingVehiculos");
+    const $sinResultados = $("#sinResultados");
+    const $estadoInicial = $("#estadoInicial");
+    const $paginacion = $("#paginacionVehiculos");
+    const $detallesPagina = $("#detalles-pagina");
+    const $searchInput = $("#searchVehiculos");
+    const $searchType = $("#searchType");
+    const $btnBuscar = $("#btnBuscarVehiculos");
 
     // Referencias búsqueda avanzada
     const $accordionCollapse = $("#collapseBusquedaVehiculos");
-    const $badgeFiltros      = $("#badgeFiltrosVehiculos");
+    const $badgeFiltros = $("#badgeFiltrosVehiculos");
     const advFieldIds = [
-        "adv_placa", "adv_propietario", "adv_docidentidad",
-        "adv_nochasis", "adv_nomotor", "adv_marca", "adv_modelo",
-        "adv_clase", "adv_color", "adv_tipo", "adv_servicio", "adv_dom"
+        "adv_placa",
+        "adv_propietario",
+        "adv_docidentidad",
+        "adv_nochasis",
+        "adv_nomotor",
+        "adv_marca",
+        "adv_modelo",
+        "adv_clase",
+        "adv_color",
+        "adv_tipo",
+        "adv_servicio",
+        "adv_dom",
+        "adv_acaldia",
     ];
 
     // ─── Cargar vehículos ──────────────────────────────────────────────────────
     function cargarVehiculos(page = 1) {
-
         currentPage = page;
         $loading.show();
         $sinResultados.hide();
@@ -61,7 +70,12 @@
 
         // Actualizar badge de filtros activos
         if (activeAdvCount > 0) {
-            $badgeFiltros.text(activeAdvCount + (activeAdvCount === 1 ? " filtro" : " filtros")).show();
+            $badgeFiltros
+                .text(
+                    activeAdvCount +
+                        (activeAdvCount === 1 ? " filtro" : " filtros"),
+                )
+                .show();
         } else {
             $badgeFiltros.hide();
         }
@@ -88,23 +102,31 @@
 
                     const inicio = (data.page - 1) * pageSize + 1;
                     const fin = Math.min(data.page * pageSize, data.total);
-                    $detallesPagina.text(`Mostrando ${inicio}–${fin} de ${data.total} registros`);
+                    $detallesPagina.text(
+                        `Mostrando ${inicio}–${fin} de ${data.total} registros`,
+                    );
                 } else {
                     $listado.empty();
                     $sinResultados.show();
                     $detallesPagina.text("Sin resultados");
                 }
                 // Colapsar acordeón tras búsqueda exitosa
-                if ($accordionCollapse.hasClass("show")) {
-                    const bsCollapse = bootstrap.Collapse.getInstance($accordionCollapse[0])
-                        || new bootstrap.Collapse($accordionCollapse[0], { toggle: false });
-                    bsCollapse.hide();
-                }            })
+                // if ($accordionCollapse.hasClass("show")) {
+                //     const bsCollapse =
+                //         bootstrap.Collapse.getInstance($accordionCollapse[0]) ||
+                //         new bootstrap.Collapse($accordionCollapse[0], {
+                //             toggle: false,
+                //         });
+                //     bsCollapse.hide();
+                // }
+            })
             .fail(function (err) {
                 $loading.hide();
                 $sinResultados.show();
                 console.error("Error al cargar vehículos:", err);
-                mostrarError("Error al cargar los vehículos. Intenta nuevamente.");
+                mostrarError(
+                    "Error al cargar los vehículos. Intenta nuevamente.",
+                );
             });
     }
 
@@ -148,7 +170,7 @@
             .done(function (html) {
                 $("#modalDetallesVehiculoContent").html(html);
                 const modal = new bootstrap.Modal(
-                    document.getElementById("modalDetallesVehiculo")
+                    document.getElementById("modalDetallesVehiculo"),
                 );
                 modal.show();
             })
@@ -167,11 +189,12 @@
         </li>`;
 
         let start = Math.max(1, page - 2);
-        let end   = Math.min(totalPages, page + 2);
+        let end = Math.min(totalPages, page + 2);
 
         if (start > 1) {
             html += `<li class="page-item"><a class="page-link" href="#" data-page="1">1</a></li>`;
-            if (start > 2) html += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
+            if (start > 2)
+                html += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
         }
 
         for (let i = start; i <= end; i++) {
@@ -181,7 +204,8 @@
         }
 
         if (end < totalPages) {
-            if (end < totalPages - 1) html += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
+            if (end < totalPages - 1)
+                html += `<li class="page-item disabled"><span class="page-link">…</span></li>`;
             html += `<li class="page-item"><a class="page-link" href="#" data-page="${totalPages}">${totalPages}</a></li>`;
         }
 
@@ -199,14 +223,17 @@
     }
 
     function mostrarError(mensaje) {
-        Swal.fire({ title: "Error", text: mensaje, icon: "error", confirmButtonText: "Ok" });
+        Swal.fire({
+            title: "Error",
+            text: mensaje,
+            icon: "error",
+            confirmButtonText: "Ok",
+        });
     }
 
     // ─── Event listeners ───────────────────────────────────────────────────────
     $(document).ready(function () {
-
         cargarVehiculos(1);
-
 
         $btnBuscar.on("click", function () {
             cargarVehiculos(1);
@@ -221,6 +248,8 @@
 
         // Búsqueda avanzada — botón buscar
         $("#btnBuscarAvanzado").on("click", function () {
+            $searchInput.val("");
+            $searchType.val("");
             cargarVehiculos(1);
         });
 
@@ -254,12 +283,16 @@
             }
         });
 
-        $(document).on("click", "#paginacionVehiculos .page-link[data-page]", function (e) {
-            e.preventDefault();
-            const p = parseInt($(this).data("page"));
-            if (p >= 1 && p <= totalPages) {
-                cargarVehiculos(p);
-            }
-        });
+        $(document).on(
+            "click",
+            "#paginacionVehiculos .page-link[data-page]",
+            function (e) {
+                e.preventDefault();
+                const p = parseInt($(this).data("page"));
+                if (p >= 1 && p <= totalPages) {
+                    cargarVehiculos(p);
+                }
+            },
+        );
     });
 })();

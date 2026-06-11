@@ -58,6 +58,7 @@ class VehiculoPadronController extends Controller
                 'adv_color'        => 'color',
                 'adv_tipo'         => 'tipo',
                 'adv_servicio'     => 'servicio',
+                'adv_acaldia'      => 'alcaldia',
             ];
 
             foreach ($advSimpleFields as $param => $column) {

@@ -78,7 +78,7 @@ class CiudadanoController extends Controller
                 'adv_ocupacion' => 'ocupacion',
                 'adv_mun'       => 'nom_mun',
                 'adv_prov'      => 'nom_prov',
-                'adv_pais'      => 'pais_nac',
+                'adv_departamento' => 'id_departamento',
             ];
 
             foreach ($advSimpleFields as $param => $column) {
@@ -97,9 +97,15 @@ class CiudadanoController extends Controller
                 });
             }
 
+            // Fecha de nacimiento: búsqueda exacta
+            if ($request->filled('adv_fecha_nac')) {
+                $val = $request->input('adv_fecha_nac');
+                $query->whereDate('fecha_nac', $val);
+            }
+
             $query->orderBy('id', 'desc');
 
-            $ciudadanos = $query->paginate($request->get('size', 10), ['*'], 'page', $request->get('page', 1));
+            $ciudadanos = $query->paginate($request->input('size', 10), ['*'], 'page', $request->input('page', 1));
 
             return response()->json([
                 'datos' => $ciudadanos->items(),

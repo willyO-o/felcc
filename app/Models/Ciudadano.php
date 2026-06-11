@@ -44,6 +44,10 @@ class Ciudadano extends Model
         'fecha_ins' => 'datetime',
     ];
 
+    protected $appends = [
+        'fecha_nac_formatted',
+    ];
+
 
     public function localidad()
     {
@@ -69,6 +73,13 @@ class Ciudadano extends Model
         return trim($this->nombres . ' ' . $apellidos_str);
     }
 
+    /**
+     * Obtener fecha de nacimiento formateada
+     */
+    public function getFechaNacFormattedAttribute()
+    {
+        return $this->fecha_nac ? $this->fecha_nac->format('d/m/Y') : null;
+    }
     /**
      * Obtener cédula formateada
      */

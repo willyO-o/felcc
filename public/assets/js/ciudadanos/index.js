@@ -28,11 +28,11 @@
     const $btnNuevo = $("#btnNuevoCiudadano");
 
     // Referencias búsqueda avanzada
-    const $accordionCollapse = $("#collapseBusquedaCiudadanos");
+    // const $accordionCollapse = $("#collapseBusquedaCiudadanos");
     const $badgeFiltros = $("#badgeFiltrosActivos");
     const advFieldIds = [
-        "adv_nombres", "adv_ap_pat", "adv_ap_mat", "adv_ap_esp",
-        "adv_cedula", "adv_ocupacion", "adv_dom", "adv_mun", "adv_prov", "adv_pais"
+        "adv_nombres", "adv_ap_pat", "adv_ap_mat", "adv_ap_esp", "adv_fecha_nac",
+        "adv_cedula", "adv_ocupacion", "adv_dom", "adv_mun", "adv_prov", "adv_pais", "adv_departamento",
     ];
 
     /**
@@ -123,11 +123,11 @@
                 $detallesPagina.text(`Mostrando ${inicio}-${fin} de ${data.total} registros`);
 
                 // Colapsar acordeón tras búsqueda exitosa
-                if ($accordionCollapse.hasClass("show")) {
-                    const bsCollapse = bootstrap.Collapse.getInstance($accordionCollapse[0])
-                        || new bootstrap.Collapse($accordionCollapse[0], { toggle: false });
-                    bsCollapse.hide();
-                }
+                // if ($accordionCollapse.hasClass("show")) {
+                //     const bsCollapse = bootstrap.Collapse.getInstance($accordionCollapse[0])
+                //         || new bootstrap.Collapse($accordionCollapse[0], { toggle: false });
+                //     bsCollapse.hide();
+                // }
             })
             .fail(function (err) {
                 $loading.hide();
@@ -152,6 +152,7 @@
             const departamento = ciudadano.departamento?.departamento || ciudadano.nom_dep || "N/A";
             const ubicacion = getUbicacion(ciudadano);
             const estadoRegistro = ciudadano.estado_registro ?? "N/A";
+            const fechaNacFormatted = ciudadano.fecha_nac_formatted || "N/A";
 
             let acciones = '';
 
@@ -179,14 +180,13 @@
                         </div>
                     </td>
                     <td>${escapeHtml(cedula)}</td>
+                    <td>${escapeHtml(fechaNacFormatted)}</td>
                     <td>${sexo}</td>
                     <td>${estadoCivil}</td>
                     <td>${escapeHtml(ocupacion)}</td>
                     <td>${escapeHtml(departamento)}</td>
                     <td class="text-muted small">${escapeHtml(ubicacion)}</td>
-                    <td>
-                        <span >${estadoRegistro}</span>
-                    </td>
+
                     <td class="text-center">
                         <div class="btn-group" role="group">
                             ${acciones}
@@ -629,6 +629,10 @@
 
         // Búsqueda avanzada — botón buscar
         $("#btnBuscarAvanzado").on("click", function () {
+            $filtroDepartamento.val("")
+            $filtroSexo.val("");
+            $searchType.val("");
+            $searchInput.val("");
             cargarCiudadanos(1);
         });
 

@@ -18,90 +18,132 @@
             <div class="accordion" id="accordionBusquedaVehiculos">
                 <div class="accordion-item border-0 shadow-sm">
                     <h2 class="accordion-header" id="headingBusquedaVehiculos">
-                        <button class="accordion-button py-2" type="button"
-                            data-bs-toggle="collapse" data-bs-target="#collapseBusquedaVehiculos"
-                            aria-expanded="true" aria-controls="collapseBusquedaVehiculos">
-                            <i class="ri-filter-3-line me-2 text-primary"></i>
+                        <button class="accordion-button " type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseBusquedaVehiculos" aria-expanded="true"
+                            aria-controls="collapseBusquedaVehiculos">
+                            <i class="ri-search-line me-2 text-primary"></i>
                             <strong>Búsqueda Avanzada por Campo</strong>
-                            <span class="badge bg-primary ms-2 small" id="badgeFiltrosVehiculos" style="display:none;">0 filtros</span>
+                            <span class="badge bg-primary ms-2 small" id="badgeFiltrosVehiculos" style="display:none;">0
+                                filtros</span>
                         </button>
                     </h2>
-                    <div id="collapseBusquedaVehiculos" class="accordion-collapse collapse show"
-                        aria-labelledby="headingBusquedaVehiculos">
+                    <div id="collapseBusquedaVehiculos" class="accordion-collapse collapse"
+                        aria-labelledby="headingBusquedaVehiculos" data-bs-parent="#accordionBusquedaVehiculos">
                         <div class="accordion-body pb-3">
                             <form id="formBusquedaVehiculos" autocomplete="off">
                                 <div class="row g-2">
-                                    <div class="col-md-2 col-sm-6">
+                                    <div class="col-md-3 col-sm-6">
                                         <label class="form-label small mb-1 fw-semibold">Placa</label>
-                                        <input type="text" class="form-control form-control-sm adv-field"
-                                            id="adv_placa" name="adv_placa" placeholder="Placa o placa antigua...">
+                                        <input type="text" class="form-control  adv-field" id="adv_placa"
+                                            name="adv_placa" placeholder="Placa o placa antigua...">
                                     </div>
                                     <div class="col-md-3 col-sm-6">
                                         <label class="form-label small mb-1 fw-semibold">Propietario</label>
-                                        <input type="text" class="form-control form-control-sm adv-field"
-                                            id="adv_propietario" name="adv_propietario" placeholder="Nombre del propietario...">
+                                        <input type="text" class="form-control  adv-field"
+                                            id="adv_propietario" name="adv_propietario"
+                                            placeholder="Nombre, apellido, propietario...">
                                     </div>
-                                    <div class="col-md-2 col-sm-6">
+                                    <div class="col-md-3 col-sm-6">
                                         <label class="form-label small mb-1 fw-semibold">Doc. Identidad</label>
-                                        <input type="text" class="form-control form-control-sm adv-field"
-                                            id="adv_docidentidad" name="adv_docidentidad" placeholder="CI / pasaporte...">
+                                        <input type="text" class="form-control  adv-field"
+                                            id="adv_docidentidad" name="adv_docidentidad" placeholder="C.I...">
                                     </div>
-                                    <div class="col-md-2 col-sm-6">
+                                    <div class="col-md-3 col-sm-6">
                                         <label class="form-label small mb-1 fw-semibold">N° Chasis</label>
-                                        <input type="text" class="form-control form-control-sm adv-field"
+                                        <input type="text" class="form-control  adv-field"
                                             id="adv_nochasis" name="adv_nochasis" placeholder="N° de chasis...">
                                     </div>
-                                    <div class="col-md-2 col-sm-6">
+                                    <div class="col-md-3 col-sm-6">
                                         <label class="form-label small mb-1 fw-semibold">N° Motor</label>
-                                        <input type="text" class="form-control form-control-sm adv-field"
+                                        <input type="text" class="form-control  adv-field"
                                             id="adv_nomotor" name="adv_nomotor" placeholder="N° de motor...">
                                     </div>
-                                    <div class="col-md-2 col-sm-6">
+                                    <div class="col-md-3 col-sm-6">
                                         <label class="form-label small mb-1 fw-semibold">Marca</label>
-                                        <input type="text" class="form-control form-control-sm adv-field"
-                                            id="adv_marca" name="adv_marca" placeholder="Marca...">
+                                        <input type="text" class="form-control  adv-field" id="adv_marca"
+                                            name="adv_marca" placeholder="Marca...">
                                     </div>
-                                    <div class="col-md-2 col-sm-6">
+                                    <div class="col-md-3 col-sm-6">
                                         <label class="form-label small mb-1 fw-semibold">Modelo</label>
-                                        <input type="text" class="form-control form-control-sm adv-field"
-                                            id="adv_modelo" name="adv_modelo" placeholder="Modelo...">
+                                        <input type="text" class="form-control  adv-field" id="adv_modelo"
+                                            name="adv_modelo" placeholder="Modelo...">
                                     </div>
-                                    <div class="col-md-2 col-sm-6">
+                                    <div class="col-md-3 col-sm-6">
                                         <label class="form-label small mb-1 fw-semibold">Clase</label>
-                                        <input type="text" class="form-control form-control-sm adv-field"
-                                            id="adv_clase" name="adv_clase" placeholder="Clase...">
+                                        <input type="text" class="form-control  adv-field" id="adv_clase"
+                                            name="adv_clase" placeholder="Clase...">
                                     </div>
-                                    <div class="col-md-2 col-sm-6">
+                                    <div class="col-md-3 col-sm-6">
                                         <label class="form-label small mb-1 fw-semibold">Color</label>
-                                        <input type="text" class="form-control form-control-sm adv-field"
-                                            id="adv_color" name="adv_color" placeholder="Color...">
+                                        <input type="text" class="form-control  adv-field" id="adv_color"
+                                            name="adv_color" placeholder="Color...">
                                     </div>
-                                    <div class="col-md-2 col-sm-6">
+                                    <div class="col-md-3 col-sm-6">
                                         <label class="form-label small mb-1 fw-semibold">Tipo</label>
-                                        <input type="text" class="form-control form-control-sm adv-field"
-                                            id="adv_tipo" name="adv_tipo" placeholder="Tipo...">
+                                        <input type="text" class="form-control  adv-field" id="adv_tipo"
+                                            name="adv_tipo" placeholder="Tipo...">
                                     </div>
-                                    <div class="col-md-2 col-sm-6">
+                                    <div class="col-md-3 col-sm-6">
                                         <label class="form-label small mb-1 fw-semibold">Servicio</label>
-                                        <input type="text" class="form-control form-control-sm adv-field"
+                                        <input type="text" class="form-control  adv-field"
                                             id="adv_servicio" name="adv_servicio" placeholder="Servicio...">
                                     </div>
                                     <div class="col-md-3 col-sm-6">
                                         <label class="form-label small mb-1 fw-semibold">Dirección Propietario</label>
-                                        <input type="text" class="form-control form-control-sm adv-field"
-                                            id="adv_dom" name="adv_dom" placeholder="Dirección...">
+                                        <input type="text" class="form-control  adv-field"
+                                            id="adv_dom" name="adv_dom" placeholder="Dirección, calle, palabra clave...">
+                                    </div>
+                                    <div class="col-md-3 col-sm-6">
+                                        <label class="form-label small mb-1 fw-semibold">Acaldía</label>
+                                        <input type="text" class="form-control  adv-field"
+                                            id="adv_acaldia" name="adv_acaldia" placeholder="Acaldía...">
                                     </div>
                                 </div>
                                 <div class="d-flex gap-2 mt-3 align-items-center">
                                     <button type="button" class="btn btn-primary btn-sm" id="btnBuscarAvanzado">
                                         <i class="ri-search-line me-1"></i> Buscar
                                     </button>
-                                    <button type="button" class="btn btn-outline-secondary btn-sm" id="btnLimpiarAvanzado">
+                                    <button type="button" class="btn btn-outline-secondary btn-sm"
+                                        id="btnLimpiarAvanzado">
                                         <i class="ri-refresh-line me-1"></i> Limpiar
                                     </button>
-                                    <span class="text-muted small ms-2">Ingrese uno o más campos para filtrar. Se aplica LIKE en cada campo.</span>
+                                    <span class="text-muted small ms-2">Ingrese uno o más campos para filtrar. </span>
                                 </div>
                             </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item border-0 shadow-sm">
+                    <h2 class="accordion-header" id="headingBusquedaVehiculosSimple">
+                        <button class="accordion-button " type="button" data-bs-toggle="collapse"
+                            data-bs-target="#collapseBusquedaVehiculosSimple" aria-expanded="true"
+                            aria-controls="collapseBusquedaVehiculosSimple">
+                            <i class="ri-search-line me-2 text-primary"></i>
+                            <strong>Búsqueda Simple</strong>
+
+                        </button>
+                    </h2>
+                    <div id="collapseBusquedaVehiculosSimple" class="accordion-collapse collapse show"
+                        aria-labelledby="headingBusquedaVehiculosSimple" data-bs-parent="#accordionBusquedaVehiculos">
+                        <div class="accordion-body pb-3">
+                            <div class="d-flex gap-2 flex-grow-1 flex-wrap">
+                                <div class="input-group" style="max-width: 420px;">
+                                    <button type="button" class="btn btn-primary" id="btnBuscarVehiculos"
+                                        title="Buscar">
+                                        <i class="ri-search-line me-1"></i> Buscar
+                                    </button>
+                                    <input type="search" id="searchVehiculos" class="form-control"
+                                        placeholder="Ingrese término de búsqueda...">
+                                </div>
+                                <select id="searchType" class="form-select" style="max-width: 210px;">
+                                    <option value="">Buscar en: Todos</option>
+                                    <option value="placa">Placa</option>
+                                    <option value="propietario">Propietario</option>
+                                    <option value="docidentidad">Doc. Identidad</option>
+                                    <option value="nochasis">N° Chasis</option>
+                                    <option value="nomotor">N° Motor</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -113,26 +155,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-header">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-2">
-                        {{-- Búsqueda --}}
-                        <div class="d-flex gap-2 flex-grow-1 flex-wrap">
-                            <div class="input-group" style="max-width: 420px;">
-                                <button type="button" class="btn btn-primary" id="btnBuscarVehiculos" title="Buscar">
-                                    <i class="ri-search-line me-1"></i> Buscar
-                                </button>
-                                <input type="search" id="searchVehiculos" class="form-control"
-                                    placeholder="Ingrese término de búsqueda...">
-                            </div>
-                            <select id="searchType" class="form-select" style="max-width: 210px;">
-                                <option value="">Buscar en: Todos</option>
-                                <option value="placa">Placa</option>
-                                <option value="propietario">Propietario</option>
-                                <option value="docidentidad">Doc. Identidad</option>
-                                <option value="nochasis">N° Chasis</option>
-                                <option value="nomotor">N° Motor</option>
-                            </select>
-                        </div>
-                    </div>
+
                     <div class="d-flex justify-content-between align-items-center mt-2">
                         <span id="detalles-pagina" class="text-muted small"></span>
                     </div>
@@ -180,7 +203,8 @@
                     <div id="estadoInicial" class="text-center p-4">
                         <i class="ri-car-line text-muted" style="font-size: 3rem;"></i>
                         <h5 class="mt-2 text-muted">Ingrese un término de búsqueda</h5>
-                        <p class="text-muted small">Busque por placa, propietario, documento de identidad, N° de chasis o N° de motor.</p>
+                        <p class="text-muted small">Busque por placa, propietario, documento de identidad, N° de chasis o
+                            N° de motor.</p>
                     </div>
 
                     {{-- Paginación --}}
