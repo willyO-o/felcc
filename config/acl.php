@@ -28,12 +28,13 @@ return [
             'registro-criminal_all',
             'reporte_all',
             'ciudadanos_all',
+            'vehiculos_padron_all',
         ],
         'tecnico_felcc' => [
             'consulta_mandamientos',
             'personas_crear',
             'mandamientos_crear',
-            'ciudadanos_all',
+            
 
         ],
         'tecnico_daci' => [
@@ -52,6 +53,9 @@ return [
             'imeis_crear',
             'consulta_mandamientos',
             'consulta_registro-criminal',
+            'consulta_personas',
+            'ciudadanos_all',
+            'vehiculos_padron_all',
 
         ],
         'consultor_felcc' => [
