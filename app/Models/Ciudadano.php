@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Ciudadano extends Model
 {
     // use SoftDeletes;
+    protected $connection = 'mysql_vehiculos';
 
     protected $table = 'ciudadano';
     public $timestamps = false;

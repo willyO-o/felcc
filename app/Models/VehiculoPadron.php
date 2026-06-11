@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class VehiculoPadron extends Model
 {
-    protected $connection = 'mysql_vehiculos';
-    protected $table = 'vehiculo';
+    protected $table = 'vehiculo_db';
     public $timestamps = false;
 
     protected $fillable = [
