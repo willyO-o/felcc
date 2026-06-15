@@ -129,8 +129,8 @@ class MandamientoController extends Controller
      */
     public function show(string $id)
     {
-        if(!request()->ajax()){
-             abort(404);
+        if (!request()->ajax()) {
+            abort(404);
         }
 
         if (!request()->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_listar', 'consulta_mandamientos'])) {
@@ -140,10 +140,8 @@ class MandamientoController extends Controller
 
         $mandamiento = Mandamiento::getMandamientos([], $id)->first();
 
-        if (in_array(request()->user()->role->nombre, ['tecnico_daci', 'tecnico_felcc', 'consultor_daci', 'consultor_felcc'])) {
-            $identificador = request()->get('identificador', null);
-            AuditarConsultas::agregarIdsAccedidos($identificador, $id, get_class($mandamiento));
-        }
+        $identificador = request()->get('identificador', null);
+        AuditarConsultas::agregarIdsAccedidos($identificador, $id, get_class($mandamiento));
 
         if (!$mandamiento) {
             return response()->json(['error' => 'Mandamiento no encontrado'], 404);
@@ -161,7 +159,7 @@ class MandamientoController extends Controller
      */
     public function edit(string $id)
     {
-        if (!request()->user()->hasAnyPermission(['mandamientos_all'])) {
+        if (!request()->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_edit'])) {
             abort(403, 'No tienes permiso para acceder a esta sección.');
         }
 
@@ -180,7 +178,7 @@ class MandamientoController extends Controller
     public function update(Request $request, string $id)
     {
 
-        if (!request()->user()->hasAnyPermission(['mandamientos_all'])) {
+        if (!request()->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_edit'])) {
             abort(403, 'No tienes permiso para acceder a esta sección.');
         }
 
@@ -273,7 +271,8 @@ class MandamientoController extends Controller
             abort(403, 'No tienes permiso para acceder a esta sección.');
         }
         $mandamiento = Mandamiento::findOrFail($id);
-        $mandamiento->delete();
+        $mandamiento->multimedia()->delete();
+        $mandamiento->forceDelete();
 
         return response()->json(['success' => 'Mandamiento eliminado correctamente.'], 200);
     }
@@ -297,13 +296,11 @@ class MandamientoController extends Controller
                 ->paginate($request->get('size', 10), ['*'], 'page', $request->get('page', 1));
 
             $user = auth()->user();
-            if (in_array($user->role->nombre, ['tecnico_daci', 'tecnico_felcc', 'consultor_daci', 'consultor_felcc'])) {
-                if ($request->get('nuevo_filtro', false)) {
-                    $request->merge([
-                        'cantidad_resultados' => $mandamientos->total(),
-                    ]);
-                    AuditarConsultas::registrar($user, 'consulta_mandamientos', $request);
-                }
+            if ($request->get('nuevo_filtro', false)) {
+                $request->merge([
+                    'cantidad_resultados' => $mandamientos->total(),
+                ]);
+                AuditarConsultas::registrar($user, 'consulta_mandamientos', $request);
             }
 
             return response()->json([
@@ -326,9 +323,7 @@ class MandamientoController extends Controller
 
         $mandamiento = Mandamiento::getMandamientos([], $codigo, true)->first();
 
-        if (in_array(request()->user()->role->nombre, ['tecnico_daci', 'tecnico_felcc', 'consultor_daci', 'consultor_felcc'])) {
-            AuditarConsultas::agregarIdsAccedidos(request()->get('identificador'), $mandamiento->id, get_class($mandamiento));
-        }
+        AuditarConsultas::agregarIdsAccedidos(request()->get('identificador'), $mandamiento->id, get_class($mandamiento));
 
         if (!$mandamiento) {
             return response()->json(['error' => 'Mandamiento no encontrado'], 404);

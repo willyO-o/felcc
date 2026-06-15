@@ -144,15 +144,16 @@
                                 <i class="ri-eye-fill align-bottom"></i>
                             </button>
 
-                            ${['superadmin', 'administrador'].includes(window.role) ?
-                    /*html*/`
+                            ${['superadmin', 'administrador','tecnico_daci'].includes(window.role) ? /*html*/`
                             <button class="btn btn-sm btn-soft-secondary btn-editar" value="${telefono.id}" title="Editar">
                                 <i class="ri-pencil-fill align-bottom"></i>
-                            </button>
+                            </button>` : ""
+                            }
+                            ${['superadmin', 'administrador'].includes(window.role) ? /*html*/`
                             <button class="btn btn-sm btn-soft-secondary btn-eliminar" value="${telefono.id}" title="Eliminar">
                                 <i class="ri-delete-bin-fill align-bottom"></i>
                             </button>` : ""
-                }
+                            }
                         </div>
                     </td>
                 </tr>

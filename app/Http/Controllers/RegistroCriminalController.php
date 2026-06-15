@@ -266,10 +266,9 @@ class RegistroCriminalController extends Controller
         }
         $datos = RegistroCriminal::with(['persona', 'fotos', 'persona.vehiculos', 'persona.telefonos'])->findOrFail($id);
 
-        if (in_array(request()->user()->role->nombre, ['tecnico_daci', 'tecnico_felcc', 'consultor_daci', 'consultor_felcc'])) {
-            $identificador = request()->get('identificador');
-            AuditarConsultas::agregarIdsAccedidos($identificador, $id, get_class($datos));
-        }
+        $identificador = request()->get('identificador');
+        AuditarConsultas::agregarIdsAccedidos($identificador, $id, get_class($datos));
+
         return view('registro-criminal.partials._datos', [
             'datos' => $datos,
             'identificador' => isset($identificador) ? $identificador : null,
@@ -399,7 +398,8 @@ class RegistroCriminalController extends Controller
         }
 
         $registro = RegistroCriminal::findOrFail($id);
-        $registro->delete();
+        $registro->fotos()->delete();
+        $registro->forceDelete();
         return response()->json(['success' => 'Registro eliminado exitosamente.']);
     }
 
@@ -522,13 +522,11 @@ class RegistroCriminalController extends Controller
 
 
             $user = auth()->user();
-            if (in_array($user->role->nombre, ['tecnico_daci', 'tecnico_felcc', 'consultor_daci', 'consultor_felcc'])) {
-                if ($request->get('nuevo_filtro', false)) {
-                    $request->merge([
-                        'cantidad_resultados' => $query->total(),
-                    ]);
-                    AuditarConsultas::registrar($user, 'consulta_registros', $request);
-                }
+            if ($request->get('nuevo_filtro', false)) {
+                $request->merge([
+                    'cantidad_resultados' => $query->total(),
+                ]);
+                AuditarConsultas::registrar($user, 'consulta_registros', $request);
             }
 
 
@@ -553,10 +551,8 @@ class RegistroCriminalController extends Controller
 
         $datos = RegistroCriminal::with(['persona', 'fotos', 'persona.vehiculos', 'persona.telefonos'])->whereRaw('MD5(id) = ?', [$codigo])->firstOrFail();
 
-        if (in_array(request()->user()->role->nombre, ['tecnico_daci', 'tecnico_felcc', 'consultor_daci', 'consultor_felcc'])) {
-            $identificador = request()->get('identificador');
-            AuditarConsultas::agregarIdsAccedidos($identificador, $datos->id, get_class($datos));
-        }
+        $identificador = request()->get('identificador');
+        AuditarConsultas::agregarIdsAccedidos($identificador, $datos->id, get_class($datos));
 
         return view('registro-criminal.show', [
             'datos' => $datos,
@@ -575,7 +571,7 @@ class RegistroCriminalController extends Controller
         $ultomaFicha = FichaRegistro::whereYear('created_at', Carbon::now()->year)->max('numero_ficha');
         $nro = str_pad($ultomaFicha + 1, 3, '0', STR_PAD_LEFT);
 
-        $nroFicha = $nro.'/'.Carbon::now()->year;
+        $nroFicha = $nro . '/' . Carbon::now()->year;
 
         $fechaHoraActual = Carbon::now()->isoFormat('dddd DD [de] MMMM [de] YYYY, [a horas] hh:mm a');
         $plantilla->introduccion = Str::replace('{fecha_hora_actual}', $fechaHoraActual, $plantilla->introduccion);
@@ -585,6 +581,6 @@ class RegistroCriminalController extends Controller
 
         $registrCriminalId = $registro->id;
 
-        return view('registro-criminal.partials._previewPrint',compact('plantilla', 'fechaActual', 'nroFicha', 'registrCriminalId'));
+        return view('registro-criminal.partials._previewPrint', compact('plantilla', 'fechaActual', 'nroFicha', 'registrCriminalId'));
     }
 }

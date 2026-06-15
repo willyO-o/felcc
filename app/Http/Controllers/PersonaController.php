@@ -192,6 +192,9 @@ class PersonaController extends Controller
      */
     public function edit(string $id)
     {
+        if (!request()->user()->hasAnyPermission(['personas_all', 'personas_editar'])) {
+            abort(403, 'No tienes permiso para realizar esta acción.');
+        }
         $persona = Persona::with('multimedia')->findOrFail($id);
         $paises = Pais::all();
         return view('personas.formulario', compact('persona', 'paises'));
@@ -202,6 +205,10 @@ class PersonaController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        if (!request()->user()->hasAnyPermission(['personas_all', 'personas_editar'])) {
+            abort(403, 'No tienes permiso para realizar esta acción.');
+        }
+
         $persona = Persona::findOrFail($id);
 
         // Si solo se está vinculando un documento, hacer validación simplificada
@@ -376,7 +383,7 @@ class PersonaController extends Controller
     /**
      * Migrar datos relacionados y eliminar persona
      */
-    public function restore( string $id)
+    public function restore(string $id)
     {
         $persona = Persona::withTrashed()->findOrFail($id);
 
@@ -385,8 +392,6 @@ class PersonaController extends Controller
             'success' => 'Persona restaurada correctamente.',
             'datos' => $persona,
         ], 200);
-
-
     }
 
     public function checkCI(Request $request)
@@ -407,6 +412,5 @@ class PersonaController extends Controller
         return response()->json([
             'data' => $persona,
         ]);
-
     }
 }

@@ -210,6 +210,9 @@
                             <button class="${persona.deleted_at ? "d-none" : ""} btn btn-sm btn-soft-danger btn-eliminar" value="${persona.id}" title="Eliminar">
                                 <i class="ri-delete-bin-fill align-bottom"></i>
                             </button>
+                            <button class=" btn btn-sm btn-soft-dark btn-eliminar-total" value="${persona.id}" title="Eliminar definitivamente">
+                                <i class="ri-delete-bin-fill align-bottom"></i>
+                            </button>
                             ${
                                 persona.deleted_at
                                     ? /*html*/ `
@@ -238,6 +241,38 @@
 
     $(document).on("click", ".btn-editar", function () {
         abrirModalEditar($(this).val());
+    });
+    $(document).on("click", ".btn-eliminar-total", async function (e) {
+        e.preventDefault();
+
+        const personaId = $(this).val();
+
+        const boton = $(this);
+
+        const confirmacion = await confirmarEnvio(
+            "Sí, eliminar",
+            "¿Estás seguro de eliminar este registro de forma permanente? Esta acción no se puede deshacer.",
+        );
+
+        $.ajax({
+            url: `/personas/${personaId}`,
+            type: "DELETE",
+            dataType: "json",
+            headers: {
+                "X-CSRF-TOKEN": csrfToken,
+                "X-Requested-With": "XMLHttpRequest",
+                Accept: "application/json",
+            },
+            data: {
+                eliminar_completo: true,
+            },
+        }).done(function (response) {
+            notification(response.success, "Persona Eliminada");
+            boton.closest("tr").remove();
+        }).fail(function (xhr) {
+            processError(xhr);
+        });
+
     });
 
     $(document).on("click", ".btn-eliminar", function (e) {

@@ -135,11 +135,11 @@ class VehiculoController extends Controller
                 }
             }
 
-            if($request->hasFile('fotosVehiculos')) {
+            if ($request->hasFile('fotosVehiculos')) {
                 $fotos = $request->file('fotosVehiculos');
                 foreach ($fotos as $foto) {
                     $nombreArchivo = $foto->getClientOriginalName();
-                    $path = $foto->storeAs('vehiculos', $nombreArchivo  , 'public');
+                    $path = $foto->storeAs('vehiculos', $nombreArchivo, 'public');
                     Multimedia::create([
                         'id_vehiculo' => $vehiculo->id,
                         'tipo' => 'foto_vehiculo',
@@ -170,7 +170,7 @@ class VehiculoController extends Controller
             abort(403, 'No tienes permiso para ver vehículos.');
         }
 
-        $vehiculo = Vehiculo::with(['casos.persona', 'cargios','cargios.estacionServicio','inspecciones'])->findOrFail($id);
+        $vehiculo = Vehiculo::with(['casos.persona', 'cargios', 'cargios.estacionServicio', 'inspecciones'])->findOrFail($id);
         return view('vehiculos.detalles', ['vehiculo' => $vehiculo]);
     }
 
@@ -248,7 +248,7 @@ class VehiculoController extends Controller
                 VehiculoCaso::where('vehiculo_id', $vehiculo->id)->delete();
             }
 
-            if($request->hasFile('fotosVehiculos')) {
+            if ($request->hasFile('fotosVehiculos')) {
 
                 $fotos = $request->file('fotosVehiculos');
                 foreach ($fotos as $foto) {
@@ -271,7 +271,7 @@ class VehiculoController extends Controller
             ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Error al actualizar vehículo'. $e->getMessage()], 500);
+            return response()->json(['error' => 'Error al actualizar vehículo' . $e->getMessage()], 500);
         }
     }
 
@@ -284,12 +284,26 @@ class VehiculoController extends Controller
             abort(403, 'No tienes permiso para eliminar vehículos.');
         }
 
-        $vehiculo = Vehiculo::findOrFail($id);
-        $vehiculo->delete();
+        try {
+            DB::beginTransaction();
+            $vehiculo = Vehiculo::findOrFail($id);
+            $vehiculo->casos()->delete();
+            $vehiculo->inspecciones()->delete();
+            $vehiculo->cargios()->delete();
+            $vehiculo->multimedia()->delete();
+            $vehiculo->personas()->detach();
 
-        return response()->json([
-            'success' => 'Vehículo eliminado correctamente',
-        ]);
+            $vehiculo->forceDelete();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => 'Vehículo eliminado correctamente',
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => 'Error al eliminar vehículo'], 500);
+        }
     }
 
     /**

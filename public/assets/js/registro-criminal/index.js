@@ -98,10 +98,11 @@
                                 </button>
                                 ${['superadmin', 'administrador','tecnico_daci'].includes(window.role) ? `<button type="button" value="${item.id}" class="btn btn-soft-secondary btn-sm shadow-none vistaPrevia" data-bs-toggle="tooltip" data-bs-placement="top" title="Imprimir Ficha de Registro">
                                     <i class="ri-file-pdf-line"></i>
-                                </button>` : ''}
-                                ${['superadmin', 'administrador'].includes(window.role) ? `<a  href="/registro-criminal/${item.id}/edit"  class="btn btn-soft-secondary btn-sm shadow-none " data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Registro">
+                                </button>
+                                <a  href="/registro-criminal/${item.id}/edit"  class="btn btn-soft-secondary btn-sm shadow-none " data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Registro">
                                     <i class="ri-pencil-line"></i>
-                                </a>
+                                </a>` : ''}
+                                ${['superadmin', 'administrador'].includes(window.role) ? `
                                 <button type="button" class="btn btn-soft-secondary btn-sm shadow-none btnDelete" value="${item.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Registro">
                                     <i class="ri-delete-bin-2-line"></i>
                                 </button>
