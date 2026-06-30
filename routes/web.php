@@ -110,4 +110,10 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/reportes', [App\Http\Controllers\ReporteController::class, 'index'])->name('reportes.index');
     Route::get('/reportes/formulario/{tipo}', [App\Http\Controllers\ReporteController::class, 'formulario'])->name('reportes.formulario');
     Route::get('/reportes/exportar', [App\Http\Controllers\ReporteController::class, 'exportar'])->name('reportes.exportar');
+
+    // Auditoría de Cambios (laravel-auditing)
+    Route::get('/auditorias', [App\Http\Controllers\AuditoriaController::class, 'index'])->name('auditorias.index');
+    Route::get('/auditorias/{id}', [App\Http\Controllers\AuditoriaController::class, 'show'])->name('auditorias.show');
+    Route::get('/auditorias-filtros/modelos', [App\Http\Controllers\AuditoriaController::class, 'obtenerModelos'])->name('auditorias.modelos');
+    Route::get('/auditorias-filtros/eventos', [App\Http\Controllers\AuditoriaController::class, 'obtenerEventos'])->name('auditorias.eventos');
 });

@@ -164,6 +164,12 @@
                             <i class="mdi mdi-history"></i> <span>Auditoría de Consultas</span>
                         </a>
                     </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('auditorias.index') }}">
+                            <i class="mdi mdi-shield-check-outline"></i> <span>Auditoría de Cambios</span>
+                        </a>
+                    </li>
                 @endcanany
 
             </ul>

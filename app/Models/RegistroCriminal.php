@@ -1,15 +1,17 @@
 <?php
 
 namespace App\Models;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class RegistroCriminal extends Model
+class RegistroCriminal extends Model implements AuditableContract
 {
     use SoftDeletes;
+    use \OwenIt\Auditing\Auditable;
     protected $table = 'registro_criminal';
 
 

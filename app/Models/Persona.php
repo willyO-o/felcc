@@ -1,14 +1,16 @@
 <?php
 
 namespace App\Models;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
-class Persona extends Model
+class Persona extends Model implements AuditableContract
 {
     use SoftDeletes;
+    use \OwenIt\Auditing\Auditable;
     protected $table = 'persona';
 
     protected $fillable = [

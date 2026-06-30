@@ -1,11 +1,14 @@
 <?php
 
 namespace App\Models;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ImeiTelefono extends Model
+class ImeiTelefono extends Model implements AuditableContract
 {
+    use \OwenIt\Auditing\Auditable;
+
     //
     protected $table = 'imei_telefono';
     protected $fillable = [
