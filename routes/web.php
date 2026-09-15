@@ -7,6 +7,7 @@ use App\Http\Controllers\Importacion;
 use App\Http\Controllers\RegistroCriminalController;
 use App\Http\Controllers\MandamientoController;
 use App\Http\Controllers\AuditarConsultasController;
+use App\Http\Controllers\Auth\GoogleController;
 
 
 Route::get('/', function () {
@@ -19,6 +20,12 @@ Route::get('/velzon/{file?}', function (string $file = 'index') {
 });
 
 Auth::routes(['register' => false]);
+
+// Autenticación con Google (sin registro: el usuario debe existir y estar activo)
+Route::middleware('guest')->group(function () {
+    Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
+    Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
+});
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
