@@ -5,12 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Mandamiento;
 use App\Models\Multimedia;
-use App\Models\Persona;
-use App\Models\Delito;
-use App\Models\Juzgado;
 use App\Models\TipoMandamiento;
+use App\Models\AuditarConsultas;
 use Illuminate\Support\Facades\DB;
-use Yajra\DataTables\Facades\DataTables;
 use Illuminate\Support\Facades\Storage;
 
 class MandamientoController extends Controller
@@ -20,6 +17,9 @@ class MandamientoController extends Controller
      */
     public function index(Request $request)
     {
+        if (!$request->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_listar'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
         // Si es una petición AJAX, devolver los datos para DataTables
         if ($request->ajax()) {
             $mandamientos = Mandamiento::getMandamientos($request->all())
@@ -45,9 +45,11 @@ class MandamientoController extends Controller
      */
     public function create()
     {
-        $mandamientos = new Mandamiento();
-        $tipoMandamientos = TipoMandamiento::all();
-        return view('mandamientos.formulario', compact('mandamientos', 'tipoMandamientos'));
+        if (!request()->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_crear'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+        $estados = Mandamiento::select('estado')->groupBy('estado')->get()->pluck('estado');
+        return view('mandamientos.formulario', compact('estados'));
     }
 
     /**
@@ -55,6 +57,10 @@ class MandamientoController extends Controller
      */
     public function store(Request $request)
     {
+
+        if (!request()->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_crear'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
 
         $request->validate(Mandamiento::$rules);
 
@@ -102,7 +108,6 @@ class MandamientoController extends Controller
                     'id_mandamiento' => $mandamiento->id,
                     'tipo_archivo' => $extensionActa,
                 ]);
-
             }
 
 
@@ -124,13 +129,29 @@ class MandamientoController extends Controller
      */
     public function show(string $id)
     {
+        if (!request()->ajax()) {
+            abort(404);
+        }
+
+        if (!request()->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_listar', 'consulta_mandamientos'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
+
         $mandamiento = Mandamiento::getMandamientos([], $id)->first();
+
+        $identificador = request()->get('identificador', null);
+        AuditarConsultas::agregarIdsAccedidos($identificador, $id, get_class($mandamiento));
 
         if (!$mandamiento) {
             return response()->json(['error' => 'Mandamiento no encontrado'], 404);
         }
 
-        return view('mandamientos.show', compact('mandamiento'));
+        return view('mandamientos.partials._datos', [
+            'mandamiento' => $mandamiento,
+            'identificador' => isset($identificador) ? $identificador : null,
+            'isAjax' => true,
+        ]);
     }
 
     /**
@@ -138,6 +159,10 @@ class MandamientoController extends Controller
      */
     public function edit(string $id)
     {
+        if (!request()->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_edit'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
         $mandamiento = Mandamiento::getMandamientos([], $id)->first();
 
         if (!$mandamiento) {
@@ -153,6 +178,9 @@ class MandamientoController extends Controller
     public function update(Request $request, string $id)
     {
 
+        if (!request()->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_edit'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
 
         try {
             DB::beginTransaction();
@@ -238,9 +266,69 @@ class MandamientoController extends Controller
      */
     public function destroy(string $id)
     {
+
+        if (!request()->user()->hasAnyPermission(['mandamientos_all'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
         $mandamiento = Mandamiento::findOrFail($id);
-        $mandamiento->delete();
+        $mandamiento->multimedia()->delete();
+        $mandamiento->forceDelete();
 
         return response()->json(['success' => 'Mandamiento eliminado correctamente.'], 200);
+    }
+
+
+
+    public function consultarMandamientos(Request $request)
+    {
+        if (!request()->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_listar', 'consulta_mandamientos'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
+        if ($request->ajax()) {
+
+            if (empty($request->input('tipo_filtro')) || strlen($request->input('search')) < 4) {
+                return response()->json(['datos' => []]);
+            }
+
+
+            $mandamientos = Mandamiento::getMandamientos($request->all())
+                ->paginate($request->get('size', 10), ['*'], 'page', $request->get('page', 1));
+
+            $user = auth()->user();
+            if ($request->get('nuevo_filtro', false)) {
+                $request->merge([
+                    'cantidad_resultados' => $mandamientos->total(),
+                ]);
+                AuditarConsultas::registrar($user, 'consulta_mandamientos', $request);
+            }
+
+            return response()->json([
+                'datos' => $mandamientos->items(),
+                'total' => $mandamientos->total(),
+                'page' => $mandamientos->currentPage(),
+            ]);
+        }
+
+
+        return view('mandamientos.consultas');
+    }
+
+    public function showByCodigo(string $codigo)
+    {
+        if (!request()->user()->hasAnyPermission(['mandamientos_all', 'mandamientos_listar', 'consulta_mandamientos'])) {
+            abort(403, 'No tienes permiso para acceder a esta sección.');
+        }
+
+
+        $mandamiento = Mandamiento::getMandamientos([], $codigo, true)->first();
+
+        AuditarConsultas::agregarIdsAccedidos(request()->get('identificador'), $mandamiento->id, get_class($mandamiento));
+
+        if (!$mandamiento) {
+            return response()->json(['error' => 'Mandamiento no encontrado'], 404);
+        }
+
+        return view('mandamientos.show', compact('mandamiento'));
     }
 }

@@ -125,9 +125,11 @@
                                     <i class="ri-eye-line"></i>
                                 </button>
 
-                                ${['superadmin', 'administrador'].includes(window.role) ? /*html */`<button type="button" value="${item.id}"  class="btn btn-soft-secondary btn-sm shadow-none openModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Mandamiento">
+                                ${['superadmin', 'administrador','tecnico_daci','tecnico_felcc'].includes(window.role) ? /*html */`<button type="button" value="${item.id}"  class="btn btn-soft-secondary btn-sm shadow-none openModal" data-bs-toggle="tooltip" data-bs-placement="top" title="Editar Mandamiento">
                                     <i class="ri-pencil-line"></i>
-                                </button>
+                                </button>` : ''}
+
+                                ${['superadmin', 'administrador'].includes(window.role) ? /*html */`
                                 <button type="button" class="btn btn-soft-secondary btn-sm shadow-none btnDelete" value="${item.id}" data-bs-toggle="tooltip" data-bs-placement="top" title="Eliminar Mandamiento">
                                     <i class="ri-delete-bin-2-line"></i>
                                 </button>` : ''}
@@ -1094,7 +1096,7 @@
                     // cerrar popup de agregar persona
 
                     // agregar la nueva persona al select del formulario principal
-                    const newOption = new Option(`${response.data.nombres} ${response.data.apellidos || ''} - ${response.data.ci || ''}`, response.data.id, true, true);
+                    const newOption = new Option(`${response.datos.nombres} ${response.datos.apellidos || ''} - ${response.datos.ci || ''}`, response.datos.id, true, true);
                     $('#id_persona').append(newOption).trigger('change');
 
                     setTimeout(() => {

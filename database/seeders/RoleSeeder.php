@@ -14,42 +14,57 @@ class RoleSeeder extends Seeder
     {
         $roles = [
             [
+                'id' => 1,
                 'nombre' => 'superadmin',
-                'descripcion' => 'Super Administrador con acceso total al sistema',
+                'descripcion' => 'Superadmin',
             ],
             [
+                'id' => 2,
                 'nombre' => 'administrador',
-                'descripcion' => 'Administrador con acceso a la gestión general',
+                'descripcion' => 'Administrador',
             ],
             [
-                'nombre' => 'tecnico',
-                'descripcion' => 'Técnico con acceso limitado a operaciones',
+                'id' => 3,
+                'nombre' => 'tecnico_felcc',
+                'descripcion' => 'Técnico FELCC',
+            ],
+
+            [
+                'id' => 4,
+                'nombre' => 'consultor_felcc',
+                'descripcion' => 'Consultor FELCC',
             ],
             [
-                'nombre' => 'consultor',
-                'descripcion' => 'Consultor con acceso limitado a operaciones',
+                'id' => 5,
+                'nombre' => 'tecnico_daci',
+                'descripcion' => 'Técnico DACI',
+            ],
+            [
+                'id' => 6,
+                'nombre' => 'consultor_daci',
+                'descripcion' => 'Consultor DACI',
             ],
         ];
 
         foreach ($roles as $role) {
-            Role::firstOrCreate(['nombre' => $role['nombre']], $role);
+            // Role::firstOrCreate(['nombre' => $role['nombre']], $role);
+            Role::updateOrCreate(['id' => $role['id']], $role);
         }
 
 
 
-        \App\Models\User::create([
+        \App\Models\User::updateOrCreate(['email' => 'administrador@gmail.com'], [
             'name' => 'administrador',
             'email' => 'administrador@gmail.com',
             'password' => bcrypt('79515350/WillyWonka2026'),
             'role_id' => 1,
         ]);
 
-        \App\Models\User::create([
+        \App\Models\User::updateOrCreate(['email' => 'admin@gmail.com'], [
             'name' => 'admin',
             'email' => 'admin@gmail.com',
             'password' => bcrypt('73054483/administrador2026'),
             'role_id' => 2,
         ]);
-
     }
 }

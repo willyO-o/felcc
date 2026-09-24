@@ -41,49 +41,74 @@
                     </a>
                 </li>
 
-                <!-- Mandamientos -->
+                @canany(['superadmin', 'administrador', 'tecnico_daci'])
+                    <!-- Mandamientos -->
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('mandamientos.index') }}">
+                            <i class="mdi mdi-gavel"></i> <span>Mandamientos</span>
+                        </a>
+                    </li>
+                @endcanany
+
+
+                @canany(['tecnico_felcc'])
+                    <!-- Mandamientos -->
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('mandamientos.create') }}">
+                            <i class="mdi mdi-plus"></i> <span>Registrar Mandamiento</span>
+                        </a>
+                    </li>
+                @endcanany
+                <li class="menu-title"><span data-key="t-menu">Consultas</span></li>
                 <li class="nav-item">
-                    <a class="nav-link menu-link" href="{{ route('mandamientos.index') }}">
-                        <i class="mdi mdi-gavel"></i> <span>Mandamientos</span>
+                    <a class="nav-link menu-link" href="{{ route('consultas.mandamientos') }}">
+                        <i class="mdi mdi-clipboard-text-search-outline"></i> <span>Consultar Mandamientos</span>
                     </a>
                 </li>
+                @canany(['superadmin', 'administrador', 'tecnico_daci', 'consultor_daci'])
+                    <li class="nav-item ">
+                        <a class="nav-link menu-link " href="{{ route('consultas.registro-criminal') }}">
+                            <i class="mdi mdi-account-search-outline"></i> <span>Consultar Registro Criminal</span>
+                        </a>
+                    </li>
+                @endcanany
 
-                <!-- Registro Criminal -->
-                <li class="nav-item">
-                    <a class="nav-link menu-link" href="{{ route('registro-criminal.index') }}">
-                        <i class="mdi mdi-file-document-outline"></i> <span>Registro Criminal</span>
-                    </a>
-                </li>
+                @canany(['superadmin', 'administrador', 'tecnico_daci'])
+                    <li class="menu-title"><span data-key="t-menu">EREBOR</span></li>
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('registro-criminal.index') }}">
+                            <i class="mdi mdi-head"></i> <span>Registro Criminal</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('personas.index') }}">
+                            <i class="mdi mdi-account-outline"></i> <span>Personas</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('telefonos.index') }}">
+                            <i class="mdi mdi-phone"></i> <span>Teléfonos</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('imeis.index') }}">
+                            <i class="mdi mdi-numeric"></i> <span>IMEIs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('vehiculos.index') }}">
+                            <i class="mdi mdi-car"></i> <span>Vehículos</span>
+                        </a>
+                    </li>
+                @endcanany
 
 
-
-                <li class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebarInteligencia" data-bs-toggle="collapse" role="button"
-                        aria-expanded="false" aria-controls="sidebarInteligencia">
-                        <i class="mdi mdi-head-lightbulb-outline"></i> <span>EREBOR</span>
-                    </a>
-                    <div class="collapse menu-dropdown" id="sidebarInteligencia">
-                        <ul class="nav nav-sm flex-column">
-                            <li class="nav-item ">
-                                <a  href="{{ route('personas.index') }}" class="nav-link">Personas</a>
-                            </li>
-
-                            <li class="nav-item d-none">
-                                <a href="{{ route('importar.mandamientos.index') }}" class="nav-link">Importar
-                                    Mandamientos</a>
-                            </li>
-
-                            <li class="nav-item d-none">
-                                <a href="{{ route('usuarios.index') }}" class="nav-link">Importar Registro</a>
-                            </li>
-
-                        </ul>
-                    </div>
-                </li>
-
-
-                @canany(['superadmin', 'administrador', 'tecnico'])
+                @canany(['superadmin', 'administrador', 'tecnico_daci'])
                     <!-- Usuarios -->
+                    <li class="menu-title"><span data-key="t-menu">Importar</span></li>
+                @endcanany
+
+                @canany(['superadmin', 'administrador', 'tecnico_daci', 'tecnico_felcc'])
                     <li class="nav-item">
                         <a class="nav-link menu-link" href="#sidebarImportar" data-bs-toggle="collapse" role="button"
                             aria-expanded="false" aria-controls="sidebarImportar">
@@ -99,10 +124,19 @@
                                     <a href="{{ route('importar.mandamientos.index') }}" class="nav-link">Importar
                                         Mandamientos</a>
                                 </li>
-
-                                <li class="nav-item d-none">
-                                    <a href="{{ route('usuarios.index') }}" class="nav-link">Importar Registro</a>
-                                </li>
+                                @canany(['superadmin', 'administrador', 'tecnico_daci'])
+                                    <li class="nav-item">
+                                        <a href="{{ route('telefonos.importar.index') }}" class="nav-link">Importar
+                                            Telefonos</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a href="{{ route('vehiculos.importar.index') }}" class="nav-link">Importar
+                                            Vehículos</a>
+                                    </li>
+                                    <li class="nav-item d-none">
+                                        <a href="{{ route('usuarios.index') }}" class="nav-link">Importar Registro</a>
+                                    </li>
+                                @endcanany
 
                             </ul>
                         </div>
@@ -110,11 +144,30 @@
                 @endcanany
 
                 @canany(['superadmin', 'administrador'])
+                    <li class="menu-title"><span data-key="t-menu">Reportes</span></li>
+
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('reportes.index') }}">
+                            <i class="mdi mdi-account-group-outline"></i> <span>Reportes</span>
+                        </a>
+                    </li>
                     <li class="menu-title"><span data-key="t-menu">Seguridad</span></li>
 
                     <li class="nav-item">
                         <a class="nav-link menu-link" href="{{ route('usuarios.index') }}">
                             <i class="mdi mdi-account-group-outline"></i> <span>Usuarios</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('auditar-consultas.index') }}">
+                            <i class="mdi mdi-history"></i> <span>Auditoría de Consultas</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link menu-link" href="{{ route('auditorias.index') }}">
+                            <i class="mdi mdi-shield-check-outline"></i> <span>Auditoría de Cambios</span>
                         </a>
                     </li>
                 @endcanany

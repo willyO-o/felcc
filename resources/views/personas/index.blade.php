@@ -40,6 +40,16 @@
                             </div>
                         </div>
                         <div class="col-md-2">
+                            <select name="filtros" id="filtros" class="form-select">
+                                <option value="">Filtrar Por</option>
+                                <option value="nombre">Nombre</option>
+                                <option value="apellidos">Apellidos</option>
+                                <option value="ci">C.I.</option>
+                                <option value="nombre_padre">Nombre del Padre</option>
+                                <option value="nombre_madre">Nombre de la Madre</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
                             <select name="filtroGenero" id="filtroGenero" class="form-select">
                                 <option value="">Todos los Géneros</option>
                                 <option value="MASCULINO">Masculino</option>
@@ -56,6 +66,15 @@
                                 <option value="CONYUGUE">Cónyuge</option>
                             </select>
                         </div>
+                        @canany(['superadmin', 'administrador'])
+                            <div class="col-md-2">
+                                <select name="filtroVisible" id="filtroVisible" class="form-select">
+                                    <option value="todos">Todos los registros</option>
+                                    <option value="activos">Solo Activos</option>
+                                    <option value="eliminados">Solo Eliminados</option>
+                                </select>
+                            </div>
+                        @endcanany
                     </div>
                     <div class="d-flex justify-content-between align-items-center mt-2">
                         <span id="detalles-pagina" class="text-muted small"></span>
@@ -69,11 +88,13 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">Nombre Completo</th>
-                                    <th scope="col">Cédula de Identidad</th>
+                                    <th scope="col">C.I.</th>
+                                    <th scope="col">Alias</th>
                                     <th scope="col">Género</th>
                                     <th scope="col">Estado Civil</th>
                                     <th scope="col">Teléfono</th>
                                     <th scope="col">Fecha Registro</th>
+                                    <th scope="col" class="text-center">Documento</th>
                                     <th scope="col" class="text-center">Acciones</th>
                                 </tr>
                             </thead>
@@ -109,46 +130,59 @@
     </div>
 
     {{-- Modal Crear/Editar Persona --}}
-    <div class="modal fade" id="modalPersona" tabindex="-1" aria-labelledby="modalPersonaLabel" aria-hidden="true">
-        <div class="modal-dialog modal-lg" style="max-height: 90vh; display: flex; align-items: flex-start; padding-top: 2rem;">
-            <div class="modal-content" id="modalPersonaContent" style="max-height: calc(90vh - 2rem); overflow-y: auto;">
+    <div class="modal fade" id="modalPersona" tabindex="-1" aria-labelledby="modalPersonaLabel" data-bs-focus="false" aria-hidden="true"
+        data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content" id="modalPersonaContent">
                 {{-- Se carga dinámicamente --}}
             </div>
         </div>
     </div>
 
-    {{-- Modal Confirmar Eliminación --}}
-    <div class="modal fade" id="modalEliminar" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-body text-center p-5">
-                    <lord-icon src="https://cdn.lordicon.com/gsqxdxog.json" trigger="loop"
-                        colors="primary:#405189,secondary:#f06548" style="width:90px;height:90px">
-                    </lord-icon>
-                    <div class="mt-4">
-                        <h4>¿Está seguro?</h4>
-                        <p class="text-muted mb-4">Está a punto de eliminar esta persona. Esta acción no se puede deshacer.</p>
-                        <div class="hstack gap-2 justify-content-center">
-                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
-                            <button type="button" class="btn btn-danger" id="btnConfirmarEliminar">Sí, Eliminar</button>
-                        </div>
-                    </div>
-                </div>
+
+
+
+
+    {{-- Modal Ver Detalles --}}
+    <div class="modal fade" id="modalDetalles" tabindex="-1" aria-labelledby="modalDetallesLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-xl">
+            <div class="modal-content" id="modalDetallesContent">
+
             </div>
         </div>
     </div>
 
-    {{-- Modal Ver Detalles --}}
-    <div class="modal fade" id="modalDetalles" tabindex="-1" aria-labelledby="modalDetallesLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered modal-lg">
+    {{-- Modal Vincular Documento --}}
+    <div class="modal fade" id="modalVincularDocumento" tabindex="-1" aria-labelledby="modalVincularDocumentoLabel"
+        aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modalDetallesLabel">Detalles de la Persona</h5>
+                    <h5 class="modal-title" id="modalVincularDocumentoLabel">Vincular Documento</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body" id="modalDetallesContent">
-                    {{-- Se carga dinámicamente --}}
-                </div>
+                <form id="formVincularDocumento">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="urlDocumento" class="form-label">URL del Documento *</label>
+                            <input type="text" class="form-control" id="urlDocumento"
+                                placeholder="https://drive.google.com/..." required>
+                            <small class="text-muted d-block mt-2">
+                                Puedes vincular documentos desde Google Drive, OneDrive, Dropbox o cualquier otra fuente.
+                            </small>
+                            <div id="error-url_documento" class="invalid-feedback"></div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="ri-close-line align-middle me-1"></i> Cancelar
+                        </button>
+                        <button type="submit" class="btn btn-primary" id="btnVincularDocumento">
+                            <i class="ri-link align-middle me-1"></i> Vincular
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -156,8 +190,27 @@
 
 @section('css')
     <link href="/assets/libs/sweetalert2/sweetalert2.min.css" rel="stylesheet" type="text/css" />
+    <link href="{{ url('/assets/css/select2.min.css') }}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="{{ url('assets/css/select2-bootstrap-5-theme.min.css') }}" type="text/css" />
+    <link rel="stylesheet" href="/assets/libs/filepond/filepond.min.css" type="text/css" />
+    <link rel="stylesheet" href="/assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.css">
 @endsection
 
 @section('js')
-    <script src="{{ url('/assets/js/personas/index.js') }}"></script>
+
+    <script src="{{ url('/assets/libs/filepond/filepond.min.js') }}"></script>
+    <script src="{{ url('/assets/libs/filepond-plugin-image-preview/filepond-plugin-image-preview.min.js') }}"></script>
+    <script src="{{ url('/assets/libs/filepond-plugin-file-validate-size/filepond-plugin-file-validate-size.min.js') }}">
+    </script>
+    <script
+        src="{{ url('/assets/libs/filepond-plugin-image-exif-orientation/filepond-plugin-image-exif-orientation.min.js') }}">
+    </script>
+    {{-- <script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script> --}}
+
+    <script src="{{ url('assets/libs/filepond/filepond-plugin-file-validate-type.js') }}"></script>
+    <script src="{{ url('/assets/libs/filepond-plugin-file-encode/filepond-plugin-file-encode.min.js') }}"></script>
+    <script src="{{ url('/assets/js/select2.min.js') }}"></script>
+
+    <script src="{{ url('/assets/js/personas/index.js?v=' . config('app.aplicacion.version')) }}"></script>
+
 @endsection

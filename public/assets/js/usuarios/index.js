@@ -11,6 +11,13 @@
     let pageSize = 10;
     let searchTimeout = null;
     let deleteUserId = null;
+    let currentUserId = null;
+
+    // Obtener ID del usuario actual
+    const userIdMeta = document.querySelector('meta[name="user-id"]');
+    if (userIdMeta) {
+        currentUserId = userIdMeta.getAttribute('content');
+    }
 
     // Referencias DOM
     const listado = document.getElementById("listadoUsuarios");
@@ -89,6 +96,14 @@
                   })
                 : "—";
 
+            const estadoBadge = user.is_active
+                ? '<span class="badge bg-success">Activo</span>'
+                : '<span class="badge bg-danger">Inactivo</span>';
+
+            const btnEstado = user.is_active
+                ? `<button class="btn btn-sm btn-soft-warning btn-cambiar-estado" data-id="${user.id}" title="Desactivar"><i class="ri-forbid-2-line align-bottom"></i></button>`
+                : `<button class="btn btn-sm btn-soft-success btn-cambiar-estado" data-id="${user.id}" title="Activar"><i class="ri-check-double-line align-bottom"></i></button>`;
+
             html += `
                 <tr>
                     <td>${(currentPage - 1) * pageSize + index + 1}</td>
@@ -104,9 +119,11 @@
                     </td>
                     <td>${escapeHtml(user.email)}</td>
                     <td>${roleBadge}</td>
+                    <td>${estadoBadge}</td>
                     <td>${fecha}</td>
                     <td class="text-center">
                         <div class="d-flex gap-2 justify-content-center">
+                            ${btnEstado}
                             <button class="btn btn-sm btn-soft-info btn-editar" data-id="${user.id}" title="Editar">
                                 <i class="ri-pencil-fill align-bottom"></i>
                             </button>
@@ -121,6 +138,10 @@
         listado.innerHTML = html;
 
         // Bind eventos
+        listado.querySelectorAll(".btn-cambiar-estado").forEach((btn) => {
+            btn.addEventListener("click", () => cambiarEstadoUsuario(btn.dataset.id));
+        });
+
         listado.querySelectorAll(".btn-editar").forEach((btn) => {
             btn.addEventListener("click", () => abrirModalEditar(btn.dataset.id));
         });
@@ -331,6 +352,64 @@
                 console.error("Error:", err);
                 Swal.fire("Error", "Error de conexión. Intente nuevamente.", "error");
             });
+    }
+
+    /**
+     * Cambiar estado de usuario (activar/desactivar)
+     */
+    function cambiarEstadoUsuario(id) {
+        // Validar que no intente deshabilitar su propio usuario
+        if (id == currentUserId) {
+            Swal.fire({
+                icon: "warning",
+                title: "No permitido",
+                text: "No puedes deshabilitar tu propia cuenta.",
+            });
+            return;
+        }
+
+        Swal.fire({
+            icon: "warning",
+            title: "Cambiar estado de usuario",
+            text: "¿Deseas cambiar el estado de este usuario?",
+            showCancelButton: true,
+            confirmButtonText: "Sí, cambiar",
+            cancelButtonText: "Cancelar",
+            confirmButtonColor: "#0ab39c",
+            cancelButtonColor: "#f06548",
+        }).then((result) => {
+            if (!result.isConfirmed) return;
+
+            fetch(`/usuarios/${id}/toggle-status`, {
+                method: "POST",
+                headers: {
+                    "X-CSRF-TOKEN": csrfToken,
+                    "X-Requested-With": "XMLHttpRequest",
+                    Accept: "application/json",
+                },
+            })
+                .then((res) => res.json().then((data) => ({ status: res.status, body: data })))
+                .then(({ status, body }) => {
+                    if (status >= 400) {
+                        Swal.fire("Error", body.error || "No se pudo cambiar el estado.", "error");
+                        return;
+                    }
+
+                    Swal.fire({
+                        icon: "success",
+                        title: "¡Éxito!",
+                        text: body.success,
+                        timer: 2000,
+                        showConfirmButton: false,
+                    });
+
+                    cargarUsuarios(currentPage);
+                })
+                .catch((err) => {
+                    console.error("Error:", err);
+                    Swal.fire("Error", "Error de conexión.", "error");
+                });
+        });
     }
 
     /**

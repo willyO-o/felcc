@@ -57,6 +57,7 @@
                                     <th scope="col">Nombre</th>
                                     <th scope="col">Correo Electrónico</th>
                                     <th scope="col">Rol</th>
+                                    <th scope="col">Estado</th>
                                     <th scope="col">Fecha de Registro</th>
                                     <th scope="col" class="text-center">Acciones</th>
                                 </tr>
@@ -128,5 +129,5 @@
 @endsection
 
 @section('js')
-    <script src="{{ url('/assets/js/usuarios/index.js') }}"></script>
+    <script src="{{ url('/assets/js/usuarios/index.js?v='.config('app.aplicacion.version')) }}"></script>
 @endsection

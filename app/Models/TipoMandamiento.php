@@ -1,11 +1,14 @@
 <?php
 
 namespace App\Models;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 use Illuminate\Database\Eloquent\Model;
 
-class TipoMandamiento extends Model
+class TipoMandamiento extends Model implements AuditableContract
 {
+    use \OwenIt\Auditing\Auditable;
+
     protected $table = 'tipo_mandamiento';
 
     protected $fillable = [

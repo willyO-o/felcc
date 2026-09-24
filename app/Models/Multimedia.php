@@ -1,11 +1,14 @@
 <?php
 
 namespace App\Models;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Multimedia extends Model
+class Multimedia extends Model implements AuditableContract
 {
+    use \OwenIt\Auditing\Auditable;
+
     protected $table = 'multimedia';
 
     protected $fillable = [
@@ -15,6 +18,7 @@ class Multimedia extends Model
         'id_mandamiento',
         'id_persona',
         'tipo_archivo',
+        'id_vehiculo',
     ];
 
     /**

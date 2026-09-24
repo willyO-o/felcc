@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Models;
+use OwenIt\Auditing\Contracts\Auditable as AuditableContract;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -8,9 +9,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 
-class Mandamiento extends Model
+class Mandamiento extends Model implements AuditableContract
 {
     use SoftDeletes;
+    use \OwenIt\Auditing\Auditable;
     protected $table = 'mandamiento';
 
     protected $fillable = [
@@ -112,7 +114,7 @@ class Mandamiento extends Model
 
 
 
-    static function getMandamientos($filtros = [], $idMandamiento = null)
+    static function getMandamientos($filtros = [], $idMandamiento = null , $md5Id = false)
     {
 
         $search = $filtros['search'] ?? null;
@@ -150,7 +152,9 @@ class Mandamiento extends Model
                                             ORDER BY m1.created_at DESC
                                             LIMIT 1) as acta_ejecucion")
             ])
-            ->orderBy('mandamiento.id', 'desc');
+            ->orderBy('mandamiento.id', 'desc')
+            ->whereNull('persona.deleted_at')
+            ->whereNull('mandamiento.deleted_at'); // Excluir mandamientos eliminados
 
         if ($search && empty($tipoFiltro)) {
             $search= str_replace(' ', '%', $search); // Reemplazar espacios por comodines para mejorar la búsqueda
@@ -199,6 +203,12 @@ class Mandamiento extends Model
                 case 'apellidos':
                     $query->where('persona.apellidos', 'like', "%$search%");
                     break;
+                case 'nombre_persona':
+                    $query->where('persona.nombres', 'like', "%$search%");
+                    break;
+                case 'nombre_completo':
+                    $query->whereRaw("CONCAT(COALESCE(persona.nombres, ''), ' ', COALESCE(persona.apellidos, '')) like ?", ["%$search%"]);
+                    break;
                 case 'encargado':
                     $query->where('mandamiento.asignado', 'like', "%$search%");
                     break;
@@ -232,7 +242,11 @@ class Mandamiento extends Model
         }
 
         if ($idMandamiento) {
-            $query->where('mandamiento.id', $idMandamiento);
+            if ($md5Id) {
+                $query->whereRaw('MD5(mandamiento.id) = ?', [$idMandamiento]);
+            } else {
+                $query->where('mandamiento.id', $idMandamiento);
+            }
         }
 
         return $query;

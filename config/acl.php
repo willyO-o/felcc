@@ -1,0 +1,71 @@
+<?php
+
+return [
+    'permissions' => [
+        'superadmin' => [
+            'users_all',
+            'mandamientos_all',
+            'personas_all',
+            'vehiculos_all',
+            'telefonos_all',
+            'imeis_all',
+            'importar_all',
+            'consulta_all',
+            'registro-criminal_all',
+            'reporte_all',
+        ],
+        'administrador' => [
+            'users_all',
+            'mandamientos_all',
+            'personas_all',
+            'vehiculos_all',
+            'telefonos_all',
+            'imeis_all',
+            'importar_all',
+            'consulta_all',
+            'registro-criminal_all',
+            'reporte_all',
+        ],
+        'tecnico_felcc' => [
+            'consulta_mandamientos',
+            'personas_crear',
+            'mandamientos_crear',
+            'mandamientos_edit',
+        ],
+        'tecnico_daci' => [
+            'registro-criminal_crear',
+            'registro-criminal_listar',
+            'registro-criminal_editar',
+            'personas_crear',
+            'personas_listar',
+            'personas_editar',
+            'mandamientos_listar',
+            'mandamientos_crear',
+            'mandamientos_edit',
+            'vehiculos_listar',
+            'vehiculos_crear',
+            'vehiculos_vincular',
+            'vehiculos_editar',
+            'telefonos_listar',
+            'telefonos_crear',
+            'telefonos_editar',
+            'imeis_listar',
+            'imeis_crear',
+            'imeis_editar',
+            'consulta_mandamientos',
+            'consulta_registro-criminal',
+
+        ],
+        'consultor_felcc' => [
+            'consulta_mandamientos',
+        ],
+        'consultor_daci' => [
+            'consulta_mandamientos',
+            'consulta_personas',
+
+            'consulta_registro-criminal',
+            'consulta_vehiculos',
+            'consulta_telefonos',
+        ],
+    ],
+];
