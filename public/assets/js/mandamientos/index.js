@@ -408,7 +408,17 @@
 
         }).fail(function (xhr) {
             console.error('Error:', xhr);
-            processError(xhr);
+            const mensajes = {
+                0: 'No se pudo conectar con el servidor. Verifique su conexión e intente nuevamente.',
+                401: 'Su sesión expiró. Recargue la página e inicie sesión nuevamente.',
+                413: 'Los archivos adjuntos son demasiado pesados. Reduzca su tamaño e intente nuevamente.',
+                419: 'Su sesión expiró. Recargue la página e intente nuevamente.'
+            };
+            if (mensajes[xhr.status]) {
+                Swal.fire({ title: 'Error', html: mensajes[xhr.status], icon: 'error', confirmButtonText: 'Aceptar' });
+            } else {
+                processError(xhr);
+            }
         }).always(function () {
             boton.prop('disabled', false).find('i').removeClass('fa-solid fa-spinner fa-spin').addClass('ri-save-line');
         })

@@ -24,5 +24,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(\App\Http\Middleware\EnsureUserIsActive::class);
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        //
+        // Por defecto Laravel no registra el 413 (archivo demasiado grande); se necesita para diagnosticar subidas.
+        $exceptions->stopIgnoring(\Illuminate\Http\Exceptions\PostTooLargeException::class);
+
+        // Toda excepción registrada incluye quién y desde dónde ocurrió.
+        $exceptions->context(fn () => [
+            'usuario_id' => auth()->id(),
+            'url' => request()->fullUrl(),
+            'metodo' => request()->method(),
+            'ip' => request()->ip(),
+        ]);
     })->create();

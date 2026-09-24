@@ -8,6 +8,7 @@ use App\Models\Multimedia;
 use App\Models\TipoMandamiento;
 use App\Models\AuditarConsultas;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class MandamientoController extends Controller
@@ -65,6 +66,8 @@ class MandamientoController extends Controller
         $request->validate(Mandamiento::$rules);
 
 
+        $archivosGuardados = [];
+
         try {
 
             DB::beginTransaction();
@@ -83,6 +86,7 @@ class MandamientoController extends Controller
                 if (!Storage::disk('public')->exists($directorio . '/' . $nombreArchivo)) {
                     throw new \Exception('Error al guardar la imagen del mandamiento.');
                 }
+                $archivosGuardados[] = $ruta;
                 $multimedia = Multimedia::create([
                     'tipo' => 'mandamiento',
                     'ruta' => $ruta,
@@ -101,6 +105,7 @@ class MandamientoController extends Controller
                 if (!Storage::disk('public')->exists($directorioActa . '/' . $nombreArchivoActa)) {
                     throw new \Exception('Error al guardar el acta de ejecución.');
                 }
+                $archivosGuardados[] = $rutaActa;
                 $multimediaActa = Multimedia::create([
                     'tipo' => 'acta_ejecucion',
                     'ruta' => $rutaActa,
@@ -110,18 +115,31 @@ class MandamientoController extends Controller
                 ]);
             }
 
-
-
             DB::commit();
-            $datos = Mandamiento::getMandamientos([], $mandamiento->id)->first();
-            return response()->json([
-                'success' => 'Mandamiento guardado correctamente.',
-                'datos' => $datos
-            ], 200);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Error al guardar el mandamiento: ' . $e->getMessage()], 500);
+            Storage::disk('public')->delete($archivosGuardados);
+            $this->registrarError('registrar', $e, $request);
+            $mensaje = 'Error al guardar el mandamiento: ' . $e->getMessage();
+            return response()->json(['error' => $mensaje, 'message' => $mensaje], 500);
         }
+
+        // El mandamiento ya está guardado; si falla la consulta no se debe invitar a reintentar (duplicaría el registro).
+        try {
+            $datos = Mandamiento::getMandamientos([], $mandamiento->id)->first();
+            if (!$datos) {
+                throw new \RuntimeException("Mandamiento {$mandamiento->id} guardado pero no recuperable (persona eliminada?).");
+            }
+        } catch (\Throwable $e) {
+            $this->registrarError('consultar tras registrar', $e, $request);
+            $mensaje = 'El mandamiento se guardó, pero no se pudo mostrar. Recargue la página para verlo; no lo registre de nuevo.';
+            return response()->json(['error' => $mensaje, 'message' => $mensaje], 500);
+        }
+
+        return response()->json([
+            'success' => 'Mandamiento guardado correctamente.',
+            'datos' => $datos
+        ], 200);
     }
 
     /**
@@ -255,10 +273,40 @@ class MandamientoController extends Controller
                 'success' => 'Mandamiento actualizado correctamente.',
                 'datos' => $datos
             ], 200);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
-            return response()->json(['error' => 'Error al actualizar el mandamiento: ' . $e->getMessage()], 500);
+            $this->registrarError('actualizar', $e, $request);
+            $mensaje = 'Error al actualizar el mandamiento: ' . $e->getMessage();
+            return response()->json(['error' => $mensaje, 'message' => $mensaje], 500);
         }
+    }
+
+    /**
+     * Deja en el log el detalle de un error al guardar (sin datos personales ni contenido de archivos).
+     */
+    private function registrarError(string $accion, \Throwable $e, Request $request): void
+    {
+        $archivos = [];
+        foreach (['imagen_mandamiento', 'acta_ejecucion'] as $campo) {
+            $archivo = $request->file($campo);
+            if ($archivo) {
+                $archivos[$campo] = [
+                    'nombre' => $archivo->getClientOriginalName(),
+                    'extension' => $archivo->getClientOriginalExtension(),
+                    'bytes' => $archivo->getSize(),
+                    'valido' => $archivo->isValid(),
+                    'error_subida' => $archivo->isValid() ? null : $archivo->getErrorMessage(),
+                ];
+            }
+        }
+
+        Log::error("Mandamiento: error al {$accion}", [
+            'usuario_id' => auth()->id(),
+            'url' => $request->fullUrl(),
+            'ids' => $request->only(['id_persona', 'id_juzgado', 'id_delito', 'id_tipo_mandamiento', 'estado']),
+            'archivos' => $archivos,
+            'exception' => $e,
+        ]);
     }
 
     /**

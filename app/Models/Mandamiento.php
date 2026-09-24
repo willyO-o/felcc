@@ -41,6 +41,8 @@ class Mandamiento extends Model implements AuditableContract
 
 
     static $rules = [
+        'hoja_ruta' => 'nullable|string|max:100',
+        'telefono' => 'nullable|string|max:150',
         'estado' => 'required|string|max:200',
         'id_juzgado' => 'required|exists:juzgado,id',
         'id_delito' => 'required|exists:delito,id',
@@ -51,7 +53,8 @@ class Mandamiento extends Model implements AuditableContract
         'tipo_documento' => 'nullable|string|max:255',
         'asignado' => 'nullable|string|max:255',
         'ejecutado_por' => 'nullable|required_if:estado,EJECUTADO|string|max:200',
-        'acta_ejecucion'=> 'nullable|file|mimes:jpg,jpeg,png,webp,pdf|max:2048',
+        'imagen_mandamiento' => 'nullable|file|mimes:jpg,jpeg,png,webp,pdf|max:5120',
+        'acta_ejecucion'=> 'nullable|file|mimes:jpg,jpeg,png,webp,pdf|max:5120',
     ];
 
     /**
